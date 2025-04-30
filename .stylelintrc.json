@@ -1,0 +1,14 @@
+{
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-config-standard-scss",
+    "stylelint-config-clean-order"
+  ],
+  "rules": {
+    "value-keyword-case": "lower",
+    "selector-class-pattern": null,
+    "import-notation": "string",
+    "scss/load-partial-extension": "always"
+  },
+  "ignoreFiles": ["dist/**/*", "node_modules/"]
+}
