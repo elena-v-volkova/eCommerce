@@ -25,7 +25,7 @@ export default [
     languageOptions: {
       parser: eslintParserTypescript,
       parserOptions: {
-        project: './tsconfig.eslint.json',
+        project: './tsconfig.json',
         sourceType: 'module',
       },
     },
@@ -90,7 +90,7 @@ export default [
       'import/resolver': {
         typescript: {
           alwaysTryTypes: true,
-          project: ['./tsconfig.json', './tsconfig.eslint.json'],
+          project: ['./tsconfig.json'],
         },
       },
     },
