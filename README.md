@@ -30,6 +30,58 @@ In this project, our team of three people including the team leader works togeth
 18. react-helmet
 19. tailwindcss
 
+## Getting Started
+
+To get started with this project, follow these steps:
+
+1. Clone this repository to your local machine:
+
+```bash
+git clone https://github.com/elena-v-volkova/eCommerce.git
+```
+
+2. Switch to development branch:
+
+```bash
+git checkout develop
+```
+
+3. Install the required dependencies.
+
+```bash
+npm install
+```
+
+## Available Scripts
+
+In the project directory, you can run:
+
+### Development:
+
+| Command           | Description                                 |
+| ----------------- | ------------------------------------------- |
+| `npm run prepare` | Bind husky hooks                            |
+| `npm run dev`     | Starts dev server at http://localhost:5173/ |
+| `npm run build`   | Build for production                        |
+| `npm run preview` | Locally preview production build            |
+
+### Linter Scripts:
+
+| Command                | Description                                | Fix errors command      |
+| ---------------------- | ------------------------------------------ | ----------------------- |
+| `npm run lint`         | ESLint check code to quickly find problems | `npm run lint:fix`      |
+| `npm run format:check` | Prettier check code format style           | `npm run format`        |
+| `npm run stylelint`    | Check CSS-like languages                   | `npm run stylelint:fix` |
+
+### Test Scripts:
+
+| Command            | Description                 |
+| ------------------ | --------------------------- |
+| `npm run test`     | Run Vitest tests            |
+| `npm run coverage` | Show details tests coverage |
+
+---
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

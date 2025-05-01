@@ -1,0 +1,116 @@
+import { RuleConfigSeverity } from '@commitlint/types';
+
+export default {
+  extends: ['@commitlint/config-conventional'],
+  parserPreset: 'conventional-changelog-atom',
+  formatter: '@commitlint/format',
+  rules: {
+    'body-leading-blank': [RuleConfigSeverity.Warning, 'always'],
+    'body-max-line-length': [RuleConfigSeverity.Error, 'always', 100],
+    'footer-leading-blank': [RuleConfigSeverity.Warning, 'always'],
+    'footer-max-line-length': [RuleConfigSeverity.Error, 'always', 100],
+    'header-max-length': [RuleConfigSeverity.Error, 'always', 100],
+    'header-trim': [RuleConfigSeverity.Error, 'always'],
+    'subject-case': [
+      RuleConfigSeverity.Error,
+      'never',
+      ['sentence-case', 'start-case', 'pascal-case', 'upper-case'],
+    ],
+    'subject-empty': [RuleConfigSeverity.Error, 'never'],
+    'subject-full-stop': [RuleConfigSeverity.Error, 'never', '.'],
+    'type-case': [RuleConfigSeverity.Error, 'always', 'lower-case'],
+    'type-empty': [RuleConfigSeverity.Error, 'never'],
+    'type-enum': [
+      RuleConfigSeverity.Error,
+      'always',
+      [
+        'build',
+        'chore',
+        'ci',
+        'docs',
+        'feat',
+        'fix',
+        'perf',
+        'refactor',
+        'revert',
+        'style',
+        'test',
+      ],
+    ],
+  },
+  prompt: {
+    questions: {
+      type: {
+        description: "Select the type of change that you're committing",
+        enum: {
+          feat: {
+            description: 'A new feature',
+            title: 'Features',
+            emoji: '✨',
+          },
+          fix: { description: 'A bug fix', title: 'Bug Fixes', emoji: '🐛' },
+          docs: {
+            description: 'Documentation only changes',
+            title: 'Documentation',
+            emoji: '📚',
+          },
+          style: {
+            description: 'Code style changes (formatting, etc.)',
+            title: 'Styles',
+            emoji: '💎',
+          },
+          refactor: {
+            description: 'Code refactoring (no feature or fix)',
+            title: 'Refactoring',
+            emoji: '📦',
+          },
+          perf: {
+            description: 'Performance improvements',
+            title: 'Performance',
+            emoji: '🚀',
+          },
+          test: {
+            description: 'Adding or correcting tests',
+            title: 'Tests',
+            emoji: '🚨',
+          },
+          build: {
+            description: 'Build system or dependencies changes',
+            title: 'Builds',
+            emoji: '🛠',
+          },
+          ci: {
+            description: 'CI configuration changes',
+            title: 'Continuous Integration',
+            emoji: '⚙️',
+          },
+          chore: {
+            description: "Other changes that don't modify src or test files",
+            title: 'Chores',
+            emoji: '♻️',
+          },
+          revert: {
+            description: 'Reverting a previous commit',
+            title: 'Reverts',
+            emoji: '🗑',
+          },
+        },
+      },
+      scope: {
+        description: 'Scope of this change (e.g. component or file name)',
+      },
+      subject: { description: 'Write a short description of the change' },
+      body: { description: 'Provide a longer description of the change' },
+      isBreaking: { description: 'Are there any breaking changes?' },
+      breakingBody: {
+        description: 'A breaking change requires a detailed explanation',
+      },
+      breaking: { description: 'Describe the breaking changes' },
+      isIssueAffected: {
+        description: 'Does this change affect any open issues?',
+      },
+      issuesBody: { description: 'If issues are closed, provide more details' },
+      issues: { description: 'Add issue references (e.g. "fix #123")' },
+    },
+  },
+};
