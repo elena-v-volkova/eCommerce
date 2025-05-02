@@ -8,7 +8,13 @@
     "value-keyword-case": "lower",
     "selector-class-pattern": null,
     "import-notation": "string",
-    "scss/load-partial-extension": "always"
+    "scss/load-partial-extension": "always",
+    "scss/at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": ["tailwind", "apply", "layer", "config", "screen"]
+      }
+    ]
   },
   "ignoreFiles": ["dist/**/*", "node_modules/"]
 }

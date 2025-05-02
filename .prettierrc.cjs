@@ -5,4 +5,6 @@ module.exports = {
   printWidth: 120,
   singleQuote: true,
   endOfLine: "auto",
+  plugins: ["prettier-plugin-tailwindcss"],
+  tailwindConfig: './tailwind.config.js',
 };
