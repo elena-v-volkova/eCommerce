@@ -30,6 +30,29 @@ In this project, our team of three people including the team leader works togeth
 18. react-helmet
 19. tailwindcss
 
+## Server
+
+To integrate with the [commercetools](https://commercetools.com/) platform:
+
+1. **Create a commercetools Account**
+   Register at [commercetools.com](https://commercetools.com/).
+
+2. **Create a Project**
+   Set up a new commercial project to access the platform API.
+   Refer to the [official documentation](https://docs.commercetools.com/docs) for guidance.
+
+3. **Configure Project Settings**
+   In the [Merchant Center](https://docs.commercetools.com/merchant-center), set up:
+
+   - Authorization (API clients)
+   - Currencies
+   - Languages
+   - Other relevant configurations
+
+4. **Update `.env` File**
+   Once your project is configured, you will receive the required API credentials.
+   Add them to the `.env` file of the [client application](#getting-started).
+
 ## Getting Started
 
 To get started with this project, follow these steps:
@@ -51,6 +74,19 @@ git checkout develop
 ```bash
 npm install
 ```
+
+4. Replace in the `.env.example` file the data for API access obtained when setting up the configuration in [Merchant Center](https://docs.commercetools.com/merchant-center).
+
+```js
+VITE_CTP_PROJECT_KEY=name-project
+VITE_CTP_CLIENT_ID=string
+VITE_CTP_CLIENT_SECRET=string
+VITE_CTP_SCOPES=manage_project:name-project
+VITE_CTP_API_URL=https://api.us-central1.gcp.commercetools.com
+VITE_CTP_AUTH_URL=https://auth.us-central1.gcp.commercetools.com
+```
+
+5. Remove the `.example` prefix for the `.env` file in the root project directory..
 
 For each task, create a **new branch** from the `develop` branch, make the changes, and create a pull request to merge the changes back into the `develop` branch after a code review.<br>Multiple issues can be combined into a single pull request. 🔄
 
