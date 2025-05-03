@@ -8,9 +8,11 @@ import importPlugin from 'eslint-plugin-import';
 import css from 'eslint-plugin-css';
 import stylistic from '@stylistic/eslint-plugin';
 import unicorn from 'eslint-plugin-unicorn';
+import tailwindcss from "eslint-plugin-tailwindcss";
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
+  ...tailwindcss.configs["flat/recommended"],
   {
     ignores: [
       '.config/',
@@ -25,7 +27,7 @@ export default [
     languageOptions: {
       parser: eslintParserTypescript,
       parserOptions: {
-        project: './tsconfig.eslint.json',
+        project: './tsconfig.json',
         sourceType: 'module',
       },
     },
@@ -39,6 +41,7 @@ export default [
       css,
       '@stylistic': stylistic,
       unicorn,
+      tailwindcss
     },
     rules: {
       'prettier/prettier': 'error',
@@ -90,8 +93,26 @@ export default [
       'import/resolver': {
         typescript: {
           alwaysTryTypes: true,
-          project: ['./tsconfig.json', './tsconfig.eslint.json'],
+          project: ['./tsconfig.json'],
         },
+      },
+      tailwindcss: {
+        // These are the default values but feel free to customize
+        callees: ["classnames", "clsx", "ctl"],
+        config: "tailwind.config.js", // returned from `loadConfig()` utility if not provided
+        cssFiles: [
+          "**/*.css",
+          "!**/node_modules",
+          "!**/.*",
+          "!**/dist",
+          "!**/build",
+        ],
+        cssFilesRefreshRate: 5_000,
+        removeDuplicates: true,
+        skipClassAttribute: false,
+        whitelist: [],
+        tags: [], // can be set to e.g. ['tw'] for use in tw`bg-blue`
+        classRegex: "^class(Name)?$", // can be modified to support custom attributes. E.g. "^tw$" for `twin.macro`
       },
     },
   },
