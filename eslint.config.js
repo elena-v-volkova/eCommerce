@@ -26,6 +26,9 @@ export default defineConfig([
         {
           'src/**/*.{scss,css}*': 'PASCAL_CASE',
         },
+        {
+          ignoreMiddleExtensions: true,
+        },
       ],
 
     },
