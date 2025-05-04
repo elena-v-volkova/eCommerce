@@ -4,6 +4,7 @@ import tsParser from '@typescript-eslint/parser';
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 import checkFile from 'eslint-plugin-check-file';
 import css from "@eslint/css";
+
 import { fileURLToPath } from 'url';
 import path from 'path';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -13,25 +14,24 @@ export default defineConfig([
     ignores: ['**/*.d.ts', '**/index.*', '**/*.gitkeep', '**/main.tsx',],
   },
   {
-    files: ['src/**/*.*'],
-    ignores: ['**/*.{ts,tsx}'],
+    files: ['src/**/*.{scss,css}'],
     language: "css/css",
     plugins: {
       'check-file': checkFile,
-      css
+      css,
     },
     rules: {
       'check-file/filename-naming-convention': [
         'error',
         {
-          'src/**/*.*': 'PASCAL_CASE',
+          'src/**/*.{scss,css}*': 'PASCAL_CASE',
         },
       ],
+
     },
   },
   {
-    files: ['src/**/*.{ts,tsx}'],
-    ignores: ['*.css', '*.scss'],
+    files: ['src/**/*.tsx'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -53,7 +53,7 @@ export default defineConfig([
     },
   },
   {
-    files: ['src**/*.ts', 'src**/*.tsx'],
+    files: ['src/**/*.ts'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -64,8 +64,15 @@ export default defineConfig([
     },
     plugins: {
       '@typescript-eslint': tsPlugin,
+      unicorn: eslintPluginUnicorn,
     },
     rules: {
+      'unicorn/filename-case': [
+        'error',
+        {
+          case: 'camelCase',
+        },
+      ],
       '@typescript-eslint/naming-convention': [
         'error',
         {
