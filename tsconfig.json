@@ -28,7 +28,7 @@
     "noImplicitAny": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src/**/*", "vite.config.ts", "*.d.ts", "commitlint.config.mjs"],
+  "include": ["src/**/*", "vite.config.ts", "*.d.ts", "commitlint.config.mjs", "*.tsx"],
   "exclude": ["node_modules", "dist"],
   "import/no-unresolved": ["error", { "caseSensitive": true }]
 }
