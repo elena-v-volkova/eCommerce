@@ -6,15 +6,35 @@
   ],
   "rules": {
     "value-keyword-case": "lower",
-    "selector-class-pattern": null,
+    "selector-class-pattern": [
+      "^[a-z][a-zA-Z0-9]*(_[a-z][a-zA-Z0-9]*){0,1}$",
+      {
+        "resolveNestedSelectors": true
+      }
+    ],
+    "selector-pseudo-class-no-unknown": [
+      true,
+      {
+        "ignorePseudoClasses": []
+      }
+    ],
     "import-notation": "string",
     "scss/load-partial-extension": "always",
     "scss/at-rule-no-unknown": [
       true,
       {
-        "ignoreAtRules": ["tailwind", "apply", "layer", "config", "screen"]
+        "ignoreAtRules": [
+          "tailwind",
+          "apply",
+          "layer",
+          "config",
+          "screen"
+        ]
       }
     ]
   },
-  "ignoreFiles": ["dist/**/*", "node_modules/"]
+  "ignoreFiles": [
+    "dist/**/*",
+    "node_modules/"
+  ]
 }
