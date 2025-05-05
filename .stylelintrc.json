@@ -6,10 +6,12 @@
   ],
   "rules": {
     "value-keyword-case": "lower",
+    "selector-type-case": "lower",
     "selector-class-pattern": [
-      "^[a-z][a-zA-Z0-9]*(_[a-z][a-zA-Z0-9]*){0,1}$",
+      "^[a-z][a-z0-9]*(_[a-z][a-z0-9]*){0,1}$",
       {
-        "resolveNestedSelectors": true
+        "resolveNestedSelectors": true,
+        "message": "Expected \"%s\" to match pattern snake_case"
       }
     ],
     "selector-pseudo-class-no-unknown": [
