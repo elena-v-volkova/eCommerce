@@ -4,12 +4,16 @@ import tsParser from '@typescript-eslint/parser';
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 import checkFile from 'eslint-plugin-check-file';
 import css from "@eslint/css";
+import { globalIgnores } from "eslint/config";
 
 import { fileURLToPath } from 'url';
 import path from 'path';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig([
+  globalIgnores([
+    "globals.css",
+  ]),
   {
     ignores: ['**/*.d.ts', '**/index.*', '**/*.gitkeep', '**/main.tsx',],
   },
