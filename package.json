@@ -22,7 +22,9 @@
     "@commercetools/sdk-client-v2": "^3.0.0",
     "@commercetools/ts-client": "^3.3.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-router": "^7.5.3",
+    "react-router-dom": "^7.5.3"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.0",
@@ -56,6 +58,7 @@
     "husky": "^9.1.7",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
+    "sass-embedded": "^1.87.0",
     "stylelint": "^16.19.1",
     "stylelint-config-clean-order": "^7.0.0",
     "stylelint-config-standard": "^38.0.0",

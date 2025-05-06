@@ -10,6 +10,7 @@ export default defineConfig({
   base: '/',
   server: {
     open: '/',
+    hmr: true
   },
   root: './src/',
   css: {

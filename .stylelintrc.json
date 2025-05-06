@@ -6,15 +6,37 @@
   ],
   "rules": {
     "value-keyword-case": "lower",
-    "selector-class-pattern": null,
+    "selector-type-case": "lower",
+    "selector-class-pattern": [
+      "^[a-z][a-z0-9]*(_[a-z][a-z0-9]*){0,1}$",
+      {
+        "resolveNestedSelectors": true,
+        "message": "Expected \"%s\" to match pattern snake_case"
+      }
+    ],
+    "selector-pseudo-class-no-unknown": [
+      true,
+      {
+        "ignorePseudoClasses": []
+      }
+    ],
     "import-notation": "string",
     "scss/load-partial-extension": "always",
     "scss/at-rule-no-unknown": [
       true,
       {
-        "ignoreAtRules": ["tailwind", "apply", "layer", "config", "screen"]
+        "ignoreAtRules": [
+          "tailwind",
+          "apply",
+          "layer",
+          "config",
+          "screen"
+        ]
       }
     ]
   },
-  "ignoreFiles": ["dist/**/*", "node_modules/"]
+  "ignoreFiles": [
+    "dist/**/*",
+    "node_modules/"
+  ]
 }

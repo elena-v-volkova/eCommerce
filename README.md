@@ -20,7 +20,7 @@ In this project, our team of three people including the team leader works togeth
 8. Zod
 9. Swiper js
 10. React toast
-11. Redux toolkid
+11. Redux toolkit
 12. axios
 13. React Spring
 14. Jira
