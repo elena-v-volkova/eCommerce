@@ -1,4 +1,3 @@
-import styles from './Home.module.scss';
 import { Link } from '@heroui/link';
 import { Snippet } from '@heroui/snippet';
 import { Code } from '@heroui/code';
@@ -17,8 +16,12 @@ function Home() {
           <span className={TITLE()}>Make&nbsp;</span>
           <span className={TITLE({ color: 'violet' })}>beautiful&nbsp;</span>
           <br />
-          <span className={TITLE()}>websites regardless of your design experience.</span>
-          <div className={SUBTITLE({ class: 'mt-4' })}>Beautiful, fast and modern React UI library.</div>
+          <span className={TITLE()}>
+            websites regardless of your design experience.
+          </span>
+          <div className={SUBTITLE({ class: 'mt-4' })}>
+            Beautiful, fast and modern React UI library.
+          </div>
         </div>
 
         <div className="flex gap-3">

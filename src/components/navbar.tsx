@@ -16,7 +16,13 @@ import clsx from 'clsx';
 
 import { SITE_CONFIG } from '@/config/site';
 import { ThemeSwitch } from '@/components/ThemeSwitch';
-import { TwitterIcon, GithubIcon, DiscordIcon, HeartFilledIcon, SearchIcon } from '@/components/Icons';
+import {
+  TwitterIcon,
+  GithubIcon,
+  DiscordIcon,
+  HeartFilledIcon,
+  SearchIcon,
+} from '@/components/Icons';
 import { Logo } from '@/components/Icons';
 
 export const Navbar = () => {
@@ -34,7 +40,9 @@ export const Navbar = () => {
       }
       labelPlacement="outside"
       placeholder="Search..."
-      startContent={<SearchIcon className="pointer-events-none flex-shrink-0 text-base text-default-400" />}
+      startContent={
+        <SearchIcon className="pointer-events-none shrink-0 text-base text-default-400" />
+      }
       type="search"
     />
   );
@@ -43,7 +51,11 @@ export const Navbar = () => {
     <HeroUINavbar maxWidth="xl" position="sticky">
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand className="max-w-fit gap-3">
-          <Link className="flex items-center justify-start gap-1" color="foreground" href="/">
+          <Link
+            className="flex items-center justify-start gap-1"
+            color="foreground"
+            href="/"
+          >
             <Logo />
             <p className="font-bold text-inherit">ACME</p>
           </Link>
@@ -54,7 +66,7 @@ export const Navbar = () => {
               <Link
                 className={clsx(
                   linkStyles({ color: 'foreground' }),
-                  'data-[active=true]:font-medium data-[active=true]:text-primary'
+                  'data-[active=true]:font-medium data-[active=true]:text-primary',
                 )}
                 color="foreground"
                 href={item.href}
@@ -66,7 +78,10 @@ export const Navbar = () => {
         </div>
       </NavbarContent>
 
-      <NavbarContent className="hidden basis-1/5 sm:flex sm:basis-full" justify="end">
+      <NavbarContent
+        className="hidden basis-1/5 sm:flex sm:basis-full"
+        justify="end"
+      >
         <NavbarItem className="hidden gap-2 sm:flex">
           <Link isExternal href={SITE_CONFIG.links.twitter} title="Twitter">
             <TwitterIcon className="text-default-500" />
@@ -109,7 +124,11 @@ export const Navbar = () => {
             <NavbarMenuItem key={`${item}-${index}`}>
               <Link
                 color={
-                  index === 2 ? 'primary' : index === SITE_CONFIG.navMenuItems.length - 1 ? 'danger' : 'foreground'
+                  index === 2
+                    ? 'primary'
+                    : index === SITE_CONFIG.navMenuItems.length - 1
+                      ? 'danger'
+                      : 'foreground'
                 }
                 href="#"
                 size="lg"

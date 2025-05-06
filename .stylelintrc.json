@@ -2,7 +2,8 @@
   "extends": [
     "stylelint-config-standard",
     "stylelint-config-standard-scss",
-    "stylelint-config-clean-order"
+    "stylelint-config-clean-order",
+    "stylelint-config-tailwindcss"
   ],
   "rules": {
     "value-keyword-case": "lower",
@@ -17,17 +18,40 @@
     "selector-pseudo-class-no-unknown": [
       true,
       {
-        "ignorePseudoClasses": []
+        "ignorePseudoClasses": [
+          "global",
+          "local",
+          "export"
+        ]
       }
     ],
     "import-notation": "string",
+    "at-rule-no-deprecated": null,
+    "at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": [
+          "apply",
+          "variants",
+          "responsive",
+          "apply",
+          "tailwind",
+          "layer",
+          "config",
+          "screen"
+        ]
+      }
+    ],
     "scss/load-partial-extension": "always",
     "scss/at-rule-no-unknown": [
       true,
       {
         "ignoreAtRules": [
-          "tailwind",
           "apply",
+          "variants",
+          "responsive",
+          "apply",
+          "tailwind",
           "layer",
           "config",
           "screen"

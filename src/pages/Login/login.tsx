@@ -1,5 +1,6 @@
-import DefaultLayout from '@/layouts/Default';
 import styles from './Login.module.scss';
+
+import DefaultLayout from '@/layouts/Default';
 
 function Login() {
   return (

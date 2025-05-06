@@ -1,20 +1,20 @@
 import { Routes, Route } from 'react-router';
-import './App.css';
+
 import Layout from './components/layout/RootLayout';
-import NotFound from './pages/404/NotFound';
-import Home from './pages/Home/home';
-import Login from './pages/Login/Login';
-import Register from './pages/Register/register';
 import { AppRoute } from './routes/appRoutes';
+import NotFound from './pages/404/NotFound';
+import Home from './pages/Home/Home';
+import Login from './pages/Login/Login';
+import Register from './pages/Register/Register';
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route path={AppRoute.home} element={<Home />} />
-        <Route path={AppRoute.login} element={<Login />} />
-        <Route path={AppRoute.register} element={<Register />} />
-        <Route path={AppRoute.notFound} element={<NotFound />} />
+      <Route element={<Layout />} path="/">
+        <Route element={<Home />} path={AppRoute.home} />
+        <Route element={<Login />} path={AppRoute.login} />
+        <Route element={<Register />} path={AppRoute.register} />
+        <Route element={<NotFound />} path={AppRoute.notFound} />
       </Route>
     </Routes>
   );

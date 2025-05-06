@@ -3,7 +3,6 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router';
 import App from './App.tsx';
 import { Provider } from './Provider.tsx';
-import '@/styles/globals.css';
 import './index.css';
 
 createRoot(document.body).render(
@@ -13,5 +12,5 @@ createRoot(document.body).render(
         <App />
       </Provider>
     </BrowserRouter>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

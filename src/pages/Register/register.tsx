@@ -1,5 +1,6 @@
-import DefaultLayout from '@/layouts/Default';
 import styles from './Register.module.scss';
+
+import DefaultLayout from '@/layouts/Default';
 
 function Register() {
   return (
