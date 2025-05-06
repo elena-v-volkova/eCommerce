@@ -29,6 +29,7 @@ In this project, our team of three people including the team leader works togeth
 17. react-i18next
 18. react-helmet
 19. tailwindcss
+20. HeroUI
 
 ## Server
 
@@ -87,6 +88,13 @@ VITE_CTP_AUTH_URL=https://auth.us-central1.gcp.commercetools.com
 ```
 
 5. Remove the `.example` prefix for the `.env` file in the root project directory..
+
+**_To add graphic components use the library [HeroUI](https://www.heroui.com/). For detailed information follow the [link](https://www.heroui.com/docs/guide/introduction)_**
+
+```js
+// Example
+npx heroui-cli add button
+```
 
 For each task, create a **new branch** from the `develop` branch, make the changes, and create a pull request to merge the changes back into the `develop` branch after a code review.<br>Multiple issues can be combined into a single pull request. 🔄
 
