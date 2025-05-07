@@ -1,11 +1,11 @@
 import { Routes, Route } from 'react-router';
 
 import Layout from './components/layout/RootLayout';
-import { AppRoute } from './routes/appRoutes';
 import NotFound from './pages/404/NotFound';
-import Home from './pages/Home/Home';
-import Login from './pages/Login/Login';
-import Register from './pages/Register/Register';
+import Home from './pages/Home/HomePage';
+import Login from './pages/Login/LoginPage';
+import Register from './pages/Register/RegisterPage';
+import { AppRoute } from './routes/appRoutes';
 
 function App() {
   return (
