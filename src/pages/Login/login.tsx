@@ -1,10 +1,14 @@
 import styles from './Login.module.scss';
 
+import DefaultLayout from '@/layouts/Default';
+
 function Login() {
   return (
-    <div className={styles.login}>
-      <h1>Login Page</h1>
-    </div>
+    <DefaultLayout>
+      <div className={styles.login}>
+        <h1>Login Page</h1>
+      </div>
+    </DefaultLayout>
   );
 }
 

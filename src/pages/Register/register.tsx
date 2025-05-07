@@ -1,10 +1,14 @@
 import styles from './Register.module.scss';
 
+import DefaultLayout from '@/layouts/Default';
+
 function Register() {
   return (
-    <div className={styles.register}>
-      <h1>Register Page</h1>
-    </div>
+    <DefaultLayout>
+      <div className={styles.register}>
+        <h1>Register Page</h1>
+      </div>
+    </DefaultLayout>
   );
 }
 

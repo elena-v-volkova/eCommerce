@@ -1,27 +1,22 @@
-import { BrowserRouter, Routes, Route } from 'react-router';
-import './App.css';
-import NotFound from './pages/404/NotFound';
+import { Routes, Route } from 'react-router';
+
 import Layout from './components/layout/RootLayout';
+import { AppRoute } from './routes/appRoutes';
+import NotFound from './pages/404/NotFound';
+import Home from './pages/Home/Home';
 import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
-import Home from './pages/Home/Home';
-import { AppRoute } from './routes/appRoutes';
 
 function App() {
   return (
-    <div id="root">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route path={AppRoute.home} element={<Home />} />
-            <Route path={AppRoute.login} element={<Login />} />
-            <Route path={AppRoute.register} element={<Register />} />
-            <Route path={AppRoute.notFound} element={<NotFound />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </div>
+    <Routes>
+      <Route element={<Layout />} path="/">
+        <Route element={<Home />} path={AppRoute.home} />
+        <Route element={<Login />} path={AppRoute.login} />
+        <Route element={<Register />} path={AppRoute.register} />
+        <Route element={<NotFound />} path={AppRoute.notFound} />
+      </Route>
+    </Routes>
   );
 }
-
 export default App;
