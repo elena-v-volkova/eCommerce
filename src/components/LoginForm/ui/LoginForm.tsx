@@ -10,7 +10,7 @@ import useLogin from '../hooks/useLogin';
 
 import styles from './LoginForm.module.scss';
 
-import { AppRoute } from '@/routes/AppRoutes';
+import { AppRoute } from '@/routes/appRoutes';
 import DefaultLayout from '@/layouts/Default';
 
 const LoginForm = () => {
@@ -23,8 +23,10 @@ const LoginForm = () => {
     resolver: zodResolver(LOGIN_SCHEMA),
   });
 
-  const onSubmitLoginForm = async () => {
-    console.log('asdass');
+  const { user, isLoading, error, fetchUser } = useLogin();
+
+  const onSubmitLoginForm = async (data: TFormFiledsSchema) => {
+    fetchUser(data);
   };
 
   return (
@@ -38,13 +40,10 @@ const LoginForm = () => {
             label="Email"
             labelPlacement="outside"
             placeholder="Enter your email"
-            {...register('email')}
-            isInvalid={false}
             type="email"
+            {...register('email')}
           />
-          {errors.email && (
-            <p className="text-sm text-red-500">{errors.email.message}</p>
-          )}
+
           <NavLink
             className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
             to="#"
@@ -56,11 +55,10 @@ const LoginForm = () => {
             labelPlacement="outside"
             placeholder="Enter your password"
             {...register('password')}
+            errorMessage={errors.password?.message}
+            isInvalid={errors.password?.message ? true : false}
             type="password"
           />
-          {errors.password && (
-            <p className="text-sm text-red-500">{errors.password.message}</p>
-          )}
           <div className="flex gap-2">
             <Button color="primary" type="submit">
               Login

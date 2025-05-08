@@ -5,7 +5,7 @@ import NotFound from './pages/404/NotFound';
 import Home from './pages/Home/HomePage';
 import Login from './pages/Login/LoginPage';
 import Register from './pages/Register/RegisterPage';
-import { AppRoute } from './routes/appRoutes';
+import { AppRoute } from '@/routes/appRoutes';
 
 function App() {
   return (

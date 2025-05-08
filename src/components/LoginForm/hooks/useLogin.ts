@@ -24,7 +24,6 @@ const useLogin = () => {
     setIsLoading(true);
     setError(null);
     if (!email && !password) return;
-
     try {
       const loginClient = createPasswordFlowClient(email, password);
       const response = await loginClient

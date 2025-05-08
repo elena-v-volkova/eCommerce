@@ -12,6 +12,9 @@ export const authUrl = import.meta.env.VITE_CTP_AUTH_URL;
 export const apiUrl = import.meta.env.VITE_CTP_API_URL;
 export const scopes = (import.meta.env.VITE_CTP_SCOPES || '').split(',');
 
+console.log(import.meta.env);
+console.log(clientSecret);
+
 export const authMiddlewareOptions: AuthMiddlewareOptions = {
   host: authUrl,
   projectKey,
@@ -26,13 +29,13 @@ export const httpMiddlewareOptions: HttpMiddlewareOptions = {
   host: apiUrl,
 };
 
-export const ctpClient = new ClientBuilder()
-  .withProjectKey(projectKey)
-  .withClientCredentialsFlow(authMiddlewareOptions)
-  .withHttpMiddleware(httpMiddlewareOptions)
-  .withLoggerMiddleware()
-  .build();
+// export const ctpClient = new ClientBuilder()
+//   .withProjectKey(projectKey)
+//   .withClientCredentialsFlow(authMiddlewareOptions)
+//   .withHttpMiddleware(httpMiddlewareOptions)
+//   .withLoggerMiddleware()
+//   .build();
 
-export const apiRoot = createApiBuilderFromCtpClient(ctpClient).withProjectKey({
-  projectKey,
-});
+// export const apiRoot = createApiBuilderFromCtpClient(ctpClient).withProjectKey({
+//   projectKey,
+// });

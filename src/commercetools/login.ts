@@ -28,8 +28,8 @@ type PasswordAuthMiddlewareOptions = {
   fetch?: any;
 };
 
-export function createPasswordFlowClient(username: string, password: string) {
-  if (!username || !password) {
+export function createPasswordFlowClient(email: string, password: string) {
+  if (!email || !password) {
     throw new Error('Username and password are required');
   }
 
@@ -40,7 +40,7 @@ export function createPasswordFlowClient(username: string, password: string) {
       clientId: clientId,
       clientSecret: clientSecret,
       user: {
-        username: username,
+        username: email,
         password: password,
       },
     },
