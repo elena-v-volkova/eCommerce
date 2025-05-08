@@ -10,12 +10,10 @@ import stylistic from '@stylistic/eslint-plugin';
 import unicorn from 'eslint-plugin-unicorn';
 import tailwindcss from "eslint-plugin-tailwindcss";
 
-// import namingConventionConfig from "./eslint.config.js";
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-  ...tailwindcss.configs["flat/recommended"],
-  // ...namingConventionConfig,
+  ...tailwindcss.configs["flat/recommended"], 
   {
     ignores: [
       '.config/',
