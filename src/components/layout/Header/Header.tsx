@@ -1,8 +1,8 @@
 import { NavLink } from 'react-router';
 
-import { AppRoute } from '@/routes/appRoutes';
-
 import styles from './Header.module.scss';
+
+import { AppRoute } from '@/routes/appRoutes';
 
 function Header() {
   return (

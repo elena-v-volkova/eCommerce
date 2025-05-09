@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { CustomerSignInResult } from '@commercetools/platform-sdk';
+import { useNavigate } from 'react-router';
 
 import { createPasswordFlowClient } from '@/commercetools/login';
+import { AppRoute } from '@/routes/appRoutes';
 
 interface LoginError {
   message: string;
@@ -13,7 +15,7 @@ const useLogin = () => {
   const [user, setUser] = useState<CustomerSignInResult | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-
+  const navigate = useNavigate();
   const fetchUser = async ({
     email,
     password,
@@ -37,6 +39,7 @@ const useLogin = () => {
         .execute();
 
       setUser(response.body);
+      navigate(AppRoute.home, { replace: true });
     } catch (err) {
       const loginError = err as LoginError;
       let errorMessage = 'Login failed. Please try again.';

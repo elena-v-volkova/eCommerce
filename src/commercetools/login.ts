@@ -1,7 +1,6 @@
 import { Client, ClientBuilder, TokenCache } from '@commercetools/ts-client';
 import { createApiBuilderFromCtpClient } from '@commercetools/platform-sdk'; // Vor ./buildClient
 
-// import type { ApiRoot } from '@commercetools/ts-client';
 import {
   authUrl,
   clientId,
@@ -45,11 +44,20 @@ export function createPasswordFlowClient(email: string, password: string) {
       },
     },
     scopes: scopes,
+    tokenCache: {
+      get: () => {
+        return JSON.parse(localStorage.getItem('authTokens') || '{}');
+      },
+      set: (tokenData) => {
+        localStorage.setItem('authTokens', JSON.stringify(tokenData));
+      },
+    },
   };
 
   const client: Client = new ClientBuilder()
     .withPasswordFlow(passwordFlowOptions)
     .withHttpMiddleware(httpMiddlewareOptions)
+    // .withLoggerMiddleware()
     .build();
 
   return createApiBuilderFromCtpClient(client).withProjectKey({ projectKey });

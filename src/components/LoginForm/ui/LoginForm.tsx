@@ -6,27 +6,27 @@ import { useForm } from 'react-hook-form';
 import { NavLink } from 'react-router';
 
 import { LOGIN_SCHEMA, TFormFiledsSchema } from '../lib/loginSchema';
-import useLogin from '../hooks/useLogin';
 
 import styles from './LoginForm.module.scss';
 
 import { AppRoute } from '@/routes/appRoutes';
 import DefaultLayout from '@/layouts/Default';
+import { useLoginMutation } from '@/shared/store/loginApi';
 
 const LoginForm = () => {
   const {
     register,
     handleSubmit,
-    setError,
-    formState: { errors, isSubmitting },
+
+    formState: { errors },
   } = useForm<TFormFiledsSchema>({
     resolver: zodResolver(LOGIN_SCHEMA),
   });
 
-  const { user, isLoading, error, fetchUser } = useLogin();
+  const [login, { isLoading, error }] = useLoginMutation();
 
-  const onSubmitLoginForm = async (data: TFormFiledsSchema) => {
-    fetchUser(data);
+  const handleLogin = async (data: TFormFiledsSchema) => {
+    await login(data).unwrap();
   };
 
   return (
@@ -34,7 +34,7 @@ const LoginForm = () => {
       <div className={styles.login}>
         <Form
           className="flex w-full max-w-xs flex-col gap-4"
-          onSubmit={handleSubmit(onSubmitLoginForm)}
+          onSubmit={handleSubmit(handleLogin)}
         >
           <Input
             label="Email"
@@ -60,10 +60,13 @@ const LoginForm = () => {
             type="password"
           />
           <div className="flex gap-2">
-            <Button color="primary" type="submit">
+            <Button color="primary" isLoading={isLoading} type="submit">
               Login
             </Button>
           </div>
+          {/* {error.data && (
+            <p className="text-sm text-red-500">{error.data.message}</p>
+          )} */}
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{' '}
             <NavLink
