@@ -1,13 +1,10 @@
-import styles from './Register.module.scss';
-
+import { RegisterForm } from '@/components/RegisterForm/ui/RegisterForm';
 import DefaultLayout from '@/layouts/Default';
 
 function Register() {
   return (
     <DefaultLayout>
-      <div className={styles.register}>
-        <h1>Register Page</h1>
-      </div>
+      <RegisterForm />
     </DefaultLayout>
   );
 }

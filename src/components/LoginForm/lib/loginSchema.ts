@@ -11,4 +11,4 @@ export const LOGIN_SCHEMA = z.object({
     .regex(/[0-9]/, { message: 'Must contain a number' }),
 });
 
-export type TFormFiledsSchema = z.infer<typeof LOGIN_SCHEMA>;
+export type TLoginFieldsSchema = z.infer<typeof LOGIN_SCHEMA>;
