@@ -1,17 +1,12 @@
 import { DateValue, getLocalTimeZone, today } from '@internationalized/date';
 import { z } from 'zod';
 
-import {
-  COUNTRIES,
-  CountryName,
-  getCountryInfo,
-} from '@/shared/store/countries';
+import { COUNTRIES, getCountryInfo } from '@/shared/store/countries';
 const namePattern = z.string().regex(/^[A-Za-z]+$/, {
   message:
     'Must contain at least one character and no special characters or numbers',
 });
-
-let shippingCountry: CountryName | undefined;
+let shippingCountry: string | undefined = '';
 
 const addressSchema = z.object({
   street: z

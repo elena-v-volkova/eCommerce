@@ -24,9 +24,11 @@ export const RegisterForm = () => {
   });
 
   const onSubmit = (data: TRegisterFieldsSchema) => {
-    console.log('Registration Data:', data);
-  };
+    const result = JSON.parse(JSON.stringify(data));
 
+    result.dateOfBirth = `${data.dateOfBirth.day}/${data.dateOfBirth.month}/${data.dateOfBirth.year}`;
+    console.log(JSON.stringify(result));
+  };
   const [isVisible, setIsVisible] = React.useState(false);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
@@ -40,7 +42,6 @@ export const RegisterForm = () => {
         <div className="col-start-2 row-start-1 flex w-full flex-col justify-end">
           <h4>New user</h4>
           <Input
-            isRequired
             label="Email"
             labelPlacement="outside"
             type="email"
@@ -49,7 +50,6 @@ export const RegisterForm = () => {
             isInvalid={errors.email?.message ? true : false}
           />
           <Input
-            isRequired
             label="Password"
             labelPlacement="outside"
             type={isVisible ? 'text' : 'password'}
@@ -72,7 +72,6 @@ export const RegisterForm = () => {
             isInvalid={errors.password?.message ? true : false}
           />
           <Input
-            isRequired
             label="First name"
             labelPlacement="outside"
             type="text"
@@ -81,7 +80,6 @@ export const RegisterForm = () => {
             isInvalid={errors.firstName?.message ? true : false}
           />
           <Input
-            isRequired
             label="Last name"
             labelPlacement="outside"
             type="text"
@@ -96,7 +94,6 @@ export const RegisterForm = () => {
             render={({ field }) => (
               <I18nProvider locale="en-GB">
                 <DateInput
-                  isRequired
                   {...register('lastName')}
                   errorMessage={errors.dateOfBirth?.message}
                   isInvalid={!!errors.dateOfBirth}
@@ -115,7 +112,6 @@ export const RegisterForm = () => {
         <div className="col-start-1 row-start-1 flex w-full flex-col justify-end">
           <h4 className="mb-2.5">Shipping address</h4>
           <Select
-            isRequired
             className="py-0"
             label="Select Country"
             {...register('address.country')}
@@ -127,7 +123,6 @@ export const RegisterForm = () => {
             ))}
           </Select>
           <Input
-            isRequired
             label="Enter street"
             labelPlacement="outside"
             type="text"
@@ -136,7 +131,6 @@ export const RegisterForm = () => {
             isInvalid={errors.address?.street?.message ? true : false}
           />
           <Input
-            isRequired
             label="Enter city"
             labelPlacement="outside"
             {...register('address.city')}
@@ -144,7 +138,6 @@ export const RegisterForm = () => {
             isInvalid={errors.address?.city?.message ? true : false}
           />
           <Input
-            isRequired
             label="Postal code"
             labelPlacement="outside"
             type="text"
