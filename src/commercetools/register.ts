@@ -1,19 +1,22 @@
-import fetch from 'node-fetch';
+import { createApiBuilderFromCtpClient } from '@commercetools/platform-sdk';
 import {
   ClientBuilder,
   type AuthMiddlewareOptions, // Required for auth
   type HttpMiddlewareOptions, // Required for sending HTTP requests
 } from '@commercetools/ts-client';
-import { createApiBuilderFromCtpClient } from '@commercetools/platform-sdk';
+// import fetch from 'node-fetch';
 
 import {
+  apiUrl,
   authUrl,
   clientId,
   clientSecret,
   projectKey,
-  apiUrl,
   scopes,
 } from './buildClient';
+
+import { CustomerDraft } from '@/types/commercetools';
+import { TRegisterFieldsSchema } from '@/components/RegisterForm/lib/registerSchema';
 
 // Configure authMiddlewareOptions
 const authMiddlewareOptions: AuthMiddlewareOptions = {
@@ -45,15 +48,32 @@ export const apiRoot = createApiBuilderFromCtpClient(ctpClient).withProjectKey({
   projectKey: projectKey,
 });
 
-const createCustomer = () => {
+export async function createCustomer(obj: TRegisterFieldsSchema) {
+  const data = prepareData(obj);
+
   return apiRoot
-    .customers()
+    .me()
+    .signup()
     .post({
-      // The CustomerDraft is the object within the body
-      body: {
-        email: 'sdk@example.com',
-        password: 'examplePassword',
-      },
+      body: data,
     })
     .execute();
-};
+}
+
+export function prepareData(input: TRegisterFieldsSchema): CustomerDraft {
+  const address = {
+    ...input.address,
+    firstName: input.firstName,
+    lastName: input.lastName,
+  };
+
+  return {
+    email: input.email,
+    password: input.password,
+    firstName: input.firstName,
+    lastName: input.lastName,
+    dateOfBirth: input.dateOfBirth.toString(),
+    addresses: [address],
+    defaultShippingAddress: 0,
+  };
+}

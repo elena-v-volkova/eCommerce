@@ -11,7 +11,9 @@ import { REGISTER_SCHEMA, TRegisterFieldsSchema } from '../lib/registerSchema';
 import styles from './Register.module.scss';
 
 import { EyeFilledIcon, EyeSlashFilledIcon } from '@/components/Icons';
-import { COUNTRIES } from '@/shared/store/countries';
+import { COUNTRIES, getCountryInfo } from '@/shared/store/countries';
+import { prepareData } from '@/commercetools/register';
+import { useCreateCustomerMutation } from '@/shared/store/loginApi';
 
 export const RegisterForm = () => {
   const {
@@ -22,12 +24,16 @@ export const RegisterForm = () => {
   } = useForm<TRegisterFieldsSchema>({
     resolver: zodResolver(REGISTER_SCHEMA),
   });
-
-  const onSubmit = (data: TRegisterFieldsSchema) => {
+  const [createCustomer, { isLoading, error }] = useCreateCustomerMutation();
+  const onSubmit = async (data: TRegisterFieldsSchema) => {
     const result = JSON.parse(JSON.stringify(data));
 
-    result.dateOfBirth = `${data.dateOfBirth.day}/${data.dateOfBirth.month}/${data.dateOfBirth.year}`;
-    console.log(JSON.stringify(result));
+    result.dateOfBirth = `${data.dateOfBirth.year}-${String(data.dateOfBirth.month).padStart(2, '0')}-${String(data.dateOfBirth.day).padStart(2, '0')}`;
+    result.address.country = getCountryInfo(data.address.country)?.code;
+    const response = createCustomer(prepareData(result));
+
+    console.log(response);
+    console.log(error);
   };
   const [isVisible, setIsVisible] = React.useState(false);
 
@@ -126,9 +132,9 @@ export const RegisterForm = () => {
             label="Enter street"
             labelPlacement="outside"
             type="text"
-            {...register('address.street')}
-            errorMessage={errors.address?.street?.message}
-            isInvalid={errors.address?.street?.message ? true : false}
+            {...register('address.streetName')}
+            errorMessage={errors.address?.streetName?.message}
+            isInvalid={errors.address?.streetName?.message ? true : false}
           />
           <Input
             label="Enter city"
@@ -150,6 +156,7 @@ export const RegisterForm = () => {
         <Button
           className="col-span-2 col-start-1 row-start-2"
           color="primary"
+          isLoading={isLoading}
           type="submit"
         >
           Submit
