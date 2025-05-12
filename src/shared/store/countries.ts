@@ -1,4 +1,4 @@
-const COUNTRY_DEF = {
+const COUNTRY_DEF: Record<string, string> = {
   UnitedStates: '{"code":"US","validate":"\\\\d{5}(-\\\\d{4})?"}',
   Canada: '{"code":"CA","validate":"[A-Za-z]\\\\d[A-Za-z] \\\\d[A-Za-z]\\\\d"}',
   Germany: '{"code":"DE","validate":"\\\\d{5}"}',
@@ -18,7 +18,8 @@ interface SelectCountryRule {
   regex: RegExp;
 }
 
-export function getCountryInfo(country: CountryName): SelectCountryRule {
+export function getCountryInfo(country: string): SelectCountryRule | null {
+  if (country === null) return null;
   const data: SelectCountryRule = JSON.parse(COUNTRY_DEF[country]);
 
   return {
