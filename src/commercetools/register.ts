@@ -52,8 +52,7 @@ export async function createCustomer(obj: TRegisterFieldsSchema) {
   const data = prepareData(obj);
 
   return apiRoot
-    .me()
-    .signup()
+    .customers()
     .post({
       body: data,
     })

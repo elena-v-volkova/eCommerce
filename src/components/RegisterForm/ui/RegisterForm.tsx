@@ -19,10 +19,13 @@ export const RegisterForm = () => {
   const {
     control,
     register,
+    trigger,
+    setValue,
     handleSubmit,
     formState: { errors },
   } = useForm<TRegisterFieldsSchema>({
     resolver: zodResolver(REGISTER_SCHEMA),
+    mode: 'onChange',
   });
   const [createCustomer, { isLoading, error }] = useCreateCustomerMutation();
   const onSubmit = async (data: TRegisterFieldsSchema) => {
@@ -33,7 +36,6 @@ export const RegisterForm = () => {
     const response = createCustomer(prepareData(result));
 
     console.log(response);
-    console.log(error);
   };
   const [isVisible, setIsVisible] = React.useState(false);
 
@@ -119,10 +121,16 @@ export const RegisterForm = () => {
           <h4 className="mb-2.5">Shipping address</h4>
           <Select
             className="py-0"
-            label="Select Country"
+            placeholder="Select Country"
             {...register('address.country')}
             errorMessage={errors.address?.country?.message}
             isInvalid={errors.address?.country?.message ? true : false}
+            onChange={(e) => {
+              const value = e.target.value;
+
+              setValue('address.country', value);
+              trigger('address.postalCode');
+            }}
           >
             {COUNTRIES.map((country) => (
               <SelectItem key={country}>{country}</SelectItem>

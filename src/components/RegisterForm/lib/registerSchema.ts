@@ -6,43 +6,49 @@ const namePattern = z.string().regex(/^[A-ZА-Яа-яa-z]+$/, {
   message:
     'Must contain at least one character and no special characters or numbers',
 });
-let shippingCountry: string | undefined = '';
 
-const addressSchema = z.object({
-  streetName: z
-    .string()
-    .min(1, { message: 'Street must contain at least one character' }),
-  city: z
-    .string()
-    .min(1, { message: 'City must contain at least one character' })
-    .regex(/^[A-Za-zА-Яа-яЁё\s-]+$/, {
-      message: 'City must not contain numbers or special characters',
-    }),
-  postalCode: z.string().refine(
-    (code) => {
-      if (shippingCountry) {
-        const isValid = getCountryInfo(shippingCountry)?.regex.test(code);
+const addressSchema = z
+  .object({
+    streetName: z
+      .string()
+      .min(1, { message: 'Street must contain at least one character' }),
+    city: z
+      .string()
+      .min(1, { message: 'City must contain at least one character' })
+      .regex(/^[A-Za-zА-Яа-яЁё\s-]+$/, {
+        message: 'City must not contain numbers or special characters',
+      }),
+    postalCode: z.string(),
+    country: z.string().refine(
+      (value) => {
+        return COUNTRIES.includes(value);
+      },
+      {
+        message: 'Country must be from the predefined list',
+      },
+    ),
+  })
+  .superRefine(({ postalCode, country }, ctx) => {
+    if (!country) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['postalCode'],
+        message: 'Please select a country first',
+      });
 
-        return isValid || false;
-      }
+      return;
+    }
 
-      return false;
-    },
-    {
-      message: 'Postal code must be valid',
-    },
-  ),
-  country: z.string().refine(
-    (value) => {
-      shippingCountry = value;
+    const isValid = getCountryInfo(country)?.regex.test(postalCode);
 
-      return COUNTRIES.includes(value);
-    },
-    {
-      message: 'Country must be from the predefined list',
-    },
-  ),
-});
+    if (!isValid) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['postalCode'],
+        message: 'Postal code must be valid for the selected country',
+      });
+    }
+  });
 
 export const REGISTER_SCHEMA = z.object({
   lastName: namePattern,
