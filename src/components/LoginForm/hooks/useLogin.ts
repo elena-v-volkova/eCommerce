@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { CustomerSignInResult } from '@commercetools/platform-sdk';
 import { useNavigate } from 'react-router';
 
 import { createPasswordFlowClient } from '@/commercetools/login';
 import { AppRoute } from '@/routes/appRoutes';
+import { useSession } from '@/shared/model/useSession';
 
 interface LoginError {
   message: string;
@@ -12,10 +12,11 @@ interface LoginError {
 }
 
 const useLogin = () => {
-  const [user, setUser] = useState<CustomerSignInResult | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { login } = useSession();
+
   const fetchUser = async ({
     email,
     password,
@@ -38,7 +39,7 @@ const useLogin = () => {
         })
         .execute();
 
-      setUser(response.body);
+      login(response.body.customer);
       navigate(AppRoute.home, { replace: true });
     } catch (err) {
       const loginError = err as LoginError;
@@ -58,7 +59,6 @@ const useLogin = () => {
 
   return {
     fetchUser,
-    user,
     isLoading,
     error,
   };
