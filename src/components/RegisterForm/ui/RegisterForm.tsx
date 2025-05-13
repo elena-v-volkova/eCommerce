@@ -13,7 +13,7 @@ import styles from './Register.module.scss';
 import { EyeFilledIcon, EyeSlashFilledIcon } from '@/components/Icons';
 import { COUNTRIES, getCountryInfo } from '@/shared/store/countries';
 import { prepareData } from '@/commercetools/register';
-import { useCreateCustomerMutation } from '@/shared/store/loginApi';
+import useRegister from '@/shared/model/useRegister';
 
 export const RegisterForm = () => {
   const {
@@ -27,15 +27,13 @@ export const RegisterForm = () => {
     resolver: zodResolver(REGISTER_SCHEMA),
     mode: 'onChange',
   });
-  const [createCustomer, { isLoading, error }] = useCreateCustomerMutation();
+  const { createCustomer, isLoading, error } = useRegister();
   const onSubmit = async (data: TRegisterFieldsSchema) => {
     const result = JSON.parse(JSON.stringify(data));
 
     result.dateOfBirth = `${data.dateOfBirth.year}-${String(data.dateOfBirth.month).padStart(2, '0')}-${String(data.dateOfBirth.day).padStart(2, '0')}`;
     result.address.country = getCountryInfo(data.address.country)?.code;
-    const response = createCustomer(prepareData(result));
-
-    console.log(response);
+    createCustomer(prepareData(result));
   };
   const [isVisible, setIsVisible] = React.useState(false);
 
@@ -44,7 +42,7 @@ export const RegisterForm = () => {
   return (
     <div className={styles.register}>
       <Form
-        className="grid size-full grid-cols-2 grid-rows-2 justify-items-center gap-4"
+        className="grid size-full grid-cols-2   justify-items-center gap-4 grid-rows-[350px_auto]"
         onSubmit={handleSubmit(onSubmit)}
       >
         <div className="col-start-2 row-start-1 flex w-full flex-col justify-end">
@@ -169,6 +167,11 @@ export const RegisterForm = () => {
         >
           Submit
         </Button>
+        {error && (
+          <p className="text-sm text-red-500 col-start-1 col-span-2 ">
+            {error}
+          </p>
+        )}
       </Form>
     </div>
   );

@@ -15,3 +15,8 @@ export type BaseAddress = {
   city: string;
   country: string;
 };
+
+export interface ResponseError {
+  message: string;
+  statusCode?: number;
+}

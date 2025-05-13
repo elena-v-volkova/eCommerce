@@ -1,12 +1,7 @@
 import { RegisterForm } from '@/components/RegisterForm/ui/RegisterForm';
-import DefaultLayout from '@/layouts/Default';
 
 function Register() {
-  return (
-    <DefaultLayout>
-      <RegisterForm />
-    </DefaultLayout>
-  );
+  return <RegisterForm />;
 }
 
 export default Register;
