@@ -5,7 +5,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { NavLink } from 'react-router';
 
-import { LOGIN_SCHEMA, TFormFiledsSchema } from '../lib/loginSchema';
+import { TLoginFieldsSchema, LOGIN_SCHEMA } from '../lib/loginSchema';
+
 import useLogin from '../hooks/useLogin';
 
 import styles from './LoginForm.module.scss';
@@ -18,7 +19,7 @@ const LoginForm = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<TFormFiledsSchema>({
+  } = useForm<TLoginFieldsSchema>({
     resolver: zodResolver(LOGIN_SCHEMA),
   });
   const { fetchUser, isLoading, error } = useLogin();
@@ -65,7 +66,7 @@ const LoginForm = () => {
             Don&apos;t have an account?{' '}
             <NavLink
               className="underline underline-offset-4"
-              to={AppRoute.register}
+              to={`/${AppRoute.register}`}
             >
               Sign up
             </NavLink>
