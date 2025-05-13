@@ -3,7 +3,11 @@ import { Navigate, useLocation } from 'react-router';
 
 import { useSession } from './shared/model/useSession';
 
-export const ProtectedRoute = ({ children }: { children: ReactNode }) => {
+export const RedirectIfAuthenticated = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
   const { token } = useSession();
   const location = useLocation();
 

@@ -7,7 +7,7 @@ import Home from './pages/Home/HomePage';
 import Login from './pages/Login/LoginPage';
 import Register from './pages/Register/RegisterPage';
 import { store } from './shared/store/store';
-import { ProtectedRoute } from './ProtectedRoute';
+import { RedirectIfAuthenticated } from './ProtectedRoute';
 
 import { AppRoute } from '@/routes/appRoutes';
 
@@ -19,9 +19,9 @@ function App() {
           <Route element={<Home />} path={AppRoute.home} />
           <Route
             element={
-              <ProtectedRoute>
+              <RedirectIfAuthenticated>
                 <Login />
-              </ProtectedRoute>
+              </RedirectIfAuthenticated>
             }
             path={AppRoute.login}
           />
