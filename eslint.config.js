@@ -233,7 +233,7 @@ export default defineConfig([
         {
           selector: 'variable',
           modifiers: ['const'],
-          format: ['UPPER_CASE'],
+          format: ['UPPER_CASE', "camelCase"],
         },
         {
           selector: 'interface',
