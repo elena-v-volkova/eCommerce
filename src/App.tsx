@@ -7,6 +7,7 @@ import Home from './pages/Home/HomePage';
 import Login from './pages/Login/LoginPage';
 import Register from './pages/Register/RegisterPage';
 import { store } from './shared/store/store';
+import { ProtectedRoute } from './ProtectedRoute';
 
 import { AppRoute } from '@/routes/appRoutes';
 
@@ -16,7 +17,14 @@ function App() {
       <Routes>
         <Route element={<Layout />} path="/">
           <Route element={<Home />} path={AppRoute.home} />
-          <Route element={<Login />} path={AppRoute.login} />
+          <Route
+            element={
+              <ProtectedRoute>
+                <Login />
+              </ProtectedRoute>
+            }
+            path={AppRoute.login}
+          />
           <Route element={<Register />} path={AppRoute.register} />
           <Route element={<NotFound />} path={AppRoute.notFound} />
         </Route>

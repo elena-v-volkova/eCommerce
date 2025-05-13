@@ -6,35 +6,29 @@ import { useForm } from 'react-hook-form';
 import { NavLink } from 'react-router';
 
 import { LOGIN_SCHEMA, TFormFiledsSchema } from '../lib/loginSchema';
+import useLogin from '../hooks/useLogin';
 
 import styles from './LoginForm.module.scss';
 
 import { AppRoute } from '@/routes/appRoutes';
 import DefaultLayout from '@/layouts/Default';
-import { useLoginMutation } from '@/shared/store/loginApi';
 
 const LoginForm = () => {
   const {
     register,
     handleSubmit,
-
     formState: { errors },
   } = useForm<TFormFiledsSchema>({
     resolver: zodResolver(LOGIN_SCHEMA),
   });
-
-  const [login, { isLoading, error }] = useLoginMutation();
-
-  const handleLogin = async (data: TFormFiledsSchema) => {
-    await login(data).unwrap();
-  };
+  const { fetchUser, isLoading, error } = useLogin();
 
   return (
     <DefaultLayout>
       <div className={styles.login}>
         <Form
           className="flex w-full max-w-xs flex-col gap-4"
-          onSubmit={handleSubmit(handleLogin)}
+          onSubmit={handleSubmit(fetchUser)}
         >
           <Input
             label="Email"
@@ -42,6 +36,8 @@ const LoginForm = () => {
             placeholder="Enter your email"
             type="email"
             {...register('email')}
+            errorMessage={errors.email?.message}
+            isInvalid={errors.email?.message ? true : false}
           />
 
           <NavLink
@@ -60,13 +56,11 @@ const LoginForm = () => {
             type="password"
           />
           <div className="flex gap-2">
-            <Button color="primary" isLoading={isLoading} type="submit">
+            <Button color="primary" isDisabled={isLoading} type="submit">
               Login
             </Button>
           </div>
-          {/* {error.data && (
-            <p className="text-sm text-red-500">{error.data.message}</p>
-          )} */}
+          {error && <p className="text-sm text-red-500">{error}</p>}
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{' '}
             <NavLink

@@ -1,4 +1,9 @@
-import { Client, ClientBuilder, TokenCache } from '@commercetools/ts-client';
+import {
+  Client,
+  ClientBuilder,
+  TokenCache,
+  TokenStore,
+} from '@commercetools/ts-client';
 import { createApiBuilderFromCtpClient } from '@commercetools/platform-sdk'; // Vor ./buildClient
 
 import {
@@ -27,6 +32,21 @@ type PasswordAuthMiddlewareOptions = {
   fetch?: any;
 };
 
+export const tokenCache = {
+  get: () => {
+    try {
+      return JSON.parse(localStorage.getItem('authTokens') || '{}');
+    } catch (e) {
+      console.error('Ошибка при парсинге токена из localStorage:', e);
+
+      return {};
+    }
+  },
+  set: (tokenData: TokenStore) => {
+    localStorage.setItem('authTokens', JSON.stringify(tokenData));
+  },
+};
+
 export function createPasswordFlowClient(email: string, password: string) {
   if (!email || !password) {
     throw new Error('Username and password are required');
@@ -44,14 +64,7 @@ export function createPasswordFlowClient(email: string, password: string) {
       },
     },
     scopes: scopes,
-    tokenCache: {
-      get: () => {
-        return JSON.parse(localStorage.getItem('authTokens') || '{}');
-      },
-      set: (tokenData) => {
-        localStorage.setItem('authTokens', JSON.stringify(tokenData));
-      },
-    },
+    tokenCache: tokenCache,
   };
 
   const client: Client = new ClientBuilder()
