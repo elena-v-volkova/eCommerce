@@ -1,10 +1,17 @@
 import { DateInput } from '@heroui/date-input';
-import { Button, Form, Input, Select, SelectItem } from '@heroui/react';
+import {
+  Button,
+  Checkbox,
+  Form,
+  Input,
+  Select,
+  SelectItem,
+} from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getLocalTimeZone, today } from '@internationalized/date';
 import { Controller, useForm } from 'react-hook-form';
 import { I18nProvider } from '@react-aria/i18n';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { REGISTER_SCHEMA, TRegisterFieldsSchema } from '../lib/registerSchema';
 
@@ -20,6 +27,7 @@ export const RegisterForm = () => {
     control,
     register,
     trigger,
+    getValues,
     setValue,
     handleSubmit,
     formState: { errors },
@@ -29,27 +37,48 @@ export const RegisterForm = () => {
   });
   const { createCustomer, isLoading, error } = useRegister();
   const onSubmit = async (data: TRegisterFieldsSchema) => {
-    const result = JSON.parse(JSON.stringify(data));
+    const draft = JSON.parse(JSON.stringify(data));
 
-    result.dateOfBirth = `${data.dateOfBirth.year}-${String(data.dateOfBirth.month).padStart(2, '0')}-${String(data.dateOfBirth.day).padStart(2, '0')}`;
-    result.address.country = getCountryInfo(data.address.country)?.code;
-    createCustomer(prepareData(result));
+    console.log(draft);
+
+    draft.dateOfBirth = `${data.dateOfBirth.year}-${String(data.dateOfBirth.month).padStart(2, '0')}-${String(data.dateOfBirth.day).padStart(2, '0')}`;
+    draft.address.country = getCountryInfo(data.address.country)?.code;
+    draft.billingAddress.country = getCountryInfo(data.address.country)?.code;
+    createCustomer(prepareData(draft, sameAddress));
   };
   const [isVisible, setIsVisible] = React.useState(false);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
+  const [sameAddress, setSameAddress] = useState(true);
+
+  useEffect(() => {
+    if (sameAddress) {
+      const shipping = getValues('address');
+
+      setValue('billingAddress.country', shipping.country);
+      setValue('billingAddress.city', shipping.city);
+      setValue('billingAddress.streetName', shipping.streetName);
+      setValue('billingAddress.postalCode', shipping.postalCode);
+      trigger([
+        'billingAddress.country',
+        'billingAddress.city',
+        'billingAddress.streetName',
+        'billingAddress.postalCode',
+      ]);
+    }
+  }, [sameAddress, getValues('address'), setValue, trigger]);
+
   return (
     <div className={styles.register}>
       <Form
-        className="grid size-full grid-cols-2   justify-items-center gap-4 grid-rows-[350px_auto]"
+        className="grid size-auto grid-cols-[320_auto_320] grid-rows-[auto] justify-items-center gap-4"
         onSubmit={handleSubmit(onSubmit)}
       >
-        <div className="col-start-2 row-start-1 flex w-full flex-col justify-end">
-          <h4>New user</h4>
+        <div className={styles.customer}>
+          <h4 className="mb-2.5">New user</h4>
           <Input
-            label="Email"
-            labelPlacement="outside"
+            placeholder="Email"
             type="email"
             {...register('email')}
             errorMessage={errors.email?.message}
@@ -115,9 +144,10 @@ export const RegisterForm = () => {
           />
         </div>
 
-        <div className="col-start-1 row-start-1 flex w-full flex-col justify-end">
+        <div className={styles.shipping}>
           <h4 className="mb-2.5">Shipping address</h4>
           <Select
+            aria-label="Shipping country"
             className="py-0"
             placeholder="Select Country"
             {...register('address.country')}
@@ -127,13 +157,23 @@ export const RegisterForm = () => {
               const value = e.target.value;
 
               setValue('address.country', value);
-              trigger('address.postalCode');
+              if (sameAddress) {
+                setValue('billingAddress.country', value);
+              }
+              trigger(['address.postalCode', 'billingAddress.postalCode']);
             }}
           >
             {COUNTRIES.map((country) => (
               <SelectItem key={country}>{country}</SelectItem>
             ))}
           </Select>
+          <Input
+            label="Enter city"
+            labelPlacement="outside"
+            {...register('address.city')}
+            errorMessage={errors.address?.city?.message}
+            isInvalid={errors.address?.city?.message ? true : false}
+          />
           <Input
             label="Enter street"
             labelPlacement="outside"
@@ -143,13 +183,6 @@ export const RegisterForm = () => {
             isInvalid={errors.address?.streetName?.message ? true : false}
           />
           <Input
-            label="Enter city"
-            labelPlacement="outside"
-            {...register('address.city')}
-            errorMessage={errors.address?.city?.message}
-            isInvalid={errors.address?.city?.message ? true : false}
-          />
-          <Input
             label="Postal code"
             labelPlacement="outside"
             type="text"
@@ -157,21 +190,79 @@ export const RegisterForm = () => {
             errorMessage={errors.address?.postalCode?.message}
             isInvalid={errors.address?.postalCode?.message ? true : false}
           />
+          <Checkbox
+            className="m-1"
+            color="default"
+            isSelected={sameAddress}
+            onChange={(event) => {
+              const isChecked = event.target.checked;
+
+              setSameAddress(isChecked);
+            }}
+          >
+            Billing and shipping address are the same?
+          </Checkbox>
         </div>
 
+        <div
+          className={!sameAddress ? styles.show_billing : styles.hide_billing}
+        >
+          <h4 className="mb-2.5">Billing address</h4>
+          <Select
+            aria-label="billing"
+            className="py-0"
+            placeholder="Select Country"
+            {...register('billingAddress.country')}
+            errorMessage={errors.billingAddress?.country?.message}
+            isInvalid={errors.billingAddress?.country?.message ? true : false}
+            onChange={(e) => {
+              const value = e.target.value;
+
+              setValue('billingAddress.country', value);
+              trigger('billingAddress.postalCode');
+            }}
+          >
+            {COUNTRIES.map((country) => (
+              <SelectItem key={country}>{country}</SelectItem>
+            ))}
+          </Select>
+          <Input
+            label="Enter city"
+            labelPlacement="outside"
+            {...register('billingAddress.city')}
+            errorMessage={errors.billingAddress?.city?.message}
+            isInvalid={errors.billingAddress?.city?.message ? true : false}
+          />
+          <Input
+            label="Enter street"
+            labelPlacement="outside"
+            type="text"
+            {...register('billingAddress.streetName')}
+            errorMessage={errors.billingAddress?.streetName?.message}
+            isInvalid={
+              errors.billingAddress?.streetName?.message ? true : false
+            }
+          />
+          <Input
+            label="Postal code"
+            labelPlacement="outside"
+            type="text"
+            {...register('billingAddress.postalCode')}
+            errorMessage={errors.billingAddress?.postalCode?.message}
+            isInvalid={
+              errors.billingAddress?.postalCode?.message ? true : false
+            }
+          />
+        </div>
         <Button
-          className="col-span-2 col-start-1 row-start-2"
+          className="col-span-3 col-start-1 row-start-2"
           color="primary"
           isLoading={isLoading}
           type="submit"
         >
           Submit
         </Button>
-        {error && (
-          <p className="text-sm text-red-500 col-start-1 col-span-2 ">
-            {error}
-          </p>
-        )}
+        {error && <p className="col-start-2 text-sm text-red-500">{error}</p>}
       </Form>
     </div>
   );

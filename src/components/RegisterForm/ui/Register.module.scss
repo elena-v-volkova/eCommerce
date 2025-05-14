@@ -2,3 +2,31 @@
   display: flex;
   justify-content: center;
 }
+
+.customer {
+  grid-row-start: 1;
+  grid-column-start: 3;
+  flex-direction: column;
+  display: flex;
+  width: 220px;
+}
+
+.shipping {
+  grid-row-start: 1;
+  grid-column-start: 2;
+  flex-direction: column;
+  display: flex;
+  width: 220px;
+}
+
+.show_billing {
+  grid-row-start: 1;
+  grid-column-start: 1;
+  flex-direction: column;
+  display: flex;
+  width: 220px;
+}
+
+.hide_billing {
+  display: none;
+}

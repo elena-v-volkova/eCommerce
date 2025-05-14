@@ -48,8 +48,11 @@ export const apiRoot = createApiBuilderFromCtpClient(ctpClient).withProjectKey({
   projectKey: projectKey,
 });
 
-export async function createCustomer(obj: TRegisterFieldsSchema) {
-  const data = prepareData(obj);
+export async function createCustomer(
+  obj: TRegisterFieldsSchema,
+  sameAddress: boolean,
+) {
+  const data = prepareData(obj, sameAddress);
 
   return apiRoot
     .customers()
@@ -59,9 +62,17 @@ export async function createCustomer(obj: TRegisterFieldsSchema) {
     .execute();
 }
 
-export function prepareData(input: TRegisterFieldsSchema): CustomerDraft {
+export function prepareData(
+  input: TRegisterFieldsSchema,
+  sameAddress: boolean,
+): CustomerDraft {
   const address = {
     ...input.address,
+    firstName: input.firstName,
+    lastName: input.lastName,
+  };
+  const billingAddress = {
+    ...input.billingAddress,
     firstName: input.firstName,
     lastName: input.lastName,
   };
@@ -72,7 +83,8 @@ export function prepareData(input: TRegisterFieldsSchema): CustomerDraft {
     firstName: input.firstName,
     lastName: input.lastName,
     dateOfBirth: input.dateOfBirth.toString(),
-    addresses: [address],
+    addresses: [address, billingAddress],
     defaultShippingAddress: 0,
+    defaultBillingAddress: Number(!sameAddress),
   };
 }

@@ -6,6 +6,7 @@ export type CustomerDraft = {
   dateOfBirth: string;
   addresses: BaseAddress[];
   defaultShippingAddress: number;
+  defaultBillingAddress: number;
 };
 export type BaseAddress = {
   firstName: string;

@@ -73,6 +73,7 @@ export const REGISTER_SCHEMA = z.object({
     .regex(/[A-Z]/, { message: 'Must at least 1 uppercase letter,' })
     .regex(/[0-9]/, { message: 'Must contain a number' }),
   address: addressSchema,
+  billingAddress: addressSchema,
 });
 
 export type TRegisterFieldsSchema = z.infer<typeof REGISTER_SCHEMA>;
