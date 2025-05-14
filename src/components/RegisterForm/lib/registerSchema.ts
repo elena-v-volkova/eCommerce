@@ -75,6 +75,7 @@ export const REGISTER_SCHEMA = z.object({
     .regex(/[0-9]/, { message: 'Must contain a number' }),
   address: addressSchema,
   billingAddress: addressSchema,
+  sameAsDelivery: z.boolean(),
 });
 
 export type TRegisterFieldsSchema = z.infer<typeof REGISTER_SCHEMA>;

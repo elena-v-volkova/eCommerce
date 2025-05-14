@@ -30,51 +30,47 @@ export const RegisterForm = () => {
     control,
     register,
     trigger,
-    getValues,
     setValue,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<TRegisterFieldsSchema>({
     resolver: zodResolver(REGISTER_SCHEMA),
     mode: 'onChange',
+    defaultValues: {
+      sameAsDelivery: true,
+    },
   });
   const { createCustomer, isLoading, error } = useRegister();
   const onSubmit = async (data: TRegisterFieldsSchema) => {
-    createCustomer(prepareData(data, sameAddress));
+    createCustomer(prepareData(data, sameAsDelivery));
   };
   const [isVisible, setIsVisible] = React.useState(false);
+  const sameAsDelivery = watch('sameAsDelivery');
+  const address = watch('address');
 
-  const toggleVisibility = () => setIsVisible(!isVisible);
+  const [changed, setChanged] = useState<boolean>(false);
 
-  const [sameAddress, setSameAddress] = useState(true);
+  watch((data, { name }) => {
+    if (data.sameAsDelivery) {
+      if (name?.startsWith('address', 0)) {
+        setChanged(!changed);
+      }
+    }
+  });
 
   useEffect(() => {
-    if (sameAddress) {
-      const shipping = getValues('address');
-      console.log(getValues('billingAddress.country')),
-        setValue('billingAddress.country', shipping.country);
-      setValue('billingAddress.city', shipping.city);
-      setValue('billingAddress.streetName', shipping.streetName);
-      setValue('billingAddress.postalCode', shipping.postalCode);
-      trigger([
-        'billingAddress.country',
-        'billingAddress.city',
-        'billingAddress.streetName',
-        'billingAddress.postalCode',
-      ]);
-      console.log(getValues('billingAddress.country'));
-    } else {
-      // console.log(getValues('billingAddress.country')),
-      // setValue('billingAddress.country', COUNTRIES[0]  );
-      console.log(getValues('billingAddress.country')),
-        trigger('billingAddress.country');
+    if (sameAsDelivery) {
+      setValue('billingAddress', address);
     }
-  }, [sameAddress, getValues('address'), setValue, trigger]);
+  }, [sameAsDelivery, changed]);
+
+  const toggleVisibility = () => setIsVisible(!isVisible);
 
   return (
     <div className={styles.register}>
       <Form
-        className="grid size-auto grid-cols-[320_auto_320] grid-rows-[auto] justify-items-center gap-4"
+        className="grid size-auto grid-cols-[auto_320_320] grid-rows-[auto] justify-items-center gap-4"
         onSubmit={handleSubmit(onSubmit)}
       >
         <div className={styles.customer}>
@@ -86,6 +82,7 @@ export const RegisterForm = () => {
             errorMessage={errors.email?.message}
             isInvalid={errors.email?.message ? true : false}
           />
+
           <Input
             label="Password"
             labelPlacement="outside"
@@ -131,7 +128,7 @@ export const RegisterForm = () => {
             render={({ field }) => (
               <I18nProvider locale="en-GB">
                 <DateInput
-                  {...register('lastName')}
+                  {...register('dateOfBirth')}
                   errorMessage={errors.dateOfBirth?.message}
                   isInvalid={!!errors.dateOfBirth}
                   label="Date of birth"
@@ -157,13 +154,10 @@ export const RegisterForm = () => {
             isInvalid={errors.address?.country?.message ? true : false}
             onChange={(e) => {
               const value = e.target.value;
-              debugger;
+
               setValue('address.country', value);
-              if (sameAddress) {
-                setValue('billingAddress.country', value);
-                trigger('billingAddress.country');
-              }
-              trigger(['address.postalCode', 'billingAddress.postalCode']);
+              trigger('address.postalCode');
+              trigger('address.country');
             }}
           >
             {COUNTRIES.map((country) => (
@@ -196,67 +190,63 @@ export const RegisterForm = () => {
           <Checkbox
             className="m-1"
             color="default"
-            isSelected={sameAddress}
-            onChange={(event) => {
-              const isChecked = event.target.checked;
-
-              setSameAddress(isChecked);
-            }}
+            {...register('sameAsDelivery')}
           >
             Billing and shipping address are the same?
           </Checkbox>
         </div>
 
-        <div
-          className={!sameAddress ? styles.show_billing : styles.hide_billing}
-        >
-          <h4 className="mb-2.5">Billing address</h4>
-          <Select
-            aria-label="billing"
-            className="py-0"
-            placeholder="Select Country"
-            {...register('billingAddress.country')}
-            errorMessage={errors.billingAddress?.country?.message}
-            isInvalid={errors.billingAddress?.country?.message ? true : false}
-            onChange={(e) => {
-              const value = e.target.value;
-              console.log(value);
-              setValue('billingAddress.country', value);
-              trigger('billingAddress.postalCode');
-            }}
-          >
-            {COUNTRIES.map((country) => (
-              <SelectItem key={country}>{country}</SelectItem>
-            ))}
-          </Select>
-          <Input
-            label="Enter city"
-            labelPlacement="outside"
-            {...register('billingAddress.city')}
-            errorMessage={errors.billingAddress?.city?.message}
-            isInvalid={errors.billingAddress?.city?.message ? true : false}
-          />
-          <Input
-            label="Enter street"
-            labelPlacement="outside"
-            type="text"
-            {...register('billingAddress.streetName')}
-            errorMessage={errors.billingAddress?.streetName?.message}
-            isInvalid={
-              errors.billingAddress?.streetName?.message ? true : false
-            }
-          />
-          <Input
-            label="Postal code"
-            labelPlacement="outside"
-            type="text"
-            {...register('billingAddress.postalCode')}
-            errorMessage={errors.billingAddress?.postalCode?.message}
-            isInvalid={
-              errors.billingAddress?.postalCode?.message ? true : false
-            }
-          />
-        </div>
+        {!sameAsDelivery && (
+          <div className={styles.show_billing}>
+            <h4 className="mb-2.5">Billing address</h4>
+            <Select
+              aria-label="billing"
+              className="py-0"
+              placeholder="Select Country"
+              {...register('billingAddress.country')}
+              errorMessage={errors.billingAddress?.country?.message}
+              isInvalid={errors.billingAddress?.country?.message ? true : false}
+              onChange={(e) => {
+                const value = e.target.value;
+
+                setValue('billingAddress.country', value);
+                trigger('billingAddress.postalCode');
+                trigger('billingAddress.country');
+              }}
+            >
+              {COUNTRIES.map((country) => (
+                <SelectItem key={country}>{country}</SelectItem>
+              ))}
+            </Select>
+            <Input
+              label="Enter city"
+              labelPlacement="outside"
+              {...register('billingAddress.city')}
+              errorMessage={errors.billingAddress?.city?.message}
+              isInvalid={errors.billingAddress?.city?.message ? true : false}
+            />
+            <Input
+              label="Enter street"
+              labelPlacement="outside"
+              type="text"
+              {...register('billingAddress.streetName')}
+              errorMessage={errors.billingAddress?.streetName?.message}
+              isInvalid={
+                errors.billingAddress?.streetName?.message ? true : false
+              }
+            />
+            <Input
+              label="Postal code"
+              labelPlacement="outside"
+              type="text"
+              {...register('billingAddress.postalCode')}
+              errorMessage={errors.billingAddress?.postalCode?.message}
+              isInvalid={
+                errors.billingAddress?.postalCode?.message ? true : false
+              }
+            />
+          </div>
+        )}
         <Button
           className="col-span-3 col-start-1 row-start-2"
           color="primary"
@@ -265,8 +255,8 @@ export const RegisterForm = () => {
         >
           Submit
         </Button>
-        {error && <p className="col-start-2 text-sm text-red-500">{error}</p>}
       </Form>
+      {error && <p className={styles.error_msg}>{error}</p>}
     </div>
   );
 };
