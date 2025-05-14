@@ -13,13 +13,16 @@ import { Controller, useForm } from 'react-hook-form';
 import { I18nProvider } from '@react-aria/i18n';
 import React, { useEffect, useState } from 'react';
 
-import { REGISTER_SCHEMA, TRegisterFieldsSchema } from '../lib/registerSchema';
+import {
+  REGISTER_SCHEMA,
+  TRegisterFieldsSchema,
+  prepareData,
+} from '../lib/registerSchema';
 
 import styles from './Register.module.scss';
 
 import { EyeFilledIcon, EyeSlashFilledIcon } from '@/components/Icons';
-import { COUNTRIES, getCountryInfo } from '@/shared/store/countries';
-import { prepareData } from '@/commercetools/register';
+import { COUNTRIES } from '@/shared/store/countries';
 import useRegister from '@/shared/model/useRegister';
 
 export const RegisterForm = () => {
@@ -37,14 +40,7 @@ export const RegisterForm = () => {
   });
   const { createCustomer, isLoading, error } = useRegister();
   const onSubmit = async (data: TRegisterFieldsSchema) => {
-    const draft = JSON.parse(JSON.stringify(data));
-
-    console.log(draft);
-
-    draft.dateOfBirth = `${data.dateOfBirth.year}-${String(data.dateOfBirth.month).padStart(2, '0')}-${String(data.dateOfBirth.day).padStart(2, '0')}`;
-    draft.address.country = getCountryInfo(data.address.country)?.code;
-    draft.billingAddress.country = getCountryInfo(data.address.country)?.code;
-    createCustomer(prepareData(draft, sameAddress));
+    createCustomer(prepareData(data, sameAddress));
   };
   const [isVisible, setIsVisible] = React.useState(false);
 
@@ -55,8 +51,8 @@ export const RegisterForm = () => {
   useEffect(() => {
     if (sameAddress) {
       const shipping = getValues('address');
-
-      setValue('billingAddress.country', shipping.country);
+      console.log(getValues('billingAddress.country')),
+        setValue('billingAddress.country', shipping.country);
       setValue('billingAddress.city', shipping.city);
       setValue('billingAddress.streetName', shipping.streetName);
       setValue('billingAddress.postalCode', shipping.postalCode);
@@ -66,6 +62,12 @@ export const RegisterForm = () => {
         'billingAddress.streetName',
         'billingAddress.postalCode',
       ]);
+      console.log(getValues('billingAddress.country'));
+    } else {
+      // console.log(getValues('billingAddress.country')),
+      // setValue('billingAddress.country', COUNTRIES[0]  );
+      console.log(getValues('billingAddress.country')),
+        trigger('billingAddress.country');
     }
   }, [sameAddress, getValues('address'), setValue, trigger]);
 
@@ -155,10 +157,11 @@ export const RegisterForm = () => {
             isInvalid={errors.address?.country?.message ? true : false}
             onChange={(e) => {
               const value = e.target.value;
-
+              debugger;
               setValue('address.country', value);
               if (sameAddress) {
                 setValue('billingAddress.country', value);
+                trigger('billingAddress.country');
               }
               trigger(['address.postalCode', 'billingAddress.postalCode']);
             }}
@@ -217,7 +220,7 @@ export const RegisterForm = () => {
             isInvalid={errors.billingAddress?.country?.message ? true : false}
             onChange={(e) => {
               const value = e.target.value;
-
+              console.log(value);
               setValue('billingAddress.country', value);
               trigger('billingAddress.postalCode');
             }}

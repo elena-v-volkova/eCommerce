@@ -1,5 +1,6 @@
 import { DateValue, getLocalTimeZone, today } from '@internationalized/date';
 import { z } from 'zod';
+import { CustomerDraft } from '@commercetools/platform-sdk';
 
 import { COUNTRIES, getCountryInfo } from '@/shared/store/countries';
 const namePattern = z.string().regex(/^[A-ZА-Яа-яa-z]+$/, {
@@ -77,3 +78,38 @@ export const REGISTER_SCHEMA = z.object({
 });
 
 export type TRegisterFieldsSchema = z.infer<typeof REGISTER_SCHEMA>;
+
+export function prepareData(
+  input: TRegisterFieldsSchema,
+  sameAddress: boolean,
+): CustomerDraft {
+  const draft = JSON.parse(JSON.stringify(input));
+
+  draft.dateOfBirth = input.dateOfBirth.toString();
+  draft.address.country = getCountryInfo(input.address.country)?.code;
+  draft.billingAddress.country = getCountryInfo(
+    input.billingAddress.country,
+  )?.code;
+
+  const address = {
+    ...draft.address,
+    firstName: draft.firstName,
+    lastName: draft.lastName,
+  };
+  const billingAddress = {
+    ...draft.billingAddress,
+    firstName: draft.firstName,
+    lastName: draft.lastName,
+  };
+
+  return {
+    email: draft.email,
+    password: draft.password,
+    firstName: draft.firstName,
+    lastName: draft.lastName,
+    dateOfBirth: draft.dateOfBirth.toString(),
+    addresses: [address, billingAddress],
+    defaultShippingAddress: 0,
+    defaultBillingAddress: Number(!sameAddress),
+  };
+}

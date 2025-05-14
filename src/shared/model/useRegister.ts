@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
 import useLogin from '@/components/LoginForm/hooks/useLogin';
-import { CustomerDraft, ResponseError } from '@/types/commercetools';
+import { ResponseError } from '@/types/commercetools';
 
 const useRegister = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
