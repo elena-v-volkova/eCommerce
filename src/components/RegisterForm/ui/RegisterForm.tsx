@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { getLocalTimeZone, today } from '@internationalized/date';
 import { Controller, useForm } from 'react-hook-form';
 import { I18nProvider } from '@react-aria/i18n';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
   REGISTER_SCHEMA,
@@ -15,8 +15,8 @@ import {
 import styles from './Register.module.scss';
 import { AddressFields } from './Address';
 
-import { EyeFilledIcon, EyeSlashFilledIcon } from '@/components/Icons';
 import useRegister from '@/shared/model/useRegister';
+import { PasswordInput } from '@/components/PasswordInput';
 
 export const RegisterForm = () => {
   const {
@@ -38,7 +38,6 @@ export const RegisterForm = () => {
   const onSubmit = async (data: TRegisterFieldsSchema) => {
     createCustomer(prepareData(data, sameAsDelivery));
   };
-  const [isVisible, setIsVisible] = React.useState(false);
   const sameAsDelivery = watch('sameAsDelivery');
   const address = watch('address');
 
@@ -58,8 +57,6 @@ export const RegisterForm = () => {
     }
   }, [sameAsDelivery, changed]);
 
-  const toggleVisibility = () => setIsVisible(!isVisible);
-
   return (
     <div className={styles.register}>
       <Form
@@ -75,27 +72,10 @@ export const RegisterForm = () => {
             errorMessage={errors.email?.message}
             isInvalid={errors.email?.message ? true : false}
           />
-
-          <Input
-            label="Password"
-            labelPlacement="outside"
-            type={isVisible ? 'text' : 'password'}
-            {...register('password')}
-            endContent={
-              <button
-                className="focus:outline-none"
-                type="button"
-                onClick={toggleVisibility}
-              >
-                {isVisible ? (
-                  <EyeSlashFilledIcon className="pointer-events-none text-2xl text-default-400" />
-                ) : (
-                  <EyeFilledIcon className="pointer-events-none text-2xl text-default-400" />
-                )}
-              </button>
-            }
+          <PasswordInput
             errorMessage={errors.password?.message}
             isInvalid={errors.password?.message ? true : false}
+            register={register('password')}
           />
           <Input
             label="First name"

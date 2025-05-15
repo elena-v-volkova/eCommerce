@@ -4,12 +4,15 @@ import { z } from 'zod';
 import { MyCustomerDraft } from '@/types/commercetools';
 import { COUNTRIES, getCountryInfo } from '@/shared/store/countries';
 const namePattern = z.string().regex(/^[A-ZА-Яа-яa-z]+$/, {
-  message: 'Must contain at least one character and no special characters or numbers',
+  message:
+    'Must contain at least one character and no special characters or numbers',
 });
 
 const addressSchema = z
   .object({
-    streetName: z.string().min(1, { message: 'Street must contain at least one character' }),
+    streetName: z
+      .string()
+      .min(1, { message: 'Street must contain at least one character' }),
     city: z
       .string()
       .min(1, { message: 'City must contain at least one character' })
@@ -23,7 +26,7 @@ const addressSchema = z
       },
       {
         message: 'Country must be from the predefined list',
-      }
+      },
     ),
   })
   .superRefine(({ postalCode, country }, ctx) => {
@@ -59,7 +62,7 @@ export const REGISTER_SCHEMA = z.object({
       (date) => {
         return date.compare(today(getLocalTimeZone())) <= 0;
       },
-      { message: 'Date of birth cannot be in the future' }
+      { message: 'Date of birth cannot be in the future' },
     ),
 
   email: z.string().email(),
@@ -77,12 +80,17 @@ export const REGISTER_SCHEMA = z.object({
 
 export type TRegisterFieldsSchema = z.infer<typeof REGISTER_SCHEMA>;
 
-export function prepareData(input: TRegisterFieldsSchema, sameAddress: boolean): MyCustomerDraft {
+export function prepareData(
+  input: TRegisterFieldsSchema,
+  sameAddress: boolean,
+): MyCustomerDraft {
   const draft = JSON.parse(JSON.stringify(input));
 
   draft.dateOfBirth = input.dateOfBirth.toString();
   draft.address.country = getCountryInfo(input.address.country)?.code;
-  draft.billingAddress.country = getCountryInfo(input.billingAddress.country)?.code;
+  draft.billingAddress.country = getCountryInfo(
+    input.billingAddress.country,
+  )?.code;
 
   const address = {
     ...draft.address,

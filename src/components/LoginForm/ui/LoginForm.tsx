@@ -11,6 +11,7 @@ import useLogin from '../hooks/useLogin';
 import styles from './LoginForm.module.scss';
 
 import { AppRoute } from '@/routes/appRoutes';
+import { PasswordInput } from '@/components/PasswordInput';
 
 const LoginForm = () => {
   const {
@@ -44,14 +45,11 @@ const LoginForm = () => {
         >
           Forgot your password?
         </NavLink>
-        <Input
-          label="Password"
-          labelPlacement="outside"
-          placeholder="Enter your password"
-          {...register('password')}
+        <PasswordInput
           errorMessage={errors.password?.message}
           isInvalid={errors.password?.message ? true : false}
-          type="password"
+          placeholder="Enter your password"
+          register={register('password')}
         />
         <div className="flex gap-2">
           <Button color="primary" isDisabled={isLoading} type="submit">
