@@ -4,13 +4,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { getLocalTimeZone, today } from '@internationalized/date';
 import { Controller, useForm } from 'react-hook-form';
 import { I18nProvider } from '@react-aria/i18n';
-import { useEffect, useState } from 'react';
 
 import {
   REGISTER_SCHEMA,
   TRegisterFieldsSchema,
   prepareData,
-} from '../lib/registerSchema';
+  useSomeAddresses,
+} from '../lib/utils';
 
 import styles from './Register.module.scss';
 import { AddressFields } from './Address';
@@ -39,23 +39,8 @@ export const RegisterForm = () => {
     createCustomer(prepareData(data, sameAsDelivery));
   };
   const sameAsDelivery = watch('sameAsDelivery');
-  const address = watch('address');
 
-  const [changed, setChanged] = useState<boolean>(false);
-
-  watch((data, { name }) => {
-    if (data.sameAsDelivery) {
-      if (name?.startsWith('address', 0)) {
-        setChanged(!changed);
-      }
-    }
-  });
-
-  useEffect(() => {
-    if (sameAsDelivery) {
-      setValue('billingAddress', address);
-    }
-  }, [sameAsDelivery, changed]);
+  useSomeAddresses({ watch, setValue, control });
 
   return (
     <div className={styles.register}>

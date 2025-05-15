@@ -1,6 +1,6 @@
 import { Input, Select, SelectItem } from '@heroui/react';
 
-import { TRegisterFieldsSchema } from '../lib/registerSchema';
+import { TRegisterFieldsSchema } from '../lib/utils';
 
 import { COUNTRIES } from '@/shared/store/countries';
 import { AddressFieldsProps } from '@/types';

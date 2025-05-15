@@ -1,4 +1,4 @@
-import { TRegisterFieldsSchema } from '@/components/RegisterForm/lib/registerSchema';
+import { TRegisterFieldsSchema } from '@/components/RegisterForm/lib/utils';
 import { SVGProps } from 'react';
 import {
   UseFormRegister,
