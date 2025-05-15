@@ -1,4 +1,4 @@
-export type CustomerDraft = {
+export type MyCustomerDraft = {
   email: string;
   password: string;
   firstName: string;

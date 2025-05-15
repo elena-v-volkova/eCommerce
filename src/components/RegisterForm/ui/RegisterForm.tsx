@@ -13,10 +13,10 @@ import {
 } from '../lib/registerSchema';
 
 import styles from './Register.module.scss';
+import { AddressFields } from './Address';
 
 import { EyeFilledIcon, EyeSlashFilledIcon } from '@/components/Icons';
 import useRegister from '@/shared/model/useRegister';
-import { AddressFields } from './Address';
 
 export const RegisterForm = () => {
   const {
@@ -83,7 +83,6 @@ export const RegisterForm = () => {
             {...register('password')}
             endContent={
               <button
-                aria-label="toggle password visibility"
                 className="focus:outline-none"
                 type="button"
                 onClick={toggleVisibility}
@@ -138,11 +137,11 @@ export const RegisterForm = () => {
 
         <div className={styles.shipping}>
           <AddressFields
-            title="Shipping address"
+            errors={errors}
             prefix="address"
             register={register}
-            errors={errors}
             setValue={setValue}
+            title="Shipping address"
             trigger={trigger}
           />
           <Checkbox
@@ -157,11 +156,11 @@ export const RegisterForm = () => {
         {!sameAsDelivery && (
           <div className={styles.show_billing}>
             <AddressFields
-              title="Billing address"
+              errors={errors}
               prefix="billingAddress"
               register={register}
-              errors={errors}
               setValue={setValue}
+              title="Billing address"
               trigger={trigger}
             />
           </div>

@@ -1,7 +1,9 @@
+import { Input, Select, SelectItem } from '@heroui/react';
+
+import { TRegisterFieldsSchema } from '../lib/registerSchema';
+
 import { COUNTRIES } from '@/shared/store/countries';
 import { AddressFieldsProps } from '@/types';
-import { Input, Select, SelectItem } from '@heroui/react';
-import { TRegisterFieldsSchema } from '../lib/registerSchema';
 
 export const AddressFields = ({
   title,
@@ -23,6 +25,7 @@ export const AddressFields = ({
         isInvalid={errors[prefix]?.country?.message ? true : false}
         onChange={(e) => {
           const value = e.target.value;
+
           setValue(`${prefix}.country`, value);
           trigger(`${prefix}.postalCode`);
           trigger(`${prefix}.country`);

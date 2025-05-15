@@ -2,14 +2,14 @@ import { useState } from 'react';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
 import useLogin from '@/components/LoginForm/hooks/useLogin';
-import { ResponseError } from '@/types/commercetools';
+import { MyCustomerDraft, ResponseError } from '@/types/commercetools';
 
-const useRegister = () => {
+function useRegister() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const { fetchUser } = useLogin();
 
-  const createCustomer = async (customerDraft: CustomerDraft) => {
+  const createCustomer = async (customerDraft: MyCustomerDraft) => {
     setIsLoading(true);
     setError(null);
     if (!customerDraft) return;
@@ -36,6 +36,6 @@ const useRegister = () => {
     isLoading,
     error,
   };
-};
+}
 
 export default useRegister;

@@ -36,12 +36,5 @@
 }
 
 .error_msg {
-  justify-self: center;
-
-  width: fit-content;
-  margin-top: 4px;
-
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  color: #ef4444;
+  @apply text-sm text-red-500;
 }
