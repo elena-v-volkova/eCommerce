@@ -1,4 +1,40 @@
 .register {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.customer {
+  display: flex;
+  grid-column-start: 3;
+  grid-row-start: 1;
+  flex-direction: column;
+
+  width: 220px;
+}
+
+.shipping {
+  display: flex;
+  grid-column-start: 2;
+  grid-row-start: 1;
+  flex-direction: column;
+
+  width: 220px;
+}
+
+.show_billing {
+  display: flex;
+  grid-column-start: 1;
+  grid-row-start: 1;
+  flex-direction: column;
+
+  width: 220px;
+}
+
+.hide_billing {
+  display: none;
+}
+
+.error_msg {
+  @apply text-sm text-red-500;
 }

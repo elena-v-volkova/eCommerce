@@ -10,7 +10,7 @@ interface TokenStore {
   expirationTime: number;
 }
 
-export const useSession = () => {
+export function useSession() {
   const [token, setToken] = useState<TokenStore | null>(() => {
     const stored = localStorage.getItem(TOKEN_KEY);
 
@@ -43,4 +43,4 @@ export const useSession = () => {
   };
 
   return { login, logout, token, user, setUser };
-};
+}
