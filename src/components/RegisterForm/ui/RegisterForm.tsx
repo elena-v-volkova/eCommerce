@@ -1,12 +1,5 @@
 import { DateInput } from '@heroui/date-input';
-import {
-  Button,
-  Checkbox,
-  Form,
-  Input,
-  Select,
-  SelectItem,
-} from '@heroui/react';
+import { Button, Checkbox, Form, Input } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getLocalTimeZone, today } from '@internationalized/date';
 import { Controller, useForm } from 'react-hook-form';
@@ -22,8 +15,8 @@ import {
 import styles from './Register.module.scss';
 
 import { EyeFilledIcon, EyeSlashFilledIcon } from '@/components/Icons';
-import { COUNTRIES } from '@/shared/store/countries';
 import useRegister from '@/shared/model/useRegister';
+import { AddressFields } from './Address';
 
 export const RegisterForm = () => {
   const {
@@ -144,48 +137,13 @@ export const RegisterForm = () => {
         </div>
 
         <div className={styles.shipping}>
-          <h4 className="mb-2.5">Shipping address</h4>
-          <Select
-            aria-label="Shipping country"
-            className="py-0"
-            placeholder="Select Country"
-            {...register('address.country')}
-            errorMessage={errors.address?.country?.message}
-            isInvalid={errors.address?.country?.message ? true : false}
-            onChange={(e) => {
-              const value = e.target.value;
-
-              setValue('address.country', value);
-              trigger('address.postalCode');
-              trigger('address.country');
-            }}
-          >
-            {COUNTRIES.map((country) => (
-              <SelectItem key={country}>{country}</SelectItem>
-            ))}
-          </Select>
-          <Input
-            label="Enter city"
-            labelPlacement="outside"
-            {...register('address.city')}
-            errorMessage={errors.address?.city?.message}
-            isInvalid={errors.address?.city?.message ? true : false}
-          />
-          <Input
-            label="Enter street"
-            labelPlacement="outside"
-            type="text"
-            {...register('address.streetName')}
-            errorMessage={errors.address?.streetName?.message}
-            isInvalid={errors.address?.streetName?.message ? true : false}
-          />
-          <Input
-            label="Postal code"
-            labelPlacement="outside"
-            type="text"
-            {...register('address.postalCode')}
-            errorMessage={errors.address?.postalCode?.message}
-            isInvalid={errors.address?.postalCode?.message ? true : false}
+          <AddressFields
+            title="Shipping address"
+            prefix="address"
+            register={register}
+            errors={errors}
+            setValue={setValue}
+            trigger={trigger}
           />
           <Checkbox
             className="m-1"
@@ -198,55 +156,17 @@ export const RegisterForm = () => {
 
         {!sameAsDelivery && (
           <div className={styles.show_billing}>
-            <h4 className="mb-2.5">Billing address</h4>
-            <Select
-              aria-label="billing"
-              className="py-0"
-              placeholder="Select Country"
-              {...register('billingAddress.country')}
-              errorMessage={errors.billingAddress?.country?.message}
-              isInvalid={errors.billingAddress?.country?.message ? true : false}
-              onChange={(e) => {
-                const value = e.target.value;
-
-                setValue('billingAddress.country', value);
-                trigger('billingAddress.postalCode');
-                trigger('billingAddress.country');
-              }}
-            >
-              {COUNTRIES.map((country) => (
-                <SelectItem key={country}>{country}</SelectItem>
-              ))}
-            </Select>
-            <Input
-              label="Enter city"
-              labelPlacement="outside"
-              {...register('billingAddress.city')}
-              errorMessage={errors.billingAddress?.city?.message}
-              isInvalid={errors.billingAddress?.city?.message ? true : false}
-            />
-            <Input
-              label="Enter street"
-              labelPlacement="outside"
-              type="text"
-              {...register('billingAddress.streetName')}
-              errorMessage={errors.billingAddress?.streetName?.message}
-              isInvalid={
-                errors.billingAddress?.streetName?.message ? true : false
-              }
-            />
-            <Input
-              label="Postal code"
-              labelPlacement="outside"
-              type="text"
-              {...register('billingAddress.postalCode')}
-              errorMessage={errors.billingAddress?.postalCode?.message}
-              isInvalid={
-                errors.billingAddress?.postalCode?.message ? true : false
-              }
+            <AddressFields
+              title="Billing address"
+              prefix="billingAddress"
+              register={register}
+              errors={errors}
+              setValue={setValue}
+              trigger={trigger}
             />
           </div>
         )}
+
         <Button
           className="col-span-3 col-start-1 row-start-2"
           color="primary"
