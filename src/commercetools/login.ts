@@ -37,8 +37,6 @@ export const tokenCache = {
     try {
       return JSON.parse(localStorage.getItem('authTokens') || '{}');
     } catch (e) {
-      console.error('Ошибка при парсинге токена из localStorage:', e);
-
       return {};
     }
   },

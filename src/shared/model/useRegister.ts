@@ -30,7 +30,6 @@ function useRegister() {
         const loginError = err as ResponseError;
 
         setError(loginError.message);
-        console.error('Login error:', loginError.message, loginError);
       })
       .finally(() => {
         setIsLoading(false);
