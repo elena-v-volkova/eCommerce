@@ -4,15 +4,16 @@ import { Input } from '@heroui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { NavLink } from 'react-router';
+import { useState } from 'react';
 
 import { TLoginFieldsSchema, LOGIN_SCHEMA } from '../lib/loginSchema';
-
 import useLogin from '../hooks/useLogin';
 
 import styles from './LoginForm.module.scss';
 
 import { AppRoute } from '@/routes/appRoutes';
 import DefaultLayout from '@/layouts/Default';
+import { EyeFilledIcon, EyeSlashFilledIcon } from '@/components/Icons';
 
 const LoginForm = () => {
   const {
@@ -23,6 +24,10 @@ const LoginForm = () => {
     resolver: zodResolver(LOGIN_SCHEMA),
   });
   const { fetchUser, isLoading, error } = useLogin();
+
+  const [isVisible, setIsVisible] = useState(false);
+
+  const toggleVisibility = () => setIsVisible(!isVisible);
 
   return (
     <DefaultLayout>
@@ -52,9 +57,23 @@ const LoginForm = () => {
             labelPlacement="outside"
             placeholder="Enter your password"
             {...register('password')}
+            endContent={
+              <button
+                aria-label="toggle password visibility"
+                className="focus:outline-none"
+                type="button"
+                onClick={toggleVisibility}
+              >
+                {isVisible ? (
+                  <EyeSlashFilledIcon className="pointer-events-none text-2xl text-default-400" />
+                ) : (
+                  <EyeFilledIcon className="pointer-events-none text-2xl text-default-400" />
+                )}
+              </button>
+            }
             errorMessage={errors.password?.message}
             isInvalid={errors.password?.message ? true : false}
-            type="password"
+            type={isVisible ? 'text' : 'password'}
           />
           <div className="flex gap-2">
             <Button color="primary" isDisabled={isLoading} type="submit">
