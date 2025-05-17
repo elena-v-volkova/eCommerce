@@ -149,6 +149,9 @@ export function prepareData(
     firstName: draft.firstName,
     lastName: draft.lastName,
   };
+  const array = [];
+
+  sameAddress ? array.push(address) : array.push(address, billingAddress);
 
   return {
     email: draft.email,
@@ -156,7 +159,7 @@ export function prepareData(
     firstName: draft.firstName,
     lastName: draft.lastName,
     dateOfBirth: draft.dateOfBirth.toString(),
-    addresses: [address, billingAddress],
+    addresses: array,
     defaultShippingAddress: 0,
     defaultBillingAddress: Number(!sameAddress),
   };

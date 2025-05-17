@@ -19,12 +19,16 @@ function useRegister() {
         body: customerDraft,
       })
       .execute()
-      .then(() => fetchUser(customerDraft))
+      .then(() => {
+        fetchUser({
+          email: customerDraft.email,
+          password: customerDraft.password,
+        });
+      })
       .catch((err) => {
         const loginError = err as ResponseError;
 
         setError(loginError.message);
-        console.error('Login error:', loginError.message, loginError);
       })
       .finally(() => {
         setIsLoading(false);

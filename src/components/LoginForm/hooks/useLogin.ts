@@ -41,7 +41,6 @@ const useLogin = () => {
         const loginError = error as ResponseError;
 
         setError(loginError.message);
-        console.error('Login error:', loginError.message, loginError);
       })
       .finally(() => setIsLoading(false));
   };
