@@ -30,7 +30,7 @@ function Register() {
   );
 }
 
-function NavFields({
+export function NavFields({
   currentStep,
   onStepChange,
   sameAsDelivery,

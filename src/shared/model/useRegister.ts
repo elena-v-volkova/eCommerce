@@ -1,17 +1,14 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
-
-import { useSession } from './useSession';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
+import useLogin from '@/components/LoginForm/hooks/useLogin';
 import { MyCustomerDraft, ResponseError } from '@/types/commercetools';
-import { AppRoute } from '@/routes/appRoutes';
 
 function useRegister() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const { login } = useSession();
-  const navigate = useNavigate();
+  const { fetchUser } = useLogin();
+
   const createCustomer = async (customerDraft: MyCustomerDraft) => {
     setIsLoading(true);
     setError(null);
@@ -22,9 +19,11 @@ function useRegister() {
         body: customerDraft,
       })
       .execute()
-      .then((data) => {
-        login(data.body.customer);
-        navigate(AppRoute.home, { replace: true });
+      .then(() => {
+        fetchUser({
+          email: customerDraft.email,
+          password: customerDraft.password,
+        });
       })
       .catch((err) => {
         const loginError = err as ResponseError;

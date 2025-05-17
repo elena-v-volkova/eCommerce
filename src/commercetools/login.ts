@@ -1,10 +1,10 @@
+import { createApiBuilderFromCtpClient } from '@commercetools/platform-sdk'; // Vor ./buildClient
 import {
   Client,
   ClientBuilder,
   TokenCache,
   TokenStore,
 } from '@commercetools/ts-client';
-import { createApiBuilderFromCtpClient } from '@commercetools/platform-sdk'; // Vor ./buildClient
 
 import {
   authUrl,
@@ -29,14 +29,14 @@ type PasswordAuthMiddlewareOptions = {
   scopes?: Array<string>;
   tokenCache?: TokenCache;
   oauthUri?: string;
-  fetch?: any;
+  // fetch?: any;
 };
 
 export const tokenCache = {
   get: () => {
     try {
       return JSON.parse(localStorage.getItem('authTokens') || '{}');
-    } catch (e) {
+    } catch {
       return {};
     }
   },

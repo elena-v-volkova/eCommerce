@@ -45,7 +45,7 @@
     "*.d.ts",
     "commitlint.config.mjs",
     "*.tsx",
-    ".github/coverage/Register.test.tsx"
+    "src/components/RegisterForm/Register.test.tsx"
   ],
   "exclude": [
     "node_modules",
