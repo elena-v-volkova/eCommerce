@@ -11,6 +11,7 @@ export function RegisterButton({
     <Button
       className={className}
       color="primary"
+      data-testid="submit-button"
       isLoading={isLoading}
       type="submit"
     >

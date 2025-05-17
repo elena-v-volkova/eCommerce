@@ -56,6 +56,7 @@ export const RegisterForm = ({ step, onDeliveryChange }: RegisterFormProps) => {
     <div className={styles.register}>
       <Form
         className="grid size-auto grid-cols-[auto_320_320] grid-rows-[auto] justify-items-center gap-4"
+        data-testid="form"
         onSubmit={handleSubmit(onSubmit)}
       >
         {(step === 'user' || !step) && (
