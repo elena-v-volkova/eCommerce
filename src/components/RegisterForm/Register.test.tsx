@@ -149,7 +149,7 @@ describe('RegisterForm', () => {
 
     await userEvent.click(sameAsDeliveryCheckbox);
 
-    const billingTitle = screen.getByText((content, element) => {
+    const billingTitle = screen.getByText((_, element) => {
       return element?.textContent === 'Billing address';
     });
 
