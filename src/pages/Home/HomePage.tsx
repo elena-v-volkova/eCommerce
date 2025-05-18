@@ -36,14 +36,6 @@ function Home() {
           >
             Documentation
           </Link>
-          <Link
-            isExternal
-            className={buttonStyles({ variant: 'bordered', radius: 'full' })}
-            href={SITE_CONFIG.links.github}
-          >
-            <GithubIcon size={20} />
-            GitHub
-          </Link>
         </div>
 
         <div className="mt-8">

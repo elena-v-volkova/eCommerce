@@ -50,7 +50,6 @@ export const apiRoot = createApiBuilderFromCtpClient(ctpClient).withProjectKey({
 
 export async function createCustomer(obj: TRegisterFieldsSchema) {
   const data = prepareData(obj);
-
   return apiRoot
     .customers()
     .post({
