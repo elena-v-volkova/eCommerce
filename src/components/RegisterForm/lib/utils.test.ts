@@ -2,10 +2,10 @@
 import { describe, it, expect } from 'vitest';
 import { CalendarDate } from '@internationalized/date';
 
-import { TRegisterFieldsSchema, prepareData } from './lib/registerSchema';
+import { prepareData } from './utils';
 
 describe('prepareData', () => {
-  const baseInput: TRegisterFieldsSchema = {
+  const baseInput: TRegisterFieldsSchemachema = {
     email: 'test@example.com',
     password: '123456',
     firstName: 'John',
