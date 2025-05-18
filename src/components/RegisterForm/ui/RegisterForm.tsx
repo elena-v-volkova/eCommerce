@@ -64,7 +64,6 @@ export const RegisterForm = ({ step, onDeliveryChange }: RegisterFormProps) => {
             <h4 className="mb-2.5">New user</h4>
             <Input
               placeholder="Email"
-              type="email"
               {...register('email')}
               errorMessage={errors.email?.message}
               isInvalid={errors.email?.message ? true : false}
