@@ -1,6 +1,14 @@
 import { DateValue, getLocalTimeZone, today } from '@internationalized/date';
 import { z } from 'zod';
+import { useState, useEffect } from 'react';
+import {
+  UseFormWatch,
+  UseFormSetValue,
+  useWatch,
+  Control,
+} from 'react-hook-form';
 
+import { BaseAddress, MyCustomerDraft } from '@/types/commercetools';
 import { COUNTRIES, getCountryInfo } from '@/shared/store/countries';
 const namePattern = z.string().regex(/^[A-ZА-Яа-яa-z]+$/, {
   message:
@@ -73,6 +81,83 @@ export const REGISTER_SCHEMA = z.object({
     .regex(/[A-Z]/, { message: 'Must at least 1 uppercase letter,' })
     .regex(/[0-9]/, { message: 'Must contain a number' }),
   address: addressSchema,
+  billingAddress: addressSchema,
+  sameAsDelivery: z.boolean(),
 });
 
 export type TRegisterFieldsSchema = z.infer<typeof REGISTER_SCHEMA>;
+
+interface UseSyncAddressesParams {
+  watch: UseFormWatch<TRegisterFieldsSchema>;
+  setValue: UseFormSetValue<TRegisterFieldsSchema>;
+  control: Control<TRegisterFieldsSchema>;
+}
+
+export function useSomeAddresses({
+  watch,
+  setValue,
+  control,
+}: UseSyncAddressesParams) {
+  const isSame = useWatch({ control, name: 'sameAsDelivery' });
+  const address = useWatch({ control, name: 'address' });
+  const [isChanged, setChanged] = useState(false);
+
+  watch((data, { name }) => {
+    if (data.sameAsDelivery) {
+      if (name?.startsWith('address', 0)) {
+        setChanged(!isChanged);
+      }
+    }
+  });
+  useEffect(() => {
+    if (isSame && addressIsValid(address)) {
+      setValue('billingAddress', address);
+    }
+  }, [isSame, isChanged]);
+}
+
+function addressIsValid(value: unknown): value is BaseAddress {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'streetName' in value &&
+    'city' in value &&
+    'postalCode' in value &&
+    'country' in value
+  );
+}
+
+export function prepareData(
+  input: TRegisterFieldsSchema,
+  sameAddress: boolean,
+): MyCustomerDraft {
+  const draft = JSON.parse(JSON.stringify(input));
+
+  draft.dateOfBirth = input.dateOfBirth.toString();
+  draft.address.country = getCountryInfo(input.address.country)?.code;
+  draft.billingAddress.country = getCountryInfo(
+    input.billingAddress.country,
+  )?.code;
+
+  const address = {
+    ...draft.address,
+    firstName: draft.firstName,
+    lastName: draft.lastName,
+  };
+  const billingAddress = {
+    ...draft.billingAddress,
+    firstName: draft.firstName,
+    lastName: draft.lastName,
+  };
+
+  return {
+    email: draft.email,
+    password: draft.password,
+    firstName: draft.firstName,
+    lastName: draft.lastName,
+    dateOfBirth: draft.dateOfBirth.toString(),
+    addresses: [address, billingAddress],
+    defaultShippingAddress: 0,
+    defaultBillingAddress: Number(!sameAddress),
+  };
+}

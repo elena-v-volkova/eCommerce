@@ -1,4 +1,4 @@
-export type CustomerDraft = {
+export type MyCustomerDraft = {
   email: string;
   password: string;
   firstName: string;
@@ -6,6 +6,7 @@ export type CustomerDraft = {
   dateOfBirth: string;
   addresses: BaseAddress[];
   defaultShippingAddress: number;
+  defaultBillingAddress: number;
 };
 export type BaseAddress = {
   firstName: string;
@@ -15,3 +16,8 @@ export type BaseAddress = {
   city: string;
   country: string;
 };
+
+export interface ResponseError {
+  message: string;
+  statusCode?: number;
+}
