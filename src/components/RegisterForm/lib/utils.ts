@@ -10,23 +10,31 @@ import {
 
 import { BaseAddress, MyCustomerDraft } from '@/types/commercetools';
 import { COUNTRIES, getCountryInfo } from '@/shared/store/countries';
-const namePattern = z.string().regex(/^[A-ZА-Яа-яa-z]+$/, {
-  message:
-    'Must contain at least one character and no special characters or numbers',
-});
+const namePattern = z
+  .string()
+  .regex(/^\S(?:.*\S)?$/, { message: 'No leading or trailing spaces' })
+  .regex(/^[A-ZА-Яа-яЁёa-z]+$/, {
+    message:
+      'Must contain at least one character and no special characters or numbers',
+  });
 
 const addressSchema = z
   .object({
     streetName: z
       .string()
+      .regex(/^\S(?:.*\S)?$/, { message: 'No leading or trailing spaces' })
       .min(1, { message: 'Street must contain at least one character' }),
     city: z
       .string()
+      .regex(/^\S(?:.*\S)?$/, { message: 'No leading or trailing spaces' })
       .min(1, { message: 'City must contain at least one character' })
       .regex(/^[A-Za-zА-Яа-яЁё\s-]+$/, {
         message: 'City must not contain numbers or special characters',
       }),
-    postalCode: z.string(),
+    postalCode: z
+      .string()
+      .regex(/^\S(?:.*\S)?$/, { message: 'No leading or trailing spaces' })
+      .regex(/^(?!0)[^\s]+$/, { message: 'Should not start from zero' }),
     country: z.string().refine(
       (value) => {
         return COUNTRIES.includes(value);
@@ -73,8 +81,10 @@ export const REGISTER_SCHEMA = z.object({
     ),
 
   email: z.string().email(),
+
   password: z
     .string()
+    .regex(/^[^\s\t]+$/, { message: 'No spaces allowed' })
     .min(8, 'Minimum 8 characters')
     .max(20, { message: 'Password is too long' })
     .regex(/[a-z]/, { message: 'Must contain a lowercase letter' })
