@@ -5,7 +5,6 @@ import useLogin from '../hooks/useLogin';
 
 import { AppRoute } from '@/routes/appRoutes';
 
-// Мокаем зависимости
 vi.mock('react-router', () => ({
   useNavigate: () => mockedNavigate,
 }));
@@ -26,12 +25,10 @@ vi.mock('@/commercetools/login', () => ({
   })),
 }));
 
-// Моки
 const mockedNavigate = vi.fn();
 const mockedLogin = vi.fn();
 const mockedExecute = vi.fn();
 
-// Очистка перед каждым тестом
 beforeEach(() => {
   vi.clearAllMocks();
 });
