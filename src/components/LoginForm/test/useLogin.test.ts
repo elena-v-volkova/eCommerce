@@ -1,6 +1,8 @@
 import { renderHook, act } from '@testing-library/react';
 import { vi } from 'vitest';
+
 import useLogin from '../hooks/useLogin';
+
 import { AppRoute } from '@/routes/appRoutes';
 
 // Мокаем зависимости
