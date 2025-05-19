@@ -4,13 +4,13 @@ import { useState } from 'react';
 import { useWindowWidth } from '@/shared/utils/utils';
 import { RegisterForm } from '@/components/RegisterForm/ui/RegisterForm';
 
+type registerStep = 'user' | 'shipping' | 'billing';
+
 function Register() {
   const width = useWindowWidth();
   const isNarrow = width <= 734;
 
-  const [currentStep, setCurrentStep] = useState<
-    'user' | 'shipping' | 'billing'
-  >('user');
+  const [currentStep, setCurrentStep] = useState<registerStep>('user');
   const [onSameChecked, setOnSameChecked] = useState(true);
 
   return (
@@ -36,7 +36,7 @@ export function NavFields({
   sameAsDelivery,
 }: {
   currentStep: string;
-  onStepChange: (key: any) => void;
+  onStepChange: (key: registerStep) => void;
   sameAsDelivery: boolean;
 }) {
   return (
@@ -45,7 +45,7 @@ export function NavFields({
         color={'primary'}
         size={'lg'}
         underline={'hover'}
-        onAction={(key) => onStepChange(key)}
+        onAction={(key) => onStepChange(key as registerStep)}
       >
         <BreadcrumbItem key="user" isCurrent={currentStep === 'user'}>
           User Data
