@@ -14,11 +14,15 @@ import React from 'react';
 import { SITE_CONFIG } from '@/config/site';
 import { ThemeSwitch } from '@/components/ThemeSwitch';
 import { Logo } from '@/components/Icons';
-import { useSession } from '@/shared/model/useSession';
+import { useAuth } from '@/shared/model/AuthContext';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  const { user, logout } = useSession();
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <Navbar onMenuOpenChange={setIsMenuOpen}>
@@ -48,7 +52,12 @@ export function Header() {
       <NavbarContent justify="end">
         {user ? (
           <NavbarItem>
-            <Button color="primary" size="sm" variant="flat" onClick={logout}>
+            <Button
+              color="primary"
+              size="sm"
+              variant="flat"
+              onClick={handleLogout}
+            >
               Logout
             </Button>
           </NavbarItem>

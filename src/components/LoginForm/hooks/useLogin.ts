@@ -1,16 +1,15 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router';
-
+import { useNavigate } from 'react-router-dom';
 import { createPasswordFlowClient } from '@/commercetools/login';
 import { AppRoute } from '@/routes/appRoutes';
-import { useSession } from '@/shared/model/useSession';
-import { ResponseError } from '@/types/commercetools';
 
-const useLogin = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+import { useState } from 'react';
+import { useAuth } from '@/shared/model/AuthContext';
+
+export const useLogin = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { login } = useSession();
+  const { login } = useAuth();
 
   const fetchUser = async ({
     email,
@@ -21,37 +20,22 @@ const useLogin = () => {
   }) => {
     setIsLoading(true);
     setError(null);
-    if (!email && !password) return;
-    const loginClient = createPasswordFlowClient(email, password);
 
-    await loginClient
-      .login()
-      .post({
-        body: {
-          email: email,
-          password,
-        },
-      })
-      .execute()
-      .then((data) => {
-        login(data.body.customer);
-        navigate(AppRoute.home, { replace: true });
-        //need to change later (this is for header buttons (logout))
-        window.location.reload();
-      })
-      .catch((error) => {
-        const loginError = error as ResponseError;
+    try {
+      const loginClient = createPasswordFlowClient(email, password);
+      const response = await loginClient
+        .login()
+        .post({ body: { email, password } })
+        .execute();
 
-        setError(loginError.message);
-      })
-      .finally(() => setIsLoading(false));
+      login(response.body.customer);
+      navigate(AppRoute.home, { replace: true });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  return {
-    fetchUser,
-    isLoading,
-    error,
-  };
+  return { fetchUser, isLoading, error };
 };
-
-export default useLogin;
