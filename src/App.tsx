@@ -14,9 +14,7 @@ function App() {
   return (
     // <Provider store={store}>
     <AuthProvider>
-      <div className="relative flex h-screen flex-col">
-        <Header />
-      </div>
+      <Header />
       <Routes>
         <Route element={<Outlet />} path="/">
           <Route element={<Home />} path={AppRoute.home} />
