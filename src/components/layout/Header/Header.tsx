@@ -14,9 +14,11 @@ import React from 'react';
 import { SITE_CONFIG } from '@/config/site';
 import { ThemeSwitch } from '@/components/ThemeSwitch';
 import { Logo } from '@/components/Icons';
+import { useSession } from '@/shared/model/useSession';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const { user, logout } = useSession();
 
   return (
     <Navbar onMenuOpenChange={setIsMenuOpen}>
@@ -44,28 +46,38 @@ export function Header() {
       </NavbarContent>
 
       <NavbarContent justify="end">
-        <NavbarItem className=" lg:flex">
-          <Button
-            as={Link}
-            color="primary"
-            href="/login"
-            size="sm"
-            variant="flat"
-          >
-            Login
-          </Button>
-        </NavbarItem>
-        <NavbarItem>
-          <Button
-            as={Link}
-            color="primary"
-            href="/register"
-            size="sm"
-            variant="flat"
-          >
-            Sign Up
-          </Button>
-        </NavbarItem>
+        {user ? (
+          <NavbarItem>
+            <Button color="primary" size="sm" variant="flat" onClick={logout}>
+              Logout
+            </Button>
+          </NavbarItem>
+        ) : (
+          <>
+            <NavbarItem>
+              <Button
+                as={Link}
+                color="primary"
+                href="/login"
+                size="sm"
+                variant="flat"
+              >
+                Login
+              </Button>
+            </NavbarItem>
+            <NavbarItem>
+              <Button
+                as={Link}
+                color="primary"
+                href="/register"
+                size="sm"
+                variant="flat"
+              >
+                Sign Up
+              </Button>
+            </NavbarItem>
+          </>
+        )}
         <NavbarItem>
           <ThemeSwitch />
         </NavbarItem>

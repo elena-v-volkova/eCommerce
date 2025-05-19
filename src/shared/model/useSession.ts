@@ -13,13 +13,11 @@ interface TokenStore {
 export function useSession() {
   const [token, setToken] = useState<TokenStore | null>(() => {
     const stored = localStorage.getItem(TOKEN_KEY);
-
     return stored ? JSON.parse(stored) : null;
   });
 
   const [user, setUser] = useState(() => {
     const stored = localStorage.getItem(USER_DATA);
-
     return stored ? JSON.parse(stored) : null;
   });
 
