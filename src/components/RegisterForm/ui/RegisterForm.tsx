@@ -32,7 +32,7 @@ export const RegisterForm = ({ step, onDeliveryChange }: RegisterFormProps) => {
     trigger,
     setValue,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValidating },
     watch,
   } = useForm<TRegisterFieldsSchema>({
     resolver: zodResolver(REGISTER_SCHEMA),
@@ -153,9 +153,10 @@ export const RegisterForm = ({ step, onDeliveryChange }: RegisterFormProps) => {
           />
         )}
       </Form>
-      {Object.keys(errors).length > 0 && (
-        <p className={styles.error_msg}>Заполните все поля</p>
-      )}
+      {Object.keys(errors).length > 0 &&
+        step &&
+        !errors.address?.postalCode?.message &&
+        !isValidating && <p className={styles.error_msg}>Заполните все поля</p>}
       {error && <p className={styles.error_msg}>{error}</p>}
     </div>
   );
