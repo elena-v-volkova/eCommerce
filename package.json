@@ -12,7 +12,7 @@
     "stylelint": "stylelint 'src/**/*.{css,scss}'",
     "stylelint:fix": "stylelint 'src/**/*.{css,scss}' --fix",
     "test": "vitest run",
-    "test UI": "vitest --ui",
+    "test UI": "vitest --ui --coverage.enabled=true",
     "coverage": "vitest run --coverage",
     "build": "tsc -b && vite build",
     "preview": "vite preview",

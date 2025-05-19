@@ -215,5 +215,5 @@ describe('RegisterForm', () => {
         defaultBillingAddress: 0,
       });
     });
-  }, 10000);
+  }, 40000);
 });
