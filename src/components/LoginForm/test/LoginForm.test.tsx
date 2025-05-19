@@ -31,7 +31,7 @@ describe('LoginForm', () => {
 
     await user.click(submitButton);
 
-    expect(await screen.findByText('Invalid email')).toBeInTheDocument();
+    expect(await screen.findByText('Email is required')).toBeInTheDocument();
     expect(
       await screen.findByText('Password is too short'),
     ).toBeInTheDocument();

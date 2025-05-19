@@ -9,7 +9,7 @@ const COUNTRY_DEF: Record<string, string> = {
 export type CountryName = keyof typeof COUNTRY_DEF;
 export const COUNTRIES = Object.keys(COUNTRY_DEF);
 
-interface SelectCountryRule {
+export interface SelectCountryRule {
   code: string;
   regex: RegExp;
 }
