@@ -32,6 +32,7 @@ export default defineConfig({
             provider: 'v8',
             reporter: ['text', 'html'],
         },
-        exclude: [], //exclude test files
+
+        exclude: [],
     },
 });

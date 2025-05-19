@@ -33,10 +33,9 @@ const LoginForm = () => {
           label="Email"
           labelPlacement="outside"
           placeholder="Enter your email"
-          type="email"
           {...register('email')}
           errorMessage={errors.email?.message}
-          isInvalid={errors.email?.message ? true : false}
+          isInvalid={!!errors.email}
         />
 
         <NavLink
@@ -47,7 +46,7 @@ const LoginForm = () => {
         </NavLink>
         <PasswordInput
           errorMessage={errors.password?.message}
-          isInvalid={errors.password?.message ? true : false}
+          isInvalid={!!errors.password}
           placeholder="Enter your password"
           register={register('password')}
         />
