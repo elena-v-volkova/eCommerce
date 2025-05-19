@@ -36,6 +36,8 @@ const useLogin = () => {
       .then((data) => {
         login(data.body.customer);
         navigate(AppRoute.home, { replace: true });
+        //need to change later (this is for header buttons (logout))
+        window.location.reload();
       })
       .catch((error) => {
         const loginError = error as ResponseError;
