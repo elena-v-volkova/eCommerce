@@ -9,7 +9,7 @@ import {
   NavbarMenuItem,
   NavbarMenuToggle,
 } from '@heroui/navbar';
-import React from 'react';
+import { useState } from 'react';
 
 import { SITE_CONFIG } from '@/config/site';
 import { ThemeSwitch } from '@/components/ThemeSwitch';
@@ -17,7 +17,7 @@ import { Logo } from '@/components/Icons';
 import { useAuth } from '@/shared/model/AuthContext';
 
 export function Header() {
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, logout } = useAuth();
 
   const handleLogout = () => {
@@ -25,7 +25,7 @@ export function Header() {
   };
 
   return (
-    <Navbar onMenuOpenChange={setIsMenuOpen}>
+    <Navbar isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
       <NavbarContent>
         <NavbarMenuToggle
           aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
@@ -100,6 +100,7 @@ export function Header() {
               color="foreground"
               href={item.href}
               size="lg"
+              onClick={() => setIsMenuOpen(false)}
             >
               {item.label}
             </Link>
