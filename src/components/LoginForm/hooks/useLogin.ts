@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+
 import { createPasswordFlowClient } from '@/commercetools/login';
 import { AppRoute } from '@/routes/appRoutes';
-
-import { useState } from 'react';
 import { useAuth } from '@/shared/model/AuthContext';
 
 export const useLogin = () => {
@@ -18,6 +18,7 @@ export const useLogin = () => {
     email: string;
     password: string;
   }) => {
+    if (!email || !password) return;
     setIsLoading(true);
     setError(null);
 

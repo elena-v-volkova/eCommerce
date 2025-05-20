@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
-
 import { MyCustomerDraft, ResponseError } from '@/types/commercetools';
 import { useLogin } from '@/components/LoginForm/hooks/useLogin';
 
