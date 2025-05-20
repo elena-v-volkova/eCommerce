@@ -12,6 +12,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<Customer | null>(() => {
     const stored = localStorage.getItem('userData');
+
     return stored ? JSON.parse(stored) : null;
   });
 
@@ -35,8 +36,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
+
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
+
   return context;
 }

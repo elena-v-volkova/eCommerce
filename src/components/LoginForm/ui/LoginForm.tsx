@@ -6,12 +6,12 @@ import { useForm } from 'react-hook-form';
 import { NavLink } from 'react-router';
 
 import { TLoginFieldsSchema, LOGIN_SCHEMA } from '../lib/loginSchema';
+import { useLogin } from '../hooks/useLogin';
 
 import styles from './LoginForm.module.scss';
 
 import { AppRoute } from '@/routes/appRoutes';
 import { PasswordInput } from '@/components/PasswordInput';
-import { useLogin } from '../hooks/useLogin';
 
 const LoginForm = () => {
   const {

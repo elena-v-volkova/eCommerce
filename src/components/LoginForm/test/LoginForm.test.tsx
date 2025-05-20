@@ -1,17 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router';
 
 import LoginForm from '../ui/LoginForm';
 
+import { RouterWrapper } from './test-utils/Wrapper';
+
 describe('LoginForm', () => {
   it('renders login form with email and password inputs', () => {
-    render(
-      <MemoryRouter>
-        <LoginForm />
-      </MemoryRouter>,
-    );
+    render(<LoginForm />, { wrapper: RouterWrapper });
 
     expect(screen.getByLabelText(/Email/i)).toBeInTheDocument();
     expect(
@@ -21,11 +18,7 @@ describe('LoginForm', () => {
   it('shows validation errors if fields are empty', async () => {
     const user = userEvent.setup();
 
-    render(
-      <MemoryRouter>
-        <LoginForm />
-      </MemoryRouter>,
-    );
+    render(<LoginForm />, { wrapper: RouterWrapper });
 
     const submitButton = screen.getByRole('button', { name: /login/i });
 
