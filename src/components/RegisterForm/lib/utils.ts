@@ -78,6 +78,14 @@ export const REGISTER_SCHEMA = z.object({
         return date.compare(today(getLocalTimeZone())) <= 0;
       },
       { message: 'Date of birth cannot be in the future' },
+    )
+    .refine(
+      (date) => {
+        const minAdultDate = today(getLocalTimeZone()).subtract({ years: 18 });
+
+        return date.compare(minAdultDate) <= 0;
+      },
+      { message: 'You must be at least 18 years old' },
     ),
 
   email: z.string().email(),
