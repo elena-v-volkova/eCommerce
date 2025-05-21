@@ -5,6 +5,7 @@ import { getLocalTimeZone, today } from '@internationalized/date';
 import { Controller, useForm } from 'react-hook-form';
 import { I18nProvider } from '@react-aria/i18n';
 import { useEffect } from 'react';
+import { NavLink } from 'react-router';
 
 import {
   REGISTER_SCHEMA,
@@ -19,6 +20,7 @@ import { RegisterButton } from './RegisterButton';
 
 import useRegister from '@/shared/model/useRegister';
 import { PasswordInput } from '@/components/PasswordInput';
+import { AppRoute } from '@/routes/appRoutes';
 
 type RegisterFormProps = {
   step?: 'user' | 'shipping' | 'billing' | 'register' | null;
@@ -158,6 +160,17 @@ export const RegisterForm = ({ step, onDeliveryChange }: RegisterFormProps) => {
         !errors.address?.postalCode?.message &&
         !isValidating && <p className={styles.error_msg}>Заполните все поля</p>}
       {error && <p className={styles.error_msg}>{error}</p>}
+      {(step === null || step === 'user') && (
+        <div className="mt-4 text-center text-sm">
+          Have an account?{' '}
+          <NavLink
+            className="underline underline-offset-4"
+            to={`/${AppRoute.login}`}
+          >
+            Login
+          </NavLink>
+        </div>
+      )}
     </div>
   );
 };
