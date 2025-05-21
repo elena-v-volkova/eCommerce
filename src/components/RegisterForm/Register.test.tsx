@@ -212,7 +212,7 @@ describe('RegisterForm', () => {
           }),
         ]),
         defaultShippingAddress: 0,
-        defaultBillingAddress: 0,
+        defaultBillingAddress: 1,
       });
     });
   }, 40000);
