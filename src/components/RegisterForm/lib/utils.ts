@@ -187,10 +187,14 @@ export function prepareData(
   if (draft.defaultShipping)
     Object.defineProperty(result, 'defaultShippingAddress', {
       value: 0,
+      enumerable: true,
     });
   if (draft.defaultBilling)
     Object.defineProperty(result, 'defaultBillingAddress', {
-      value: 1,
+      value: (() => {
+        return sameAddress ? 0 : 1;
+      })(),
+      enumerable: true,
     });
 
   return result;

@@ -126,17 +126,17 @@ export const RegisterForm = ({ step, onDeliveryChange }: RegisterFormProps) => {
               trigger={trigger}
             />
             <DefaultAddress
-              className="mt-1 "
+              className="mt-1"
+              prefix={'defaultShipping'}
               register={register}
               text={'Default shipping address'}
-              value={'defaultShipping'}
             />
             {sameAsDelivery && (
               <DefaultAddress
-                className="mt-1 "
+                className="mt-1"
+                prefix={'defaultBilling'}
                 register={register}
                 text={'Default billing address'}
-                value={'defaultBilling'}
               />
             )}
             <Checkbox
@@ -161,18 +161,18 @@ export const RegisterForm = ({ step, onDeliveryChange }: RegisterFormProps) => {
             />
             <DefaultAddress
               className="mt-1"
+              prefix={'defaultBilling'}
               register={register}
               text={'Default billing address'}
-              value={'defaultBilling'}
             />
             {!sameAsDelivery && step && (
-              <RegisterButton className=" my-5 " isLoading={isLoading} />
+              <RegisterButton className="my-5" isLoading={isLoading} />
             )}
           </div>
         )}
         {!step && (
           <RegisterButton
-            className="col-span-3  col-start-1 row-start-2 w-1/3"
+            className="col-span-3 col-start-1 row-start-2 w-1/3"
             isLoading={isLoading}
           />
         )}

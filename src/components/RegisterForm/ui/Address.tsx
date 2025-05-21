@@ -68,19 +68,24 @@ export const AddressFields = ({
 
 interface DefaultAddressProps {
   text: string;
-  value: 'defaultShipping' | 'defaultBilling';
+  prefix: 'defaultShipping' | 'defaultBilling';
   register: UseFormRegister<TRegisterFieldsSchema>;
   className: string;
 }
 
 export const DefaultAddress: React.FC<DefaultAddressProps> = ({
   text,
-  value,
+  prefix,
   register,
   className,
 }) => {
   return (
-    <Checkbox className={className} color="warning" {...register(value)}>
+    <Checkbox
+      disableAnimation
+      className={className}
+      color="warning"
+      {...register(prefix)}
+    >
       {text}
     </Checkbox>
   );
