@@ -101,6 +101,8 @@ export const REGISTER_SCHEMA = z.object({
   address: addressSchema,
   billingAddress: addressSchema,
   sameAsDelivery: z.boolean(),
+  defaultShipping: z.boolean(),
+  defaultBilling: z.boolean(),
 });
 
 export type TRegisterFieldsSchema = z.infer<typeof REGISTER_SCHEMA>;
@@ -167,18 +169,29 @@ export function prepareData(
     firstName: draft.firstName,
     lastName: draft.lastName,
   };
-  const array = [];
+  const arrayAddr = [];
 
-  sameAddress ? array.push(address) : array.push(address, billingAddress);
+  sameAddress
+    ? arrayAddr.push(address)
+    : arrayAddr.push(address, billingAddress);
 
-  return {
+  const result = {
     email: draft.email,
     password: draft.password,
     firstName: draft.firstName,
     lastName: draft.lastName,
     dateOfBirth: draft.dateOfBirth.toString(),
-    addresses: array,
-    defaultShippingAddress: 0,
-    defaultBillingAddress: Number(!sameAddress),
+    addresses: arrayAddr,
   };
+
+  if (draft.defaultShipping)
+    Object.defineProperty(result, 'defaultShippingAddress', {
+      value: 0,
+    });
+  if (draft.defaultBilling)
+    Object.defineProperty(result, 'defaultBillingAddress', {
+      value: 1,
+    });
+
+  return result;
 }

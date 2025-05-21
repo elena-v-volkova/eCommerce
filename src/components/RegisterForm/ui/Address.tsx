@@ -1,4 +1,5 @@
-import { Input, Select, SelectItem } from '@heroui/react';
+import { Checkbox, Input, Select, SelectItem } from '@heroui/react';
+import { UseFormRegister } from 'react-hook-form';
 
 import { TRegisterFieldsSchema } from '../lib/utils';
 
@@ -62,5 +63,25 @@ export const AddressFields = ({
         isInvalid={errors[prefix]?.postalCode?.message ? true : false}
       />
     </>
+  );
+};
+
+interface DefaultAddressProps {
+  text: string;
+  value: 'defaultShipping' | 'defaultBilling';
+  register: UseFormRegister<TRegisterFieldsSchema>;
+  className: string;
+}
+
+export const DefaultAddress: React.FC<DefaultAddressProps> = ({
+  text,
+  value,
+  register,
+  className,
+}) => {
+  return (
+    <Checkbox className={className} color="warning" {...register(value)}>
+      {text}
+    </Checkbox>
   );
 };

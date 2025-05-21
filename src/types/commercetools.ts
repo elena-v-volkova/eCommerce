@@ -5,8 +5,8 @@ export type MyCustomerDraft = {
   lastName: string;
   dateOfBirth: string;
   addresses: BaseAddress[];
-  defaultShippingAddress: number;
-  defaultBillingAddress: number;
+  defaultShippingAddress?: number;
+  defaultBillingAddress?: number;
 };
 export type BaseAddress = {
   firstName: string;

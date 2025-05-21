@@ -15,7 +15,7 @@ import {
 } from '../lib/utils';
 
 import styles from './Register.module.scss';
-import { AddressFields } from './Address';
+import { AddressFields, DefaultAddress } from './Address';
 import { RegisterButton } from './RegisterButton';
 
 import useRegister from '@/shared/model/useRegister';
@@ -41,6 +41,8 @@ export const RegisterForm = ({ step, onDeliveryChange }: RegisterFormProps) => {
     mode: 'onChange',
     defaultValues: {
       sameAsDelivery: true,
+      defaultShipping: true,
+      defaultBilling: true,
     },
   });
   const { createCustomer, isLoading, error } = useRegister();
@@ -123,8 +125,22 @@ export const RegisterForm = ({ step, onDeliveryChange }: RegisterFormProps) => {
               title="Shipping address"
               trigger={trigger}
             />
+            <DefaultAddress
+              className="mt-1 "
+              register={register}
+              text={'Default shipping address'}
+              value={'defaultShipping'}
+            />
+            {sameAsDelivery && (
+              <DefaultAddress
+                className="mt-1 "
+                register={register}
+                text={'Default billing address'}
+                value={'defaultBilling'}
+              />
+            )}
             <Checkbox
-              className="m-1"
+              className="my-1"
               color="default"
               {...register('sameAsDelivery')}
             >
@@ -142,6 +158,12 @@ export const RegisterForm = ({ step, onDeliveryChange }: RegisterFormProps) => {
               setValue={setValue}
               title="Billing address"
               trigger={trigger}
+            />
+            <DefaultAddress
+              className="mt-1"
+              register={register}
+              text={'Default billing address'}
+              value={'defaultBilling'}
             />
             {!sameAsDelivery && step && (
               <RegisterButton className=" my-5 " isLoading={isLoading} />
