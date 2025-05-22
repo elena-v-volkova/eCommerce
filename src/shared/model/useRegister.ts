@@ -1,9 +1,9 @@
+import toast from 'react-hot-toast';
 import { useState } from 'react';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
 import { MyCustomerDraft, ResponseError } from '@/types/commercetools';
 import { useLogin } from '@/components/LoginForm/hooks/useLogin';
-import toast from 'react-hot-toast';
 
 function useRegister() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
