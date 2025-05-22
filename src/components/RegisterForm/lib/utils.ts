@@ -34,7 +34,9 @@ const addressSchema = z
     postalCode: z
       .string()
       .regex(/^(?:\S(?:.*\S)?)?$/, { message: 'No leading or trailing spaces' })
-      .regex(/^(?!0)\S*$|^$/, { message: 'Should not start from zero' }),
+      .refine((value: string) => value === '' || !value.startsWith('0'), {
+        message: 'Should not start with zero',
+      }),
     country: z.string().refine(
       (value) => {
         return COUNTRIES.includes(value);
@@ -54,15 +56,26 @@ const addressSchema = z
 
       return;
     }
+    const rule = getCountryInfo(country)?.regex;
 
-    const isValid = getCountryInfo(country)?.regex.test(postalCode);
+    if (rule !== undefined) {
+      const isValid = rule.test(postalCode);
+      const isSpacesAllowed = /\s/.test(rule.source);
 
-    if (!isValid) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['postalCode'],
-        message: 'Postal code must be valid for the selected country',
-      });
+      if (!isSpacesAllowed && postalCode.includes(' ')) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['postalCode'],
+          message: 'No spaces allowed',
+        });
+      }
+      if (!isValid) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['postalCode'],
+          message: 'Postal code must be valid for the selected country',
+        });
+      }
     }
   });
 
