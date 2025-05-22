@@ -5,6 +5,7 @@ import { getLocalTimeZone, today } from '@internationalized/date';
 import { Controller, useForm } from 'react-hook-form';
 import { I18nProvider } from '@react-aria/i18n';
 import { useEffect } from 'react';
+import { NavLink } from 'react-router';
 
 import {
   REGISTER_SCHEMA,
@@ -14,11 +15,12 @@ import {
 } from '../lib/utils';
 
 import styles from './Register.module.scss';
-import { AddressFields } from './Address';
+import { AddressFields, DefaultAddress } from './Address';
 import { RegisterButton } from './RegisterButton';
 
 import useRegister from '@/shared/model/useRegister';
 import { PasswordInput } from '@/components/PasswordInput';
+import { AppRoute } from '@/routes/appRoutes';
 
 type RegisterFormProps = {
   step?: 'user' | 'shipping' | 'billing' | 'register' | null;
@@ -39,6 +41,8 @@ export const RegisterForm = ({ step, onDeliveryChange }: RegisterFormProps) => {
     mode: 'onChange',
     defaultValues: {
       sameAsDelivery: true,
+      defaultShipping: true,
+      defaultBilling: true,
     },
   });
   const { createCustomer, isLoading, error } = useRegister();
@@ -121,8 +125,22 @@ export const RegisterForm = ({ step, onDeliveryChange }: RegisterFormProps) => {
               title="Shipping address"
               trigger={trigger}
             />
+            <DefaultAddress
+              className="mt-1"
+              prefix={'defaultShipping'}
+              register={register}
+              text={'Default shipping address'}
+            />
+            {sameAsDelivery && (
+              <DefaultAddress
+                className="mt-1"
+                prefix={'defaultBilling'}
+                register={register}
+                text={'Default billing address'}
+              />
+            )}
             <Checkbox
-              className="m-1"
+              className="my-1"
               color="default"
               {...register('sameAsDelivery')}
             >
@@ -141,14 +159,20 @@ export const RegisterForm = ({ step, onDeliveryChange }: RegisterFormProps) => {
               title="Billing address"
               trigger={trigger}
             />
+            <DefaultAddress
+              className="mt-1"
+              prefix={'defaultBilling'}
+              register={register}
+              text={'Default billing address'}
+            />
             {!sameAsDelivery && step && (
-              <RegisterButton className=" my-5 " isLoading={isLoading} />
+              <RegisterButton className="my-5" isLoading={isLoading} />
             )}
           </div>
         )}
         {!step && (
           <RegisterButton
-            className="col-span-3  col-start-1 row-start-2 w-1/3"
+            className="col-span-3 col-start-1 row-start-2 w-1/3"
             isLoading={isLoading}
           />
         )}
@@ -158,6 +182,17 @@ export const RegisterForm = ({ step, onDeliveryChange }: RegisterFormProps) => {
         !errors.address?.postalCode?.message &&
         !isValidating && <p className={styles.error_msg}>Заполните все поля</p>}
       {error && <p className={styles.error_msg}>{error}</p>}
+      {(step === null || step === 'user') && (
+        <div className="mt-4 text-center text-sm">
+          Have an account?{' '}
+          <NavLink
+            className="underline underline-offset-4"
+            to={`/${AppRoute.login}`}
+          >
+            Login
+          </NavLink>
+        </div>
+      )}
     </div>
   );
 };

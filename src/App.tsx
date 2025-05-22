@@ -22,7 +22,14 @@ function App() {
           }
           path={AppRoute.login}
         />
-        <Route element={<Register />} path={AppRoute.register} />
+        <Route
+          element={
+            <RedirectIfAuthenticated>
+              <Register />
+            </RedirectIfAuthenticated>
+          }
+          path={AppRoute.register}
+        />
         <Route element={<NotFound />} path={AppRoute.notFound} />
       </Route>
     </Routes>

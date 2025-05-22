@@ -1,30 +1,32 @@
 // @ts-nocheck
-import { describe, it, expect } from 'vitest';
 import { CalendarDate } from '@internationalized/date';
+import { describe, expect, it } from 'vitest';
 
-import { prepareData } from './utils';
+import { prepareData, TRegisterFieldsSchema } from './utils';
+
+const baseInput: TRegisterFieldsSchema = {
+  email: 'test@example.com',
+  password: '123456',
+  firstName: 'John',
+  lastName: 'Doe',
+  dateOfBirth: new CalendarDate(1990, 5, 9),
+  address: {
+    country: 'Russia',
+    city: 'Moscow',
+    streetName: 'Lenina',
+    postalCode: '123456',
+  },
+  billingAddress: {
+    country: 'Canada',
+    city: 'Toronto',
+    streetName: 'King St',
+    postalCode: 'A1A 1A1',
+  },
+  defaultShipping: true,
+  defaultBilling: true,
+};
 
 describe('prepareData', () => {
-  const baseInput: TRegisterFieldsSchemachema = {
-    email: 'test@example.com',
-    password: '123456',
-    firstName: 'John',
-    lastName: 'Doe',
-    dateOfBirth: new CalendarDate(1990, 5, 9),
-    address: {
-      country: 'Russia',
-      city: 'Moscow',
-      streetName: 'Lenina',
-      postalCode: '123456',
-    },
-    billingAddress: {
-      country: 'Canada',
-      city: 'Toronto',
-      streetName: 'King St',
-      postalCode: 'A1A 1A1',
-    },
-  };
-
   it('should prepare correct CustomerDraft when sameAddress is false', () => {
     const result = prepareData(baseInput, false);
 
@@ -36,9 +38,18 @@ describe('prepareData', () => {
     expect(result.defaultShippingAddress).toBe(0);
   });
 
-  it('should set defaultBillingAddress to 0 when sameAddress is true', () => {
+  it('should set addresses size when sameAddress is true', () => {
     const result = prepareData(baseInput, true);
 
-    expect(result.defaultBillingAddress).toBe(0);
+    expect(result.addresses.length).toBe(1);
+  });
+
+  it('should not parameters default billing and shipping addresses when no default addresses', () => {
+    baseInput.defaultBilling = false;
+    baseInput.defaultShipping = false;
+    const result = prepareData(baseInput, false);
+
+    expect(result.defaultBillingAddress).toBe(undefined);
+    expect(result.defaultShippingAddress).toBe(undefined);
   });
 });

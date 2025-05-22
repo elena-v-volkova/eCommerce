@@ -34,7 +34,9 @@ const addressSchema = z
     postalCode: z
       .string()
       .regex(/^(?:\S(?:.*\S)?)?$/, { message: 'No leading or trailing spaces' })
-      .regex(/^(?!0)\S*$|^$/, { message: 'Should not start from zero' }),
+      .refine((value: string) => value === '' || !value.startsWith('0'), {
+        message: 'Should not start with zero',
+      }),
     country: z.string().refine(
       (value) => {
         return COUNTRIES.includes(value);
@@ -54,15 +56,26 @@ const addressSchema = z
 
       return;
     }
+    const rule = getCountryInfo(country)?.regex;
 
-    const isValid = getCountryInfo(country)?.regex.test(postalCode);
+    if (rule !== undefined) {
+      const isValid = rule.test(postalCode);
+      const isSpacesAllowed = /\s/.test(rule.source);
 
-    if (!isValid) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['postalCode'],
-        message: 'Postal code must be valid for the selected country',
-      });
+      if (!isSpacesAllowed && postalCode.includes(' ')) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['postalCode'],
+          message: 'No spaces allowed',
+        });
+      }
+      if (!isValid) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['postalCode'],
+          message: 'Postal code must be valid for the selected country',
+        });
+      }
     }
   });
 
@@ -78,9 +91,17 @@ export const REGISTER_SCHEMA = z.object({
         return date.compare(today(getLocalTimeZone())) <= 0;
       },
       { message: 'Date of birth cannot be in the future' },
+    )
+    .refine(
+      (date) => {
+        const minAdultDate = today(getLocalTimeZone()).subtract({ years: 18 });
+
+        return date.compare(minAdultDate) <= 0;
+      },
+      { message: 'You must be at least 18 years old' },
     ),
 
-  email: z.string().email(),
+  email: z.string().email('Must be a valid email (e.g., user@example.com)'),
 
   password: z
     .string()
@@ -93,6 +114,8 @@ export const REGISTER_SCHEMA = z.object({
   address: addressSchema,
   billingAddress: addressSchema,
   sameAsDelivery: z.boolean(),
+  defaultShipping: z.boolean(),
+  defaultBilling: z.boolean(),
 });
 
 export type TRegisterFieldsSchema = z.infer<typeof REGISTER_SCHEMA>;
@@ -159,18 +182,33 @@ export function prepareData(
     firstName: draft.firstName,
     lastName: draft.lastName,
   };
-  const array = [];
+  const arrayAddr = [];
 
-  sameAddress ? array.push(address) : array.push(address, billingAddress);
+  sameAddress
+    ? arrayAddr.push(address)
+    : arrayAddr.push(address, billingAddress);
 
-  return {
+  const result = {
     email: draft.email,
     password: draft.password,
     firstName: draft.firstName,
     lastName: draft.lastName,
     dateOfBirth: draft.dateOfBirth.toString(),
-    addresses: array,
-    defaultShippingAddress: 0,
-    defaultBillingAddress: Number(!sameAddress),
+    addresses: arrayAddr,
   };
+
+  if (draft.defaultShipping)
+    Object.defineProperty(result, 'defaultShippingAddress', {
+      value: 0,
+      enumerable: true,
+    });
+  if (draft.defaultBilling)
+    Object.defineProperty(result, 'defaultBillingAddress', {
+      value: (() => {
+        return sameAddress ? 0 : 1;
+      })(),
+      enumerable: true,
+    });
+
+  return result;
 }
