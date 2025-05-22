@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import { useState } from 'react';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
@@ -23,6 +24,14 @@ function useRegister() {
         fetchUser({
           email: customerDraft.email,
           password: customerDraft.password,
+        });
+
+        toast.success('Registration was successful!', {
+          duration: 5000,
+          style: {
+            fontSize: '1.25rem',
+            padding: '16px 24px',
+          },
         });
       })
       .catch((err) => {
