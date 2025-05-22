@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { apiAnonRoot } from '@/commercetools/anonUser';
 import { MyCustomerDraft, ResponseError } from '@/types/commercetools';
 import { useLogin } from '@/components/LoginForm/hooks/useLogin';
+import toast from 'react-hot-toast';
 
 function useRegister() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -24,6 +25,8 @@ function useRegister() {
           email: customerDraft.email,
           password: customerDraft.password,
         });
+
+        toast.success('Registration was successful!');
       })
       .catch((err) => {
         const loginError = err as ResponseError;

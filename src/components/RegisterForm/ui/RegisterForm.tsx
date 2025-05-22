@@ -6,7 +6,6 @@ import { Controller, useForm } from 'react-hook-form';
 import { I18nProvider } from '@react-aria/i18n';
 import { useEffect } from 'react';
 import { NavLink } from 'react-router';
-import { toast } from 'react-hot-toast';
 
 import {
   REGISTER_SCHEMA,
@@ -49,7 +48,6 @@ export const RegisterForm = ({ step, onDeliveryChange }: RegisterFormProps) => {
   const { createCustomer, isLoading, error } = useRegister();
   const onSubmit = async (data: TRegisterFieldsSchema) => {
     createCustomer(prepareData(data, sameAsDelivery));
-    toast.success('Registration was successful!');
   };
   const sameAsDelivery = watch('sameAsDelivery');
 
