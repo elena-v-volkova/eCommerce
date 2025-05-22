@@ -20,6 +20,7 @@ const LoginForm = () => {
     formState: { errors },
   } = useForm<TLoginFieldsSchema>({
     resolver: zodResolver(LOGIN_SCHEMA),
+    mode: 'onChange',
   });
   const { fetchUser, isLoading, error } = useLogin();
 
