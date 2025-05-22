@@ -101,7 +101,7 @@ export const REGISTER_SCHEMA = z.object({
       { message: 'You must be at least 18 years old' },
     ),
 
-  email: z.string().email(),
+  email: z.string().email('Must be a valid email (e.g., user@example.com)'),
 
   password: z
     .string()
