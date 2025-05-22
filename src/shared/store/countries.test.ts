@@ -12,7 +12,10 @@ describe('getCountryInfo', () => {
     ['Russia', { code: 'RU', regex: /^\d{6}$/ }],
     ['Japan', { code: 'JP', regex: /\d{3}-\d{4}/ }],
     ['Canada', { code: 'CA', regex: /[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d/ }],
-    ['UnitedKingdom', { code: 'GB', regex: /[A-Z]{1,2}\d[A-Z\d]? \d[A-Z]{2}/ }],
+    [
+      'UnitedKingdom',
+      { code: 'GB', regex: /^[A-Z]{1,2}\d[A-Z\d]? \d[A-Z]{2}$/ },
+    ],
   ] as [CountryName, SelectCountryRule][])(
     'returns correct info for %s',
     (country, expected) => {
