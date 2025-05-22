@@ -4,7 +4,7 @@ import { Outlet } from 'react-router';
 export const RoootLayout = () => {
   return (
     <>
-      <Toaster position="top-right" />
+      <Toaster position="top-center" />
       <Outlet />
     </>
   );

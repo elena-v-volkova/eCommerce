@@ -26,7 +26,13 @@ function useRegister() {
           password: customerDraft.password,
         });
 
-        toast.success('Registration was successful!');
+        toast.success('Registration was successful!', {
+          duration: 5000,
+          style: {
+            fontSize: '1.25rem',
+            padding: '16px 24px',
+          },
+        });
       })
       .catch((err) => {
         const loginError = err as ResponseError;
