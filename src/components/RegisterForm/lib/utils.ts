@@ -101,7 +101,17 @@ export const REGISTER_SCHEMA = z.object({
       { message: 'You must be at least 18 years old' },
     ),
 
-  email: z.string().email('Must be a valid email (e.g., user@example.com)'),
+  email: z
+    .string()
+    .refine((val) => val === val.trim(), {
+      message: 'Email must not have leading or trailing spaces',
+    })
+    .refine((val) => !val.includes(' '), {
+      message: 'Email must not contain spaces',
+    })
+    .refine((val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val), {
+      message: 'Must be a valid email (e.g., user@example.com)',
+    }),
 
   password: z
     .string()
