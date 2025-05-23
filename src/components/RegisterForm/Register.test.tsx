@@ -175,7 +175,10 @@ describe('RegisterForm', () => {
 
     expect(billingTitle).toBeInTheDocument();
   });
-
+  /*
+    TODO: 
+    - make the test work. understand the context
+  */
   // it('submits correctly when all fields are filled', async () => {
   //   render(<RegisterForm step={null} onDeliveryChange={() => {}} />, {
   //     wrapper: RouterWrapper,
