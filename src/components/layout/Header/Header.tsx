@@ -10,19 +10,21 @@ import {
   NavbarMenuToggle,
 } from '@heroui/navbar';
 import { useState } from 'react';
+import { Avatar } from '@heroui/react';
+import { useNavigate } from 'react-router-dom';
+
+import styles from './Header.module.scss';
 
 import { SITE_CONFIG } from '@/config/site';
 import { ThemeSwitch } from '@/components/ThemeSwitch';
 import { Logo } from '@/components/Icons';
 import { useAuth } from '@/shared/model/AuthContext';
+import { AppRoute } from '@/routes/appRoutes';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, logout } = useAuth();
-
-  const handleLogout = () => {
-    logout();
-  };
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <Navbar isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
@@ -51,16 +53,20 @@ export function Header() {
 
       <NavbarContent justify="end">
         {user ? (
-          <NavbarItem>
-            <Button
-              color="primary"
-              size="sm"
-              variant="flat"
-              onClick={handleLogout}
-            >
-              Logout
-            </Button>
-          </NavbarItem>
+          <Avatar
+            isBordered
+            showFallback
+            classNames={{
+              base: 'bg-gradient-to-br from-[#FFB457] to-[#FF905B]',
+              name: styles.profile,
+            }}
+            name={[user.firstName?.[0], user.lastName?.[0]]
+              .filter(Boolean)
+              .join('')}
+            size="sm"
+            style={{ cursor: 'pointer' }}
+            onClick={() => navigate(AppRoute.profile, { replace: true })}
+          />
         ) : (
           <>
             <NavbarItem>
