@@ -6,6 +6,7 @@ import Login from './pages/Login/LoginPage';
 import Register from './pages/Register/RegisterPage';
 import { RedirectIfAuthenticated } from './ProtectedRoute';
 import { RoootLayout } from './components/RootLayout/RoootLayout';
+import { CatalogPage } from './pages/Catalog/CatalogPage';
 
 import { AppRoute } from '@/routes/appRoutes';
 
@@ -31,6 +32,8 @@ function App() {
           }
           path={AppRoute.register}
         />
+        <Route element={<CatalogPage />} path={AppRoute.catalog} />
+
         <Route element={<NotFound />} path={AppRoute.notFound} />
       </Route>
     </Routes>
