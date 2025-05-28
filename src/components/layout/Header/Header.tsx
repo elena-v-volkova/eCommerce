@@ -10,7 +10,13 @@ import {
   NavbarMenuToggle,
 } from '@heroui/navbar';
 import { useState } from 'react';
-import { Avatar } from '@heroui/react';
+import {
+  Avatar,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+} from '@heroui/react';
 import { useNavigate } from 'react-router-dom';
 
 import styles from './Header.module.scss';
@@ -23,7 +29,7 @@ import { AppRoute } from '@/routes/appRoutes';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   return (
@@ -53,20 +59,39 @@ export function Header() {
 
       <NavbarContent justify="end">
         {user ? (
-          <Avatar
-            isBordered
-            showFallback
-            classNames={{
-              base: 'bg-gradient-to-br from-[#FFB457] to-[#FF905B]',
-              name: styles.profile,
-            }}
-            name={[user.firstName?.[0], user.lastName?.[0]]
-              .filter(Boolean)
-              .join('')}
-            size="sm"
-            style={{ cursor: 'pointer' }}
-            onClick={() => navigate(AppRoute.profile, { replace: true })}
-          />
+          <Dropdown placement="bottom-end">
+            <DropdownTrigger>
+              <Avatar
+                isBordered
+                showFallback
+                classNames={{
+                  base: 'bg-gradient-to-br from-[#FFB457] to-[#FF905B] ',
+                  name: styles.profile,
+                }}
+                name={[user.firstName?.[0], user.lastName?.[0]].join('')}
+                size="sm"
+                style={{ cursor: 'pointer' }}
+              />
+            </DropdownTrigger>
+            <DropdownMenu aria-label="Profile Actions" variant="flat">
+              <DropdownItem key="profile" className="h-14 gap-2 ">
+                <p className="font-semibold">
+                  Hello {user.firstName} {user.lastName}
+                </p>
+              </DropdownItem>
+              <DropdownItem
+                key="settings"
+                showDivider
+                onPressUp={() => navigate(AppRoute.profile, { replace: true })}
+              >
+                My Profile
+              </DropdownItem>
+
+              <DropdownItem key="logout" color="danger" onPressUp={logout}>
+                Log Out
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
         ) : (
           <>
             <NavbarItem>
