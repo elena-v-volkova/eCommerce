@@ -6,6 +6,7 @@ import Login from './pages/Login/LoginPage';
 import Register from './pages/Register/RegisterPage';
 import { RedirectIfAuthenticated } from './ProtectedRoute';
 import { RoootLayout } from './components/RootLayout/RoootLayout';
+import { Profile } from './pages/Profile/ProfilePage';
 
 import { AppRoute } from '@/routes/appRoutes';
 
@@ -30,6 +31,14 @@ function App() {
             </RedirectIfAuthenticated>
           }
           path={AppRoute.register}
+        />
+        <Route
+          element={
+            <RedirectIfAuthenticated>
+              <Profile />
+            </RedirectIfAuthenticated>
+          }
+          path={AppRoute.profile}
         />
         <Route element={<NotFound />} path={AppRoute.notFound} />
       </Route>
