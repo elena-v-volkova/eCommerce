@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Customer } from '@commercetools/platform-sdk';
 import { UserRoundCog } from 'lucide-react';
 
 import { Selectors } from './Selectors';
 import styles from './ProfilePage.module.scss';
+import { PersonalContent } from './PersonalContent';
 
 import { useAuth } from '@/shared/model/AuthContext';
+
 export function Profile() {
   const { user } = useAuth();
   const [subpage, setSubpage] = useState<string>('');
@@ -14,7 +15,7 @@ export function Profile() {
   useEffect(() => {
     switch (subpage) {
       case 'addresses':
-        setContent(AddressesContent(user));
+        setContent(AddressesContent());
         break;
       case 'password':
         setContent(PasswordContent);
@@ -22,7 +23,7 @@ export function Profile() {
       case 'logout':
         break;
       case 'personal':
-        setContent(PersonalInfoContent(user));
+        setContent(<PersonalContent customer={user} />);
         break;
       default:
         setContent(
@@ -47,11 +48,7 @@ export function Profile() {
   );
 }
 
-function PersonalInfoContent(user: Customer | null) {
-  return <div>Your Information</div>;
-}
-
-function AddressesContent(user: Customer | null) {
+function AddressesContent() {
   return <div>Manage addresses</div>;
 }
 
