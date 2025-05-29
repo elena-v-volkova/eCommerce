@@ -1,21 +1,23 @@
 import { useEffect, useState } from 'react';
 import { UserRoundCog } from 'lucide-react';
+import { Customer } from '@commercetools/platform-sdk';
 
 import { Selectors } from './Selectors';
 import styles from './ProfilePage.module.scss';
 import { PersonalContent } from './PersonalContent';
+import { AddressContent } from './AddressContent';
 
 import { useAuth } from '@/shared/model/AuthContext';
 
 export function Profile() {
-  const { user } = useAuth();
+  const { user }: { readonly user: Customer | null } = useAuth();
   const [subpage, setSubpage] = useState<string>('');
   const [content, setContent] = useState<React.ReactNode>(null);
 
   useEffect(() => {
     switch (subpage) {
       case 'addresses':
-        setContent(AddressesContent());
+        setContent(AddressesContent(user));
         break;
       case 'password':
         setContent(PasswordContent);
@@ -40,7 +42,7 @@ export function Profile() {
       </h2>
       <div className={styles.profile}>
         <Selectors onAction={(key) => setSubpage(key.toString())} />
-        <div className="mx-[20px] flex    min-h-[180px] w-full justify-center  ">
+        <div className="mx-[20px] flex   min-h-[180px] w-full justify-center  ">
           {content}
         </div>
       </div>
@@ -48,8 +50,13 @@ export function Profile() {
   );
 }
 
-function AddressesContent() {
-  return <div>Manage addresses</div>;
+function AddressesContent(customer: Customer | null) {
+  return (
+    <div className="mx-[20px] flex w-full flex-col  gap-y-[20px]">
+      <p className="inline-flex self-center">Manage addresses</p>
+      <AddressContent customer={customer} />
+    </div>
+  );
 }
 
 function PasswordContent() {

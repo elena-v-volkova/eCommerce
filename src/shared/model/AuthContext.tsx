@@ -1,5 +1,8 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
 import { Customer } from '@commercetools/platform-sdk';
+import { useLocation, useNavigate } from 'react-router';
+
+import { AppRoute } from '@/routes/appRoutes';
 
 interface AuthContextType {
   user: Customer | null;
@@ -15,6 +18,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return stored ? JSON.parse(stored) : null;
   });
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const login = (userData: Customer) => {
     localStorage.setItem('userData', JSON.stringify(userData));
@@ -25,6 +30,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('userData');
     localStorage.removeItem('authTokens');
     setUser(null);
+    if (location.pathname === `/${AppRoute.profile}`) {
+      navigate(AppRoute.home);
+    }
   };
 
   return (

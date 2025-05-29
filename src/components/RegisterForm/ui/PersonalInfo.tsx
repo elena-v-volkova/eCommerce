@@ -13,13 +13,13 @@ import { FormFieldsProps } from '@/types';
 interface AdditionalProps {
   personalProps: {
     user: Customer | null;
-    editMode: boolean;
+    disabled: boolean;
     showPassword: boolean;
   };
 }
 
 type PersonalInfoProps = Pick<
-  FormFieldsProps<TRegisterFieldsSchema>,
+  FormFieldsProps<Partial<TRegisterFieldsSchema>>,
   'title' | 'register' | 'errors' | 'control'
 > &
   Partial<AdditionalProps>;
@@ -31,7 +31,7 @@ export function PersonalInfo({
   control,
   personalProps = {
     user: null,
-    editMode: false,
+    disabled: false,
     showPassword: true,
   },
 }: PersonalInfoProps) {
@@ -44,8 +44,8 @@ export function PersonalInfo({
         placeholder="Email"
         {...register('email')}
         errorMessage={errors.email?.message}
+        isDisabled={personalProps?.disabled}
         isInvalid={errors.email?.message ? true : false}
-        isReadOnly={Boolean(personalProps?.editMode)}
       />
       {Boolean(personalProps?.showPassword) && (
         <PasswordInput
@@ -60,8 +60,8 @@ export function PersonalInfo({
         type="text"
         {...register('firstName')}
         errorMessage={errors.firstName?.message}
+        isDisabled={personalProps?.disabled}
         isInvalid={errors.firstName?.message ? true : false}
-        isReadOnly={Boolean(personalProps?.editMode)}
       />
       <Input
         label="Last name"
@@ -69,8 +69,8 @@ export function PersonalInfo({
         type="text"
         {...register('lastName')}
         errorMessage={errors.lastName?.message}
+        isDisabled={personalProps?.disabled}
         isInvalid={errors.lastName?.message ? true : false}
-        isReadOnly={Boolean(personalProps?.editMode)}
       />
 
       <Controller
@@ -81,12 +81,12 @@ export function PersonalInfo({
             <DateInput
               {...register('dateOfBirth')}
               errorMessage={errors.dateOfBirth?.message}
+              isDisabled={personalProps?.disabled}
               isInvalid={!!errors.dateOfBirth}
-              isReadOnly={Boolean(personalProps?.editMode)}
               label="Date of birth"
               labelPlacement="outside"
               placeholderValue={today(getLocalTimeZone())}
-              value={field.value}
+              value={field.value ? field.value : undefined}
               onChange={field.onChange}
             />
           </I18nProvider>

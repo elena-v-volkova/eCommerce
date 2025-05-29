@@ -6,6 +6,8 @@ import { TRegisterFieldsSchema } from '../lib/utils';
 import { COUNTRIES } from '@/shared/store/countries';
 import { AddressFieldsProps } from '@/types';
 
+type AddressFields = AddressFieldsProps<Pick<TRegisterFieldsSchema, 'address'>>;
+
 export const AddressFields = ({
   title,
   prefix,
@@ -13,7 +15,9 @@ export const AddressFields = ({
   errors,
   setValue,
   trigger,
-}: AddressFieldsProps<TRegisterFieldsSchema>) => {
+  disabled = false,
+  newAddress = true,
+}: AddressFieldsProps<AddressFields>) => {
   return (
     <>
       <h4 className="mb-2.5">{title}</h4>
@@ -23,6 +27,7 @@ export const AddressFields = ({
         placeholder="Select Country"
         {...register(`${prefix}.country`)}
         errorMessage={errors[prefix]?.country?.message}
+        isDisabled={disabled}
         isInvalid={errors[prefix]?.country?.message ? true : false}
         onChange={(e) => {
           const value = e.target.value;
@@ -38,19 +43,21 @@ export const AddressFields = ({
       </Select>
 
       <Input
-        label="Enter city"
+        label={!newAddress ? 'City' : 'Enter city'}
         labelPlacement="outside"
         {...register(`${prefix}.city`)}
         errorMessage={errors[prefix]?.city?.message}
+        isDisabled={disabled}
         isInvalid={errors[prefix]?.city?.message ? true : false}
       />
 
       <Input
-        label="Enter street"
+        label={!newAddress ? 'Street' : 'Enter street'}
         labelPlacement="outside"
         type="text"
         {...register(`${prefix}.streetName`)}
         errorMessage={errors[prefix]?.streetName?.message}
+        isDisabled={disabled}
         isInvalid={errors[prefix]?.streetName?.message ? true : false}
       />
 
@@ -60,6 +67,7 @@ export const AddressFields = ({
         type="text"
         {...register(`${prefix}.postalCode`)}
         errorMessage={errors[prefix]?.postalCode?.message}
+        isDisabled={disabled}
         isInvalid={errors[prefix]?.postalCode?.message ? true : false}
       />
     </>
