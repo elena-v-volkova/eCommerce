@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 
-import { apiAnonRoot } from '@/commercetools/anonUser';
 import {
-  ProductsSimple,
-  transformProductsToSchemaShape,
-} from '../lib/productSchema';
+  ProductsSimpleNew,
+  transformProductsToSchemaShapeNew,
+} from '../action/buildProduckts';
 
-export const useProducts = () => {
-  const [products, setProducts] = useState<ProductsSimple[] | []>([]);
+import { apiAnonRoot } from '@/commercetools/anonUser';
+
+export const useProductsNew = () => {
+  const [products, setProducts] = useState<ProductsSimpleNew[] | []>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<unknown | null>(null);
 
@@ -16,7 +17,7 @@ export const useProducts = () => {
       try {
         const response = await apiAnonRoot.products().get().execute();
 
-        setProducts(transformProductsToSchemaShape(response.body.results));
+        setProducts(transformProductsToSchemaShapeNew(response.body.results));
       } catch (err) {
         setError(err);
       } finally {
