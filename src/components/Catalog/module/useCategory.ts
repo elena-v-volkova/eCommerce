@@ -4,7 +4,7 @@ import { apiAnonRoot } from '@/commercetools/anonUser';
 
 type FlatCategory = {
   id: string;
-  key: string;
+  key: string | undefined;
   name: string;
   description: string;
   parent: string | null;
