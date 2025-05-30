@@ -40,12 +40,12 @@ export function PasswordUpdate() {
 
   return (
     <EditableCard
-      className="col-span-12 h-fit min-h-[410px] w-[320px] p-[20px] sm:col-span-4"
+      className="col-span-12 h-fit min-h-[410px] w-[320px] p-[20px] sm:col-span-4 "
       editmode={true}
+      headerClass="flex-col items-center flex-start p-0"
       onestate={true}
-      title="Manage password"
-      onCancel={reset}
-      onEdit={() => console.log('Edit mode activated')}
+      title="Change password"
+      onCancel={(value) => reset()}
       onSave={handleSubmit(onSubmit)}
     >
       <div className="flex flex-col items-center">

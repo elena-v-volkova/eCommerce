@@ -37,7 +37,7 @@ export function PersonalInfo({
 }: PersonalInfoProps) {
   return (
     <>
-      <h4 className="mb-2.5">{title}</h4>
+      {title && <h4 className="mb-2.5">{title}</h4>}
       <Input
         label={personalProps?.user ? 'Email' : undefined}
         labelPlacement="outside"

@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { JSX, useState } from 'react';
 import { Card, CardHeader, CardBody, CardFooter, Button } from '@heroui/react';
 
 interface EditableCardProps {
   onestate?: boolean;
   editmode?: boolean;
   title: string;
-  headerChildren?: React.ReactNode;
+  headerClass: string;
+  headerChildren?: React.ReactNode | null;
   children: React.ReactNode;
   className?: string;
   onEdit?: () => void;
@@ -18,6 +19,7 @@ export function EditableCard({
   onestate = false,
   editmode = false,
   title,
+  headerClass,
   headerChildren = null,
   children,
   className = '',
@@ -30,23 +32,29 @@ export function EditableCard({
 
   const handleEdit = () => {
     if (!onestate) setMode(true);
-    onEdit?.();
+    onEdit?.(mode);
   };
 
   const handleSave = () => {
-    onSave?.();
+    onSave?.(mode);
     if (!onestate) setMode(false);
   };
 
   const handleCancel = () => {
     if (!onestate) setMode(false);
-    onCancel?.();
+    onCancel?.(mode);
   };
 
   return (
     <form onReset={onCancel} onSubmit={onSave}>
       <Card className={`${className}`}>
-        <CardHeader className="flex h-8 flex-row justify-between">
+        <CardHeader
+          className={
+            Boolean(headerClass)
+              ? `flex ${headerClass} h-8 `
+              : 'flex h-8 flex-row content-center justify-between'
+          }
+        >
           <h4 className="text-large font-medium text-teal-600">{title}</h4>
           {headerChildren !== null && headerChildren}
         </CardHeader>

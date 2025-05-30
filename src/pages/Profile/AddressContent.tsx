@@ -1,17 +1,11 @@
 import { BaseAddress, Customer } from '@commercetools/platform-sdk';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  Chip,
-  Form,
-} from '@heroui/react';
+import { Chip } from '@heroui/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CircleCheckBig } from 'lucide-react';
 import { useState } from 'react';
+
+import { EditableCard } from './EditableCard';
 
 import {
   REGISTER_SCHEMA,
@@ -94,10 +88,10 @@ function CardAddress({
   };
 
   return (
-    <Card className="col-span-12 h-fit min-h-[410px] w-[320px] p-[20px] sm:col-span-4">
-      <CardHeader className="flex h-8 flex-row justify-between">
-        <h4 className="text-large font-medium text-teal-600">{title}</h4>
-        {prop.default && (
+    <EditableCard
+      className="col-span-12 h-fit min-h-[410px] w-[320px] p-[20px] sm:col-span-4"
+      headerChildren={
+        prop.default && (
           <Chip
             color="success"
             endContent={<CircleCheckBig size={18} />}
@@ -105,62 +99,29 @@ function CardAddress({
           >
             Default
           </Chip>
-        )}
-      </CardHeader>
-      <CardBody className="overflow-visible p-0">
-        <Form>
-          <AddressFields
-            disabled={!mode}
-            errors={errors}
-            newAddress={false}
-            prefix="address"
-            register={register}
-            setValue={setValue}
-            title=""
-            trigger={trigger}
-          />
-        </Form>
-      </CardBody>
-      <CardFooter className="relative top-[10px] justify-start gap-x-4 border-t-1 border-zinc-100/50 bg-white/30 dark:bg-black/30">
-        {mode === false && (
-          <Button
-            className="text-tiny"
-            color="primary"
-            radius="full"
-            size="sm"
-            type="button"
-            onClick={() => setMode(true)}
-          >
-            Edit
-          </Button>
-        )}
-        {mode === true && (
-          <>
-            <Button
-              className="text-tiny"
-              color="warning"
-              radius="full"
-              size="sm"
-              type="submit"
-              onClick={handleSubmit(onSubmit)}
-            >
-              Save
-            </Button>
-            <Button
-              className="text-tiny"
-              color="default"
-              radius="full"
-              size="sm"
-              type="reset"
-              onClick={() => {
-                setMode(false);
-              }}
-            >
-              Cancel
-            </Button>
-          </>
-        )}
-      </CardFooter>
-    </Card>
+        )
+      }
+      title={title}
+      onCancel={(value) => {
+        setMode(!value);
+      }}
+      onEdit={(value) => {
+        setMode(!value);
+      }}
+      onSave={handleSubmit(onSubmit)}
+    >
+      <div className="flex flex-col items-start gap-2">
+        <AddressFields
+          disabled={!mode}
+          errors={errors}
+          newAddress={false}
+          prefix="address"
+          register={register}
+          setValue={setValue}
+          title=""
+          trigger={trigger}
+        />
+      </div>
+    </EditableCard>
   );
 }
