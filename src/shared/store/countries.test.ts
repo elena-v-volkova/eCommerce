@@ -10,7 +10,7 @@ import {
 describe('getCountryInfo', () => {
   test.each([
     ['Russia', { code: 'RU', regex: /^\d{6}$/ }],
-    ['Japan', { code: 'JP', regex: /\d{3}-\d{4}/ }],
+    ['Japan', { code: 'JP', regex: /^\d{3}-\d{4}$/ }],
     ['Canada', { code: 'CA', regex: /[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d/ }],
     [
       'UnitedKingdom',
