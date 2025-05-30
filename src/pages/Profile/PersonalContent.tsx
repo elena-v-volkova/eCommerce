@@ -1,13 +1,5 @@
 import { Customer } from '@commercetools/platform-sdk';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  Chip,
-  Form,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardFooter, Form } from '@heroui/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { parseDate } from '@internationalized/date';

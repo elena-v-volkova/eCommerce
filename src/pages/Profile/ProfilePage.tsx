@@ -6,6 +6,7 @@ import { Selectors } from './Selectors';
 import styles from './ProfilePage.module.scss';
 import { PersonalContent } from './PersonalContent';
 import { AddressContent } from './AddressContent';
+import { PasswordUpdate } from './PasswordUpdate';
 
 import { useAuth } from '@/shared/model/AuthContext';
 
@@ -20,7 +21,7 @@ export function Profile() {
         setContent(AddressesContent(user));
         break;
       case 'password':
-        setContent(PasswordContent);
+        setContent(<PasswordUpdate />);
         break;
       case 'logout':
         break;
@@ -57,8 +58,4 @@ function AddressesContent(customer: Customer | null) {
       <AddressContent customer={customer} />
     </div>
   );
-}
-
-function PasswordContent() {
-  return <div>Write new password</div>;
 }
