@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Search,
   SortAsc,
@@ -7,6 +7,7 @@ import {
   List,
   Car,
   Filter,
+  Loader2,
 } from 'lucide-react';
 import {
   Button,
@@ -25,8 +26,10 @@ import {
 } from '@heroui/react';
 
 import { useRetroCarCategories } from '../module/useCategory';
-import { ProductsSimpleNew } from '../action/buildProduckts';
-import { useProductsNew } from '../module/useProducts';
+import {
+  ProductsSimpleNew,
+  useProductSearch,
+} from '../module/useProductSearch';
 
 import { SkeletonSidebar } from './SkeletonSidebar';
 import ProductCard from './ProductCard';
@@ -39,188 +42,157 @@ interface FiltersState {
   condition: string;
 }
 
-const Catalog = () => {
-  const { products, isLoading } = useProductsNew();
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const { categories, isLoading: isLoadingCategories } =
-    useRetroCarCategories();
+const DEFAULT_FILTERS: FiltersState = {
+  priceRange: [0, 500000],
+  brands: [],
+  years: [1950, 2000],
+  transmission: '',
+  condition: '',
+};
 
-  const [filteredProducts, setFilteredProducts] = useState<
-    ProductsSimpleNew[] | []
-  >([]);
+const ITEMS_PER_PAGE = 6;
+
+const Catalog = () => {
+  const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [sortBy, setSortBy] = useState('name');
-  const [sortOrder, setSortOrder] = useState('asc');
-  const [filters, setFilters] = useState<FiltersState>({
-    priceRange: [0, 500000],
-    brands: [],
-    years: [1950, 2000],
-    transmission: '',
-    condition: '',
-  });
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [filters, setFilters] = useState<FiltersState>(DEFAULT_FILTERS);
   const [viewMode, setViewMode] = useState('grid');
 
-  const currentProducts = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { categories, isLoading: isLoadingCategories } =
+    useRetroCarCategories();
+  const {
+    products,
+    isLoading,
+    error,
+    filterOptions,
+    loadFilterOptions,
+    searchProducts,
+    immediateSearch,
+  } = useProductSearch();
 
-    return filteredProducts.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredProducts, currentPage, itemsPerPage]);
+  const currentProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+
+    return products.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [products, currentPage]);
 
   const totalPages = useMemo(() => {
-    return Math.ceil(filteredProducts.length / itemsPerPage);
-  }, [filteredProducts, itemsPerPage]);
+    return Math.ceil(products.length / ITEMS_PER_PAGE);
+  }, [products.length]);
 
-  const handlePageChange = (page: number) => {
+  const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  }, []);
 
-  // Reset to first page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, selectedCategory, filters, sortBy, sortOrder]);
-
-  const uniqueBrands = useMemo(() => {
-    return [...new Set(products.map((p) => p.brand))].filter(Boolean).sort();
-  }, [products]);
-
-  const uniqueConditions = useMemo(() => {
-    return [...new Set(products.map((p) => p.condition))]
-      .filter(Boolean)
-      .sort();
-  }, [products]);
-
-  // Применение фильтров и поиска
-  useEffect(() => {
-    if (!products || products.length === 0) {
-      setFilteredProducts([]);
-
-      return;
-    }
-
-    let result = [...products];
-
-    // Поиск
-    if (searchQuery) {
-      result = result.filter(
-        (product) =>
-          product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          product.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          product.description.toLowerCase().includes(searchQuery.toLowerCase()),
-      );
-    }
-
-    // Фильтр по категории - используем мапу ID->key для сопоставления
-    if (selectedCategory) {
-      result = result.filter((product) =>
-        product.categories.includes(selectedCategory),
-      );
-    }
-
-    // Фильтр по цене
-    result = result.filter(
-      (product) =>
-        product.price >= filters.priceRange[0] &&
-        product.price <= filters.priceRange[1],
-    );
-
-    // Фильтр по брендам
-    if (filters.brands.length > 0) {
-      result = result.filter((product) =>
-        filters.brands.includes(product.brand),
-      );
-    }
-
-    // Фильтр по годам
-    result = result.filter(
-      (product) =>
-        product.year >= filters.years[0] && product.year <= filters.years[1],
-    );
-
-    // Фильтр по трансмиссии
-    if (filters.transmission) {
-      result = result.filter(
-        (product) => product.transmission === filters.transmission,
-      );
-    }
-
-    // Фильтр по состоянию
-    if (filters.condition) {
-      result = result.filter(
-        (product) => product.condition === filters.condition,
-      );
-    }
-
-    // Сортировка
-    result.sort((a, b) => {
-      let aValue, bValue;
-
-      switch (sortBy) {
-        case 'price':
-          aValue = a.price;
-          bValue = b.price;
-          break;
-        case 'year':
-          aValue = a.year;
-          bValue = b.year;
-          break;
-        case 'name':
-        default:
-          aValue = a.name.toLowerCase();
-          bValue = b.name.toLowerCase();
-          break;
-      }
-
-      if (sortOrder === 'asc') {
-        return aValue > bValue ? 1 : -1;
-      } else {
-        return aValue < bValue ? 1 : -1;
-      }
-    });
-
-    setFilteredProducts(result);
-  }, [searchQuery, selectedCategory, filters, sortBy, sortOrder, products]);
-
-  const handleProductClick = (product: ProductsSimpleNew) => {
+  const handleProductClick = useCallback((product: ProductsSimpleNew) => {
     alert(
       `Переход на страницу продукта: ${product.name}\nURL: /products/${product.slug}`,
     );
-  };
+  }, []);
 
-  const handleBrandFilter = (brand: string) => {
+  const handleBrandFilter = useCallback((brand: string) => {
     setFilters((prev) => ({
       ...prev,
       brands: prev.brands.includes(brand)
         ? prev.brands.filter((b) => b !== brand)
         : [...prev.brands, brand],
     }));
-  };
+  }, []);
 
-  const clearFilters = () => {
-    setFilters({
-      priceRange: [0, 500000],
-      brands: [],
-      years: [1950, 2000],
-      transmission: '',
-      condition: '',
-    });
+  const clearFilters = useCallback(() => {
+    setFilters(DEFAULT_FILTERS);
     setSelectedCategory('');
     setSearchQuery('');
-  };
+  }, []);
 
-  // Компонент фильтров для переиспользования
+  const handleSortChange = useCallback((keys: any) => {
+    const selectedKey = Array.from(keys)[0];
+
+    if (typeof selectedKey === 'string') {
+      setSortBy(selectedKey);
+    }
+  }, []);
+
+  const toggleSortOrder = useCallback(() => {
+    setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+  }, []);
+
+  const handleConditionChange = useCallback((keys: any) => {
+    const value = (Array.from(keys)[0] as string) || '';
+
+    setFilters((prev) => ({ ...prev, condition: value }));
+  }, []);
+
+  const handlePriceRangeChange = useCallback((value: number | number[]) => {
+    const priceRange = Array.isArray(value)
+      ? (value as [number, number])
+      : ([value, value] as [number, number]);
+
+    setFilters((prev) => ({ ...prev, priceRange }));
+  }, []);
+
+  // Effects
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory, filters, sortBy, sortOrder]);
+
+  useEffect(() => {
+    loadFilterOptions();
+    immediateSearch({
+      sortBy: 'name',
+      sortOrder: 'asc',
+    });
+  }, []);
+
+  useEffect(() => {
+    const searchParams = {
+      query: searchQuery,
+      categoryId: selectedCategory,
+      priceRange: filters.priceRange,
+      brands: filters.brands,
+      years: filters.years,
+      transmission: filters.transmission,
+      condition: filters.condition,
+      sortBy,
+      sortOrder,
+    };
+
+    if (searchQuery?.trim()) {
+      searchProducts(searchParams, 500);
+    } else {
+      immediateSearch(searchParams);
+    }
+  }, [
+    searchQuery,
+    selectedCategory,
+    filters.priceRange,
+    filters.brands,
+    filters.years,
+    filters.transmission,
+    filters.condition,
+    sortBy,
+    sortOrder,
+  ]);
+
   const FiltersContent = ({ onClose }: { onClose?: () => void }) => (
-    <div className="space-y-6 ">
-      {/* Mobile header */}
+    <div className="space-y-6">
       {onClose && (
         <div className="flex items-center justify-between border-b border-divider pb-4">
           <h3 className="text-lg font-semibold text-foreground">Filters</h3>
-          <Button isIconOnly variant="light" onPress={onClose} />
+          <Button
+            isIconOnly
+            aria-label="Close filters"
+            variant="light"
+            onPress={onClose}
+          />
         </div>
       )}
+
       {/* Categories */}
       <div className="rounded-lg border border-divider bg-content1 p-4 shadow-sm">
         <h3 className="mb-3 font-semibold text-foreground">Categories</h3>
@@ -284,30 +256,26 @@ const Catalog = () => {
           </div>
         </div>
       </div>
-      Ключевые
+
       {/* Price Filter */}
       <div className="rounded-lg border border-divider bg-content1 p-4 shadow-sm">
         <h3 className="mb-3 font-semibold text-foreground">Price Range</h3>
         <div className="space-y-2">
           <Slider
+            aria-label="Select price range"
             className="w-full"
             formatOptions={{
               style: 'currency',
               currency: 'USD',
               maximumFractionDigits: 0,
             }}
+            label="Price Range"
             maxValue={500000}
             minValue={0}
             size="sm"
             step={10000}
             value={filters.priceRange}
-            onChange={(value) => {
-              const priceRange = Array.isArray(value)
-                ? (value as [number, number])
-                : ([value, value] as [number, number]);
-
-              setFilters((prev) => ({ ...prev, priceRange }));
-            }}
+            onChange={handlePriceRangeChange}
           />
           <div className="flex justify-between text-sm text-foreground-500">
             <span>${filters.priceRange[0].toLocaleString()}</span>
@@ -315,11 +283,12 @@ const Catalog = () => {
           </div>
         </div>
       </div>
+
       {/* Brand Filter */}
       <div className="rounded-lg border border-divider bg-content1 p-4 shadow-sm">
         <h3 className="mb-3 font-semibold text-foreground">Brands</h3>
         <div className="max-h-40 space-y-2 overflow-y-auto">
-          {uniqueBrands.map((brand) => (
+          {filterOptions.brands.map((brand) => (
             <Checkbox
               key={brand}
               isSelected={filters.brands.includes(brand)}
@@ -331,24 +300,73 @@ const Catalog = () => {
           ))}
         </div>
       </div>
+
+      {/* Year Filter */}
+      <div className="rounded-lg border border-divider bg-content1 p-4 shadow-sm">
+        <h3 className="mb-3 font-semibold text-foreground">Year Range</h3>
+        <div className="space-y-2">
+          <Slider
+            aria-label="Select year range"
+            className="w-full"
+            label="Year Range"
+            maxValue={2000}
+            minValue={1950}
+            size="sm"
+            step={5}
+            value={filters.years}
+            onChange={(value) => {
+              const yearRange = Array.isArray(value)
+                ? (value as [number, number])
+                : ([value, value] as [number, number]);
+
+              setFilters((prev) => ({ ...prev, years: yearRange }));
+            }}
+          />
+          <div className="flex justify-between text-sm text-foreground-500">
+            <span>{filters.years[0]}</span>
+            <span>{filters.years[1]}</span>
+          </div>
+        </div>
+      </div>
+
       {/* Condition Filter */}
       <div className="rounded-lg border border-divider bg-content1 p-4 shadow-sm">
         <h3 className="mb-3 font-semibold text-foreground">Condition</h3>
         <Select
+          aria-label="Select vehicle condition"
+          label="Vehicle Condition"
           placeholder="All Conditions"
           selectedKeys={filters.condition ? [filters.condition] : []}
           size="sm"
-          onSelectionChange={(keys) => {
-            const value = (Array.from(keys)[0] as string) || '';
-
-            setFilters((prev) => ({ ...prev, condition: value }));
-          }}
+          onSelectionChange={handleConditionChange}
         >
-          {uniqueConditions.map((condition) => (
+          {filterOptions.conditions.map((condition) => (
             <SelectItem key={condition}>{condition}</SelectItem>
           ))}
         </Select>
       </div>
+
+      {/* Transmission Filter */}
+      <div className="rounded-lg border border-divider bg-content1 p-4 shadow-sm">
+        <h3 className="mb-3 font-semibold text-foreground">Transmission</h3>
+        <Select
+          aria-label="Select transmission type"
+          label="Transmission Type"
+          placeholder="All Transmissions"
+          selectedKeys={filters.transmission ? [filters.transmission] : []}
+          size="sm"
+          onSelectionChange={(keys) => {
+            const value = (Array.from(keys)[0] as string) || '';
+
+            setFilters((prev) => ({ ...prev, transmission: value }));
+          }}
+        >
+          {filterOptions.transmissions.map((transmission) => (
+            <SelectItem key={transmission}>{transmission}</SelectItem>
+          ))}
+        </Select>
+      </div>
+
       <Button
         className="w-full"
         color="warning"
@@ -360,7 +378,7 @@ const Catalog = () => {
     </div>
   );
 
-  if (isLoading || isLoadingCategories) {
+  if (isLoadingCategories) {
     return <SkeletonSidebar />;
   }
 
@@ -375,18 +393,29 @@ const Catalog = () => {
 
           {/* Search Bar */}
           <div className="flex items-center gap-4">
-            <Input
-              className="max-w-md"
-              placeholder="Search cars, brands, or descriptions..."
-              size="lg"
-              startContent={<Search className="size-4 text-foreground-400" />}
-              type="text"
-              value={searchQuery}
-              onValueChange={setSearchQuery}
-            />
+            <div className="relative max-w-md flex-1">
+              <Input
+                aria-label="Search for cars, brands, or descriptions"
+                className="w-full"
+                label="Search"
+                placeholder="Search cars, brands, or descriptions..."
+                size="lg"
+                startContent={
+                  isLoading ? (
+                    <Loader2 className="size-4 animate-spin text-foreground-400" />
+                  ) : (
+                    <Search className="size-4 text-foreground-400" />
+                  )
+                }
+                type="text"
+                value={searchQuery}
+                onValueChange={setSearchQuery}
+              />
+            </div>
 
             {/* Mobile Filter Button */}
             <Button
+              aria-label="Open filters"
               className="md:hidden"
               color="primary"
               startContent={<Filter className="size-4" />}
@@ -396,6 +425,13 @@ const Catalog = () => {
               Filters
             </Button>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mt-4 rounded-lg border border-danger bg-danger-50 p-3 text-danger">
+              <p className="text-sm">{error}</p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -412,22 +448,19 @@ const Catalog = () => {
             <div className="mb-6 flex items-center justify-between rounded-lg border border-divider bg-content1 p-4 shadow-sm">
               <div className="flex items-center gap-4">
                 <span className="text-sm text-foreground-600">
-                  {filteredProducts.length} cars found
+                  {products.length} cars found
+                  {totalPages > 1 && ` • Page ${currentPage} of ${totalPages}`}
                 </span>
 
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-foreground-600">Sort by:</span>
                   <Select
+                    aria-label="Select sorting option"
                     className="w-32"
+                    label="Sort By"
                     selectedKeys={[sortBy]}
                     size="sm"
-                    onSelectionChange={(keys) => {
-                      const selectedKey = Array.from(keys)[0];
-
-                      if (typeof selectedKey === 'string') {
-                        setSortBy(selectedKey);
-                      }
-                    }}
+                    onSelectionChange={handleSortChange}
                   >
                     <SelectItem key="name">Name</SelectItem>
                     <SelectItem key="price">Price</SelectItem>
@@ -436,10 +469,9 @@ const Catalog = () => {
 
                   <Button
                     isIconOnly
+                    aria-label={`Sort ${sortOrder === 'asc' ? 'descending' : 'ascending'}`}
                     variant="light"
-                    onPress={() =>
-                      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
-                    }
+                    onPress={toggleSortOrder}
                   >
                     {sortOrder === 'asc' ? (
                       <SortAsc className="size-4" />
@@ -453,6 +485,7 @@ const Catalog = () => {
               <div className="flex items-center gap-2">
                 <Button
                   isIconOnly
+                  aria-label="Grid view"
                   color={viewMode === 'grid' ? 'primary' : 'default'}
                   variant={viewMode === 'grid' ? 'solid' : 'light'}
                   onPress={() => setViewMode('grid')}
@@ -461,6 +494,7 @@ const Catalog = () => {
                 </Button>
                 <Button
                   isIconOnly
+                  aria-label="List view"
                   color={viewMode === 'list' ? 'primary' : 'default'}
                   variant={viewMode === 'list' ? 'solid' : 'light'}
                   onPress={() => setViewMode('list')}
@@ -471,7 +505,17 @@ const Catalog = () => {
             </div>
 
             {/* Products Grid */}
-            {filteredProducts.length === 0 ? (
+            {isLoading ? (
+              <div className="rounded-lg border border-divider bg-content1 p-8 text-center shadow-sm">
+                <Loader2 className="mx-auto mb-4 size-12 animate-spin text-foreground-400" />
+                <h3 className="mb-2 text-lg font-semibold text-foreground">
+                  Searching cars...
+                </h3>
+                <p className="text-foreground-600">
+                  Please wait while we find the best matches
+                </p>
+              </div>
+            ) : products.length === 0 ? (
               <div className="rounded-lg border border-divider bg-content1 p-8 text-center shadow-sm">
                 <Car className="mx-auto mb-4 size-12 text-foreground-400" />
                 <h3 className="mb-2 text-lg font-semibold text-foreground">
@@ -504,6 +548,7 @@ const Catalog = () => {
                     <Pagination
                       showControls
                       showShadow
+                      aria-label="Pagination navigation"
                       classNames={{
                         cursor: 'bg-primary/10 text-primary',
                       }}

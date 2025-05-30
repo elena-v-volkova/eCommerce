@@ -44,7 +44,7 @@ const ProductCard = ({ product, onClick }) => {
           {/* Discount Badge */}
           {product.discount && (
             <Chip
-              className="absolute left-2 top-2"
+              className="absolute left-2 top-2 z-50"
               color="danger"
               size="sm"
               variant="solid"
@@ -55,7 +55,7 @@ const ProductCard = ({ product, onClick }) => {
 
           {/* Condition Badge */}
           <Chip
-            className="absolute right-2 top-2 bg-black/50 capitalize text-white"
+            className="absolute right-2 top-2 z-50 bg-black/50 capitalize text-white"
             color="default"
             size="sm"
             variant="solid"
