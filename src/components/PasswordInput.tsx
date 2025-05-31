@@ -10,16 +10,25 @@ interface PasswordInputProps {
   isInvalid?: boolean;
   type?: string;
   placeholder?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const PasswordInput: React.FC<PasswordInputProps> = ({
   register,
   errorMessage,
   isInvalid,
+  onChange,
   ...props
 }) => {
   const [isVisible, setIsVisible] = React.useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (onChange) {
+      onChange(e);
+    }
+    register.onChange(e);
+  };
 
   return (
     <Input
@@ -42,6 +51,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
       }
       errorMessage={errorMessage}
       isInvalid={isInvalid}
+      onChange={handleChange}
       {...props}
     />
   );

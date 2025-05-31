@@ -27,9 +27,21 @@ const PASSWORD_UPDATE_SCHEMA = z
     password: REGISTER_SCHEMA.shape.password,
     repeat: z.string(),
   })
-  .refine((data) => data.password === data.repeat, {
-    message: 'Passwords must match the new password',
-    path: ['repeat'],
+  .superRefine((data, ctx) => {
+    if (data.password !== data.repeat) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Value must match the new password',
+        path: ['repeat'],
+      });
+    }
+    if (data.password === data.current) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'New password must be different from current',
+        path: ['password'],
+      });
+    }
   });
 
 type PasswordFields = z.infer<typeof PASSWORD_UPDATE_SCHEMA>;
@@ -39,6 +51,8 @@ export function PasswordUpdate() {
     reset,
     register,
     handleSubmit,
+    setValue,
+    trigger,
     formState: { errors },
   } = useForm<PasswordFields>({
     resolver: zodResolver(PASSWORD_UPDATE_SCHEMA),
@@ -59,7 +73,7 @@ export function PasswordUpdate() {
       await changePassword(request);
       reset();
     } catch {
-      onOpenChange();
+      onOpen();
     }
   };
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -79,7 +93,7 @@ export function PasswordUpdate() {
 
   return (
     <EditableCard
-      className="col-span-12 h-fit min-h-[410px] w-[320px] p-[20px] sm:col-span-4 "
+      className="col-span-12 h-fit min-h-[410px] w-[320px] p-[20px] sm:col-span-4"
       editmode={true}
       headerClass="flex-col items-center flex-start p-0"
       isLoading={isLoading}
@@ -93,12 +107,13 @@ export function PasswordUpdate() {
           isDismissable={false}
           isKeyboardDismissDisabled={true}
           isOpen={isOpen}
+          placement="center"
           onOpenChange={onOpenChange}
         >
           <ModalContent>
-            {(onClose) => (
+            {() => (
               <>
-                <ModalHeader className="flex flex-col gap-1">Info</ModalHeader>
+                <ModalHeader>Info</ModalHeader>
                 <ModalBody>
                   <p>{error}</p>
                 </ModalBody>
@@ -122,18 +137,38 @@ export function PasswordUpdate() {
           type="password"
           {...register('current')}
           label="Enter current password"
+          onChange={(e) => {
+            const value = e.target.value;
+
+            setValue('current', value);
+            trigger(`password`);
+          }}
         />
         <div className="mt-5">Write new password</div>
         <PasswordInput
           errorMessage={errors.password?.message}
           isInvalid={!!errors.password}
           register={register('password')}
+          onChange={(e) => {
+            const value = e.target.value;
+
+            setValue('password', value);
+            trigger(`password`);
+            trigger(`repeat`);
+          }}
         />
-        <div className=" mt-5">Repeat new password</div>
+        <div className="mt-5">Repeat new password</div>
         <PasswordInput
           errorMessage={errors.repeat?.message}
           isInvalid={!!errors.repeat}
           register={register('repeat')}
+          onChange={(e) => {
+            const value = e.target.value;
+
+            setValue('repeat', value);
+            trigger(`password`);
+            trigger(`repeat`);
+          }}
         />
       </div>
     </EditableCard>

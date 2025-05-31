@@ -13,10 +13,15 @@ import { createPasswordFlowClient } from '@/commercetools/login';
 
 export function CustomerSettings() {
   const [isLoading, setIsLoading] = useState(false);
+  const { updateUser, user } = useSession();
   const [error, setError] = useState<string | null>(null);
-  const { login, user } = useSession();
-
   const resetError = (): void => setError(null);
+  const [version, setVersion] = useState(user.version);
+
+  const updateLocalClient = async (value: Customer): Promise<void> => {
+    setVersion(value.version);
+    updateUser(value);
+  };
 
   const changePassword = async (
     data: MyCustomerChangePassword,
@@ -37,12 +42,13 @@ export function CustomerSettings() {
         body: {
           currentPassword: data.currentPassword,
           newPassword: data.newPassword,
-          version: data.version,
+          version: version,
         },
       })
       .execute()
       .then(async (response: ClientResponse<Customer>) => {
         const customer = response.originalRequest;
+
         console.log(customer);
 
         toast.success('Password successful changed!', {
@@ -52,20 +58,20 @@ export function CustomerSettings() {
             padding: '16px 24px',
           },
         });
+
         const newClient = createPasswordFlowClient(
           user.email,
           data.newPassword,
         );
-
         const { body: updatedCustomer } = await newClient.me().get().execute();
 
-        console.log(updatedCustomer);
-        login(updatedCustomer);
+        updateLocalClient(updatedCustomer);
       })
       .catch((error) => {
         isInvalidCurrentPasswordError(error)
           ? setError('Invalid Current Password')
-          : setError(error.message);
+          : setError(error.code);
+        throw new Error();
       })
       .finally(() => {
         setIsLoading(false);
