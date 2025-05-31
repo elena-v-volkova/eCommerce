@@ -1,0 +1,9 @@
+.not_found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  h1 {
+    @apply inline bg-gradient-to-b from-[#FF1CF7] to-[#b249f8] bg-clip-text text-[2.3rem] font-semibold leading-9 tracking-tight text-transparent lg:text-5xl;
+  }
+}

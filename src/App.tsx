@@ -1,11 +1,40 @@
-import './App.css';
+import { Routes, Route } from 'react-router';
+
+import NotFound from './pages/404/NotFound';
+import Home from './pages/Home/HomePage';
+import Login from './pages/Login/LoginPage';
+import Register from './pages/Register/RegisterPage';
+import { RedirectIfAuthenticated } from './ProtectedRoute';
+import { RoootLayout } from './components/RootLayout/RoootLayout';
+
+import { AppRoute } from '@/routes/appRoutes';
 
 function App() {
   return (
-    <div id="root">
-      <h1 className="border-solid font-mono text-3xl">Sprint#1</h1>
-    </div>
+    // <Provider store={store}>
+    <Routes>
+      <Route element={<RoootLayout />} path="/">
+        <Route element={<Home />} path={AppRoute.home} />
+        <Route
+          element={
+            <RedirectIfAuthenticated>
+              <Login />
+            </RedirectIfAuthenticated>
+          }
+          path={AppRoute.login}
+        />
+        <Route
+          element={
+            <RedirectIfAuthenticated>
+              <Register />
+            </RedirectIfAuthenticated>
+          }
+          path={AppRoute.register}
+        />
+        <Route element={<NotFound />} path={AppRoute.notFound} />
+      </Route>
+    </Routes>
+    // </Provider>
   );
 }
-
 export default App;

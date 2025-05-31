@@ -10,10 +10,10 @@ import stylistic from '@stylistic/eslint-plugin';
 import unicorn from 'eslint-plugin-unicorn';
 import tailwindcss from "eslint-plugin-tailwindcss";
 
-
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-  ...tailwindcss.configs["flat/recommended"], 
+  ...tailwindcss.configs["flat/recommended"],
+
   {
     ignores: [
       '.config/',
@@ -147,4 +147,13 @@ export default [
       'no-magic-numbers': 'off',
     },
   },
+  {
+    "sort-imports": ["error", {
+      "ignoreCase": false,
+      "ignoreDeclarationSort": false,
+      "ignoreMemberSort": false,
+      "memberSyntaxSortOrder": ["none", "all", "multiple", "single"],
+      "allowSeparatedGroups": false
+    }]
+  }
 ];
