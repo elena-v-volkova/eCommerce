@@ -21,11 +21,12 @@ const PERSONAL_SCHEMA = REGISTER_SCHEMA.pick({
 
 type PersonalFields = Pick<
   TRegisterFieldsSchema,
-  'email' | 'firstName' | 'lastName' | 'dateOfBirth'
+  'email' | 'firstName' | 'lastName' | 'dateOfBirth' | 'password'
 >;
 
 export function PersonalContent({ customer }: { customer: Customer | null }) {
   const {
+    reset,
     control,
     register,
     handleSubmit,
@@ -38,11 +39,14 @@ export function PersonalContent({ customer }: { customer: Customer | null }) {
       firstName: customer?.firstName,
       lastName: customer?.lastName,
       dateOfBirth: parseDate(customer?.dateOfBirth?.toString() || ''),
+      password: undefined,
     },
   });
   const onSubmit = (data: PersonalFields) => {
-    setMode(false);
-    console.log(data);
+    if (!Boolean(errors)) {
+      setMode(false);
+      console.log(data);
+    }
   };
   const [mode, setMode] = useState(false);
 
@@ -50,11 +54,13 @@ export function PersonalContent({ customer }: { customer: Customer | null }) {
     <EditableCard
       className="col-span-12 h-fit min-h-[410px] w-[320px] p-[20px] sm:col-span-4"
       headerClass="flex-col items-center p-0"
+      noErrors={!Boolean(errors)}
       title="Your Information"
-      onCancel={(value) => {
+      onCancel={(value: boolean) => {
         setMode(!value);
+        reset();
       }}
-      onEdit={(value) => {
+      onEdit={(value: boolean) => {
         setMode(!value);
       }}
       onSave={handleSubmit(onSubmit)}

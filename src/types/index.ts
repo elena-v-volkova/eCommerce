@@ -20,7 +20,7 @@ export interface AddressFieldsProps<T extends FieldValues>
 }
 
 export interface FormFieldsProps<T extends FieldValues> {
-  title: string;
+  title?: string;
   register: UseFormRegister<T>;
   errors: FieldErrors<T>;
   setValue: UseFormSetValue<T>;

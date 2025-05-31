@@ -2,13 +2,22 @@ import { Link } from '@heroui/link';
 import { Snippet } from '@heroui/snippet';
 import { Code } from '@heroui/code';
 import { button as buttonStyles } from '@heroui/theme';
+import { Button } from '@heroui/react';
 
 import { SITE_CONFIG } from '@/config/site';
 import { TITLE, SUBTITLE } from '@/components/primitives';
+import { loadMockUser } from '@/shared/utils/utils';
 
 function Home() {
   return (
     <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
+      <Button
+        className="text-tiny"
+        color="default"
+        onClick={() => loadMockUser()}
+      >
+        Load Mock data
+      </Button>
       <div className="inline-block max-w-lg justify-center text-center">
         <span className={TITLE()}>Make&nbsp;</span>
         <span className={TITLE({ color: 'violet' })}>beautiful&nbsp;</span>

@@ -52,25 +52,25 @@ function CardAddress({
   value: BaseAddress;
   prop: AddressType;
 }) {
-  const initial = {
-    country: CodeToCountry(value.country) || '',
-    city: value.city || '',
-    postalCode: value.postalCode || '',
-    streetName: value.streetName || '',
-  };
-
   const {
     register,
     trigger,
     setValue,
     handleSubmit,
     reset,
+    control,
+    getValues,
     formState: { errors },
   } = useForm<AddressFields>({
     resolver: zodResolver(ADDRESS_SCHEMA),
     mode: 'onChange',
     defaultValues: {
-      address: initial,
+      address: {
+        country: CodeToCountry(value.country) || '',
+        city: value.city || '',
+        postalCode: value.postalCode || '',
+        streetName: value.streetName || '',
+      },
     },
   });
   const [mode, setMode] = useState(false);
@@ -83,8 +83,10 @@ function CardAddress({
   })();
 
   const onSubmit = (data: AddressFields) => {
-    console.log(data);
-    setMode(false);
+    if (!Boolean(errors)) {
+      setMode(false);
+      console.log(data);
+    }
   };
 
   return (
@@ -93,7 +95,7 @@ function CardAddress({
       headerChildren={
         prop.default && (
           <Chip
-            color="success"
+            color="secondary"
             endContent={<CircleCheckBig size={18} />}
             variant="faded"
           >
@@ -101,17 +103,20 @@ function CardAddress({
           </Chip>
         )
       }
+      noErrors={!Boolean(errors)}
       title={title}
-      onCancel={(value) => {
+      onCancel={(value: boolean) => {
         setMode(!value);
+        reset();
       }}
-      onEdit={(value) => {
+      onEdit={(value: boolean) => {
         setMode(!value);
       }}
       onSave={handleSubmit(onSubmit)}
     >
       <div className="flex flex-col items-start gap-2">
         <AddressFields
+          control={control}
           disabled={!mode}
           errors={errors}
           newAddress={false}

@@ -5,14 +5,15 @@ interface EditableCardProps {
   onestate?: boolean;
   editmode?: boolean;
   title: string;
-  headerClass: string;
+  headerClass?: string;
   headerChildren?: React.ReactNode | null;
   children: React.ReactNode;
   className?: string;
-  onEdit?: () => void;
-  onSave?: () => Promise<void> | void;
-  onCancel?: () => void;
+  onEdit?: (key: any) => void;
+  onSave?: (key: any) => Promise<void> | void;
+  onCancel?: (key: any) => void;
   isLoading?: boolean;
+  noErrors: boolean;
 }
 
 export function EditableCard({
@@ -27,6 +28,7 @@ export function EditableCard({
   onSave,
   onCancel,
   isLoading = false,
+  noErrors = true,
 }: EditableCardProps): JSX.Element {
   const [mode, setMode] = useState(editmode);
 
@@ -37,7 +39,7 @@ export function EditableCard({
 
   const handleSave = () => {
     onSave?.(mode);
-    if (!onestate) setMode(false);
+    if (!onestate && noErrors) setMode(false);
   };
 
   const handleCancel = () => {
