@@ -12,11 +12,6 @@ import {
 } from '@commercetools/platform-sdk';
 import { DateValue } from '@heroui/react';
 
-interface UpdateAction {
-  action: string;
-  [key: string]: any;
-}
-
 // #region personal
 
 export const PERSONAL_DATA_ACTION = {

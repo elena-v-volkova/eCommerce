@@ -4,8 +4,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CircleCheckBig } from 'lucide-react';
 import { useState } from 'react';
+import { Plus } from 'lucide-react';
 
 import { EditableCard } from './EditableCard';
+import { CheckBoxes } from './CheckBoxes';
 import { ProfileModal } from './Modal';
 
 import { CustomerSettings } from '@/shared/store/customerProfile';
@@ -34,6 +36,7 @@ export function AddressContent({ customer }: { customer: Customer | null }) {
             />
           );
         })}
+      <CardAddress />
     </div>
   );
 }
@@ -59,9 +62,9 @@ function CardAddress({
   prop,
   id,
 }: {
-  address: BaseAddress;
-  prop: AddressType;
-  id: string;
+  address?: BaseAddress;
+  prop?: AddressType;
+  id?: string;
 }) {
   const {
     register,
@@ -75,19 +78,26 @@ function CardAddress({
   } = useForm<AddressFields>({
     resolver: zodResolver(ADDRESS_SCHEMA),
     mode: 'onChange',
-    defaultValues: {
-      address: {
-        country: CodeToCountry(address.country) || '',
-        city: address.city || '',
-        postalCode: address.postalCode || '',
-        streetName: address.streetName || '',
-      },
-    },
+    defaultValues: address
+      ? {
+          address: {
+            country: CodeToCountry(address.country) || '',
+            city: address.city || '',
+            postalCode: address.postalCode || '',
+            streetName: address.streetName || '',
+          },
+        }
+      : {
+          address: { country: '', city: '', postalCode: '' },
+          streetName: '',
+        },
   });
   const [mode, setMode] = useState(false);
   const title = (() => {
-    if (prop.type) {
+    if (prop && prop.type) {
       return prop.type === 'billing' ? 'Billing Address' : 'Shipping Address';
+    } else {
+      return 'NEW';
     }
 
     return 'Address';
@@ -100,7 +110,7 @@ function CardAddress({
       try {
         await editAddress(addressId, getValues().address);
         setMode(!mode);
-      } catch (error: Error) {
+      } catch (error) {
         console.log(error);
         onOpen();
       }
@@ -113,23 +123,38 @@ function CardAddress({
     onOpenChange();
   };
 
-  return (
+  const [createMode, setCreateMode] = useState(false);
+
+  return address || createMode ? (
     <EditableCard
       className="col-span-12 h-fit min-h-[410px] w-[320px] p-[20px] sm:col-span-4"
+      editmode={createMode ? true : false}
       headerChildren={
-        prop.default && (
-          <Chip
-            color="secondary"
-            endContent={<CircleCheckBig size={18} />}
-            variant="faded"
-          >
-            Default
-          </Chip>
+        prop ? (
+          prop.default && (
+            <Chip
+              color="secondary"
+              endContent={<CircleCheckBig size={18} />}
+              variant="faded"
+            >
+              Default
+            </Chip>
+          )
+        ) : (
+          <CheckBoxes />
         )
       }
+      headerClass={
+        createMode ? 'mb-[20px] content-center justify-between' : undefined
+      }
+      isLoading={isLoading}
       noErrors={!Boolean(errors)}
-      title={title}
+      onestate={createMode ? true : false}
+      title={title ? title : 'New Address'}
       onCancel={(value: boolean) => {
+        if (createMode) {
+          setCreateMode(false);
+        }
         setMode(!value);
         reset();
       }}
@@ -137,7 +162,6 @@ function CardAddress({
         setMode(!value);
       }}
       onSave={onSubmit}
-      isLoading={isLoading}
     >
       {error && (
         <ProfileModal
@@ -151,9 +175,10 @@ function CardAddress({
       <div className="flex flex-col items-start gap-2">
         <AddressFields
           control={control}
-          disabled={!mode}
+          disabled={!address ? Boolean(!createMode) : Boolean(!mode)}
+          // disabled={false }
           errors={errors}
-          newAddress={false}
+          newAddress={createMode ? true : false}
           prefix="address"
           register={register}
           setValue={setValue}
@@ -162,5 +187,12 @@ function CardAddress({
         />
       </div>
     </EditableCard>
+  ) : (
+    <div
+      className="flex h-[410px] w-[320px] cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-[20px] text-primary transition-colors hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 sm:col-span-4"
+      onClick={() => setCreateMode(true)}
+    >
+      <Plus absoluteStrokeWidth size={64} strokeWidth={3} />
+    </div>
   );
 }

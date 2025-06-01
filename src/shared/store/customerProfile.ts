@@ -147,6 +147,7 @@ export function CustomerSettings() {
       PERSONAL_DATA_ACTION.setLastName(personal.lastName),
       PERSONAL_DATA_ACTION.setDateOfBirth(personal.dateOfBirth),
     ];
+
     await apiAnonRoot
       .customers()
       .withId({ ID: user.id })

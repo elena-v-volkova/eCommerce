@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { Customer } from '@commercetools/platform-sdk';
 import { Input, useDisclosure } from '@heroui/react';
 import { useState } from 'react';
+
 import { ProfileModal } from './Modal';
 import { EditableCard } from './EditableCard';
 
@@ -89,10 +90,10 @@ export function PasswordUpdate() {
         resetError(), reset();
         setMode(false);
       }}
-      onSave={handleSubmit(onSubmit)}
       onEdit={() => {
         setMode(!mode);
       }}
+      onSave={handleSubmit(onSubmit)}
     >
       {error && (
         <ProfileModal
@@ -107,6 +108,7 @@ export function PasswordUpdate() {
           isRequired
           type="password"
           {...register('current')}
+          isDisabled={!mode}
           label="Enter current password"
           onChange={(e) => {
             const value = e.target.value;
@@ -114,11 +116,11 @@ export function PasswordUpdate() {
             setValue('current', value);
             trigger(`password`);
           }}
-          isDisabled={!mode}
         />
         <div className="mt-5">{mode ? 'Write new password' : ''}</div>
         <PasswordInput
           errorMessage={errors.password?.message}
+          isDisabled={!mode}
           isInvalid={!!errors.password}
           register={register('password')}
           onChange={(e) => {
@@ -128,11 +130,11 @@ export function PasswordUpdate() {
             trigger(`password`);
             trigger(`repeat`);
           }}
-          isDisabled={!mode}
         />
         <div className="mt-5">{mode ? 'Repeat new password' : ''}</div>
         <PasswordInput
           errorMessage={errors.repeat?.message}
+          isDisabled={!mode}
           isInvalid={!!errors.repeat}
           register={register('repeat')}
           onChange={(e) => {
@@ -142,7 +144,6 @@ export function PasswordUpdate() {
             trigger(`password`);
             trigger(`repeat`);
           }}
-          isDisabled={!mode}
         />
       </div>
     </EditableCard>
