@@ -10,6 +10,7 @@ import {
   MyCustomerSetFirstNameAction,
   MyCustomerSetLastNameAction,
 } from '@commercetools/platform-sdk';
+import { DateValue } from '@heroui/react';
 
 interface UpdateAction {
   action: string;
@@ -31,19 +32,19 @@ export const PERSONAL_DATA_ACTION = {
     action: 'setLastName',
     lastName,
   }),
-  setDateOfBirth: (dateOfBirth: Date): MyCustomerSetDateOfBirthAction => ({
+  setDateOfBirth: (dateOfBirth: DateValue): MyCustomerSetDateOfBirthAction => ({
     action: 'setDateOfBirth',
-    dateOfBirth: formatDateForAPI(dateOfBirth),
+    dateOfBirth: dateOfBirth.toString(), //formatDateForAPI(dateOfBirth),
   }),
 };
 
-function formatDateForAPI(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
+// function formatDateForAPI(date: DateValue): string {
+//   const year = date.year;
+//   const month = String(date.month + 1).padStart(2, '0');
+//   const day = String(date.day).padStart(2, '0');
 
-  return `${year}-${month}-${day}`;
-}
+//   return `${year}-${month}-${day}`;
+// }
 //#endregion personal
 
 //#region address

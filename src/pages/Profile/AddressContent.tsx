@@ -99,7 +99,7 @@ function CardAddress({
     if (Object.keys(errors).length === 0) {
       try {
         await editAddress(addressId, getValues().address);
-        setMode(!Boolean(error));
+        setMode(!mode);
       } catch (error: Error) {
         console.log(error);
         onOpen();
@@ -137,6 +137,7 @@ function CardAddress({
         setMode(!value);
       }}
       onSave={onSubmit}
+      isLoading={isLoading}
     >
       {error && (
         <ProfileModal

@@ -2,6 +2,7 @@ import {
   BaseAddress,
   ClientResponse,
   Customer,
+  CustomerUpdateAction,
   MyCustomerChangePassword,
 } from '@commercetools/platform-sdk';
 import { useState } from 'react';
@@ -11,11 +12,12 @@ import { InvalidCurrentPasswordError } from '@commercetools/platform-sdk';
 import { useSession } from '../model/useSession';
 
 import { getCountryInfo } from './countries';
-import { ADDRESS_ACTION } from './updateUtils';
+import { ADDRESS_ACTION, PERSONAL_DATA_ACTION } from './updateUtils';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
 import { createPasswordFlowClient } from '@/commercetools/login';
 import { ResponseError } from '@/types/commercetools';
+import { PersonalFields } from '@/pages/Profile/PersonalContent';
 
 export function CustomerSettings() {
   const [isLoading, setIsLoading] = useState(false);
@@ -28,7 +30,15 @@ export function CustomerSettings() {
     setVersion(value.version);
     updateUser(value);
   };
-
+  const notifyToast = (msg: string) => {
+    toast.success(msg, {
+      duration: 5000,
+      style: {
+        fontSize: '1.25rem',
+        padding: '16px 24px',
+      },
+    });
+  };
   const changePassword = async (
     data: MyCustomerChangePassword,
   ): Promise<Customer | void> => {
@@ -36,16 +46,6 @@ export function CustomerSettings() {
       user.email,
       data.currentPassword,
     );
-
-    const notifyToast = (msg: string) => {
-      toast.success(msg, {
-        duration: 5000,
-        style: {
-          fontSize: '1.25rem',
-          padding: '16px 24px',
-        },
-      });
-    };
 
     setIsLoading(true);
     setError(null);
@@ -138,8 +138,36 @@ export function CustomerSettings() {
       });
   };
 
-  const editPersonal = async (): Promise<void> => {
-    return;
+  const editPersonal = async (personal: PersonalFields): Promise<void> => {
+    setIsLoading(true);
+    setError(null);
+    const request: CustomerUpdateAction[] = [
+      PERSONAL_DATA_ACTION.changeEmail(personal.email),
+      PERSONAL_DATA_ACTION.setFirstName(personal.firstName),
+      PERSONAL_DATA_ACTION.setLastName(personal.lastName),
+      PERSONAL_DATA_ACTION.setDateOfBirth(personal.dateOfBirth),
+    ];
+    await apiAnonRoot
+      .customers()
+      .withId({ ID: user.id })
+      .post({
+        body: {
+          version: version,
+          actions: request,
+        },
+      })
+      .execute()
+      .then((data: ClientResponse<Customer>) => {
+        notifyToast('Personal data changed!');
+        updateLocalClient(data.body);
+      })
+      .catch((error: ResponseError) => {
+        setError(error.message);
+        throw new Error(error.message);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return {
@@ -148,6 +176,7 @@ export function CustomerSettings() {
     error,
     resetError,
     editAddress,
+    editPersonal,
   };
 }
 

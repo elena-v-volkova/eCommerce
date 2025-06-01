@@ -50,12 +50,13 @@ export function PersonalContent({ customer }: { customer: Customer | null }) {
 
   const { isLoading, error, resetError, editPersonal } = CustomerSettings();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const onSubmit = (data: PersonalFields) => {
+
+  const onSubmit = async (data: PersonalFields) => {
     if (Object.keys(errors).length === 0) {
+      console.log(data);
       try {
-        // editPersonal();
-        setMode(false);
-        console.log(data);
+        await editPersonal(data);
+        setMode(!mode);
       } catch {
         onOpen();
       }
@@ -71,6 +72,7 @@ export function PersonalContent({ customer }: { customer: Customer | null }) {
       className="col-span-12 h-fit min-h-[410px] w-[320px] p-[20px] sm:col-span-4"
       headerClass="flex-col items-center p-0"
       noErrors={!Boolean(errors)}
+      isLoading={isLoading}
       title="Your Information"
       onCancel={(value: boolean) => {
         setMode(!value);

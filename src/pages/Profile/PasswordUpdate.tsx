@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Customer } from '@commercetools/platform-sdk';
 import { Input, useDisclosure } from '@heroui/react';
-
+import { useState } from 'react';
 import { ProfileModal } from './Modal';
 import { EditableCard } from './EditableCard';
 
@@ -52,19 +52,24 @@ export function PasswordUpdate() {
   const { user }: { readonly user: Customer | null } = useAuth();
   const { changePassword, isLoading, error, resetError } = CustomerSettings();
 
-  const onSubmit = async (data: PasswordFields) => {
-    const request = {
-      // id: user?.id || '',
-      version: user?.version || 1,
-      currentPassword: data?.current || '',
-      newPassword: data.password || '',
-    };
+  const [mode, setMode] = useState(false);
 
-    try {
-      await changePassword(request);
-      reset();
-    } catch {
-      onOpen();
+  const onSubmit = async (data: PasswordFields) => {
+    if (Object.keys(errors).length === 0) {
+      const request = {
+        // id: user?.id || '',
+        version: user?.version || 1,
+        currentPassword: data?.current || '',
+        newPassword: data.password || '',
+      };
+
+      try {
+        await changePassword(request);
+        reset();
+        setMode(!mode);
+      } catch {
+        onOpen();
+      }
     }
   };
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -76,13 +81,18 @@ export function PasswordUpdate() {
   return (
     <EditableCard
       className="col-span-12 h-fit min-h-[410px] w-[320px] p-[20px] sm:col-span-4"
-      editmode={true}
       headerClass="flex-col items-center flex-start p-0"
       isLoading={isLoading}
-      onestate={true}
+      noErrors={!Boolean(errors)}
       title="Change password"
-      onCancel={() => resetError()}
+      onCancel={() => {
+        resetError(), reset();
+        setMode(false);
+      }}
       onSave={handleSubmit(onSubmit)}
+      onEdit={() => {
+        setMode(!mode);
+      }}
     >
       {error && (
         <ProfileModal
@@ -104,8 +114,9 @@ export function PasswordUpdate() {
             setValue('current', value);
             trigger(`password`);
           }}
+          isDisabled={!mode}
         />
-        <div className="mt-5">Write new password</div>
+        <div className="mt-5">{mode ? 'Write new password' : ''}</div>
         <PasswordInput
           errorMessage={errors.password?.message}
           isInvalid={!!errors.password}
@@ -117,8 +128,9 @@ export function PasswordUpdate() {
             trigger(`password`);
             trigger(`repeat`);
           }}
+          isDisabled={!mode}
         />
-        <div className="mt-5">Repeat new password</div>
+        <div className="mt-5">{mode ? 'Repeat new password' : ''}</div>
         <PasswordInput
           errorMessage={errors.repeat?.message}
           isInvalid={!!errors.repeat}
@@ -130,6 +142,7 @@ export function PasswordUpdate() {
             trigger(`password`);
             trigger(`repeat`);
           }}
+          isDisabled={!mode}
         />
       </div>
     </EditableCard>
