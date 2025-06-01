@@ -3,9 +3,12 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { parseDate } from '@internationalized/date';
 import { useState } from 'react';
+import { useDisclosure } from '@heroui/react';
 
+import { ProfileModal } from './Modal';
 import { EditableCard } from './EditableCard';
 
+import { CustomerSettings } from '@/shared/store/customerProfile';
 import { PersonalInfo } from '@/components/RegisterForm/ui/PersonalInfo';
 import {
   REGISTER_SCHEMA,
@@ -19,7 +22,7 @@ const PERSONAL_SCHEMA = REGISTER_SCHEMA.pick({
   dateOfBirth: true,
 });
 
-type PersonalFields = Pick<
+export type PersonalFields = Pick<
   TRegisterFieldsSchema,
   'email' | 'firstName' | 'lastName' | 'dateOfBirth' | 'password'
 >;
@@ -42,13 +45,26 @@ export function PersonalContent({ customer }: { customer: Customer | null }) {
       password: undefined,
     },
   });
+
+  const [mode, setMode] = useState(false);
+
+  const { isLoading, error, resetError, editPersonal } = CustomerSettings();
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const onSubmit = (data: PersonalFields) => {
-    if (!Boolean(errors)) {
-      setMode(false);
-      console.log(data);
+    if (Object.keys(errors).length === 0) {
+      try {
+        // editPersonal();
+        setMode(false);
+        console.log(data);
+      } catch {
+        onOpen();
+      }
     }
   };
-  const [mode, setMode] = useState(false);
+  const handleClose = () => {
+    resetError();
+    onOpenChange();
+  };
 
   return (
     <EditableCard
@@ -65,6 +81,14 @@ export function PersonalContent({ customer }: { customer: Customer | null }) {
       }}
       onSave={handleSubmit(onSubmit)}
     >
+      {error && (
+        <ProfileModal
+          close={handleClose}
+          errorMessage={error}
+          isOpen={isOpen}
+          onOpenChange={onOpenChange}
+        />
+      )}
       <div
         className="grid size-auto grid-cols-[auto_320_320] grid-rows-[auto] justify-items-center gap-4"
         data-testid="form-personal-profile"

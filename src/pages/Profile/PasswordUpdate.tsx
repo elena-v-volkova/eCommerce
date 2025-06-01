@@ -1,19 +1,10 @@
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useEffect } from 'react';
 import { Customer } from '@commercetools/platform-sdk';
-import {
-  Input,
-  Button,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  useDisclosure,
-} from '@heroui/react';
+import { Input, useDisclosure } from '@heroui/react';
 
+import { ProfileModal } from './Modal';
 import { EditableCard } from './EditableCard';
 
 import { REGISTER_SCHEMA } from '@/components/RegisterForm/lib/utils';
@@ -77,15 +68,6 @@ export function PasswordUpdate() {
     }
   };
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
-  useEffect(() => {
-    if (error) {
-      onOpen();
-    } else {
-      onOpenChange();
-    }
-  }, [error, onOpen, onOpenChange]);
-
   const handleClose = () => {
     resetError();
     onOpenChange();
@@ -103,33 +85,12 @@ export function PasswordUpdate() {
       onSave={handleSubmit(onSubmit)}
     >
       {error && (
-        <Modal
-          isDismissable={false}
-          isKeyboardDismissDisabled={true}
+        <ProfileModal
+          close={handleClose}
+          errorMessage={error}
           isOpen={isOpen}
-          placement="center"
           onOpenChange={onOpenChange}
-        >
-          <ModalContent>
-            {() => (
-              <>
-                <ModalHeader>Info</ModalHeader>
-                <ModalBody>
-                  <p>{error}</p>
-                </ModalBody>
-                <ModalFooter>
-                  <Button
-                    color="secondary"
-                    variant="light"
-                    onPress={handleClose}
-                  >
-                    Close
-                  </Button>
-                </ModalFooter>
-              </>
-            )}
-          </ModalContent>
-        </Modal>
+        />
       )}
       <div className="flex flex-col items-center">
         <Input

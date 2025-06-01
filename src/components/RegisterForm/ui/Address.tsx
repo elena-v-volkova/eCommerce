@@ -48,18 +48,18 @@ export const AddressFields = ({
               isInvalid={!!fieldState.error}
               placeholder="Select Country"
               selectedKeys={field.value ? [field.value] : []}
-              onSelectionChange={(keys) => {
-                const value = Array.from(keys)[0] as string;
-
-                field.onChange(value);
-                trigger(`${prefix}.postalCode`);
-              }}
               onChange={(e) => {
                 const value = e.target.value;
 
                 setValue(`${prefix}.country`, value);
                 trigger(`${prefix}.postalCode`);
                 trigger(`${prefix}.country`);
+              }}
+              onSelectionChange={(keys) => {
+                const value = Array.from(keys)[0] as string;
+
+                field.onChange(value);
+                trigger(`${prefix}.postalCode`);
               }}
             >
               {COUNTRIES.map((country) => (

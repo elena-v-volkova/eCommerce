@@ -1,12 +1,14 @@
 import { BaseAddress, Customer } from '@commercetools/platform-sdk';
-import { Chip } from '@heroui/react';
+import { Chip, useDisclosure } from '@heroui/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CircleCheckBig } from 'lucide-react';
 import { useState } from 'react';
 
 import { EditableCard } from './EditableCard';
+import { ProfileModal } from './Modal';
 
+import { CustomerSettings } from '@/shared/store/customerProfile';
 import {
   REGISTER_SCHEMA,
   TRegisterFieldsSchema,
@@ -20,10 +22,17 @@ export function AddressContent({ customer }: { customer: Customer | null }) {
     <div className="flex min-h-[180px] w-full justify-center gap-[20px]">
       {customer &&
         customer.addresses.length > 0 &&
-        customer.addresses.map((item) => {
+        customer.addresses.map((item: BaseAddress) => {
           const info = checkVariants(item.id || '', customer);
 
-          return <CardAddress key={item.id} prop={info} value={item} />;
+          return (
+            <CardAddress
+              key={item.id}
+              address={item}
+              id={item.id ?? ''}
+              prop={info}
+            />
+          );
         })}
     </div>
   );
@@ -46,11 +55,13 @@ const ADDRESS_SCHEMA = REGISTER_SCHEMA.pick({ address: true });
 type AddressFields = Pick<TRegisterFieldsSchema, 'address'>;
 
 function CardAddress({
-  value,
+  address,
   prop,
+  id,
 }: {
-  value: BaseAddress;
+  address: BaseAddress;
   prop: AddressType;
+  id: string;
 }) {
   const {
     register,
@@ -66,10 +77,10 @@ function CardAddress({
     mode: 'onChange',
     defaultValues: {
       address: {
-        country: CodeToCountry(value.country) || '',
-        city: value.city || '',
-        postalCode: value.postalCode || '',
-        streetName: value.streetName || '',
+        country: CodeToCountry(address.country) || '',
+        city: address.city || '',
+        postalCode: address.postalCode || '',
+        streetName: address.streetName || '',
       },
     },
   });
@@ -82,11 +93,24 @@ function CardAddress({
     return 'Address';
   })();
 
-  const onSubmit = (data: AddressFields) => {
-    if (!Boolean(errors)) {
-      setMode(false);
-      console.log(data);
+  const { isLoading, error, resetError, editAddress } = CustomerSettings();
+  const addressId = id;
+  const onSubmit = async (data: boolean) => {
+    if (Object.keys(errors).length === 0) {
+      try {
+        await editAddress(addressId, getValues().address);
+        setMode(!Boolean(error));
+      } catch (error: Error) {
+        console.log(error);
+        onOpen();
+      }
     }
+  };
+
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const handleClose = () => {
+    reset();
+    onOpenChange();
   };
 
   return (
@@ -112,8 +136,17 @@ function CardAddress({
       onEdit={(value: boolean) => {
         setMode(!value);
       }}
-      onSave={handleSubmit(onSubmit)}
+      onSave={onSubmit}
     >
+      {error && (
+        <ProfileModal
+          close={handleClose}
+          errorMessage={error}
+          isOpen={isOpen}
+          onOpenChange={onOpenChange}
+        />
+      )}
+
       <div className="flex flex-col items-start gap-2">
         <AddressFields
           control={control}

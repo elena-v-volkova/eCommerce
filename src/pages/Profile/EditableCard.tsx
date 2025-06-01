@@ -37,12 +37,14 @@ export function EditableCard({
     onEdit?.(mode);
   };
 
-  const handleSave = () => {
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
     onSave?.(mode);
     if (!onestate && noErrors) setMode(false);
   };
 
-  const handleCancel = () => {
+  const handleCancel = (e: React.FormEvent) => {
+    e.preventDefault();
     if (!onestate) setMode(false);
     onCancel?.(mode);
   };

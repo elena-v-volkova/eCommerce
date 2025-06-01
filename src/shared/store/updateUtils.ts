@@ -1,107 +1,39 @@
-import { BaseAddress } from '@commercetools/platform-sdk';
+import {
+  BaseAddress,
+  MyCustomerAddAddressAction,
+  MyCustomerChangeAddressAction,
+  MyCustomerChangeEmailAction,
+  MyCustomerRemoveAddressAction,
+  MyCustomerSetDateOfBirthAction,
+  MyCustomerSetDefaultBillingAddressAction,
+  MyCustomerSetDefaultShippingAddressAction,
+  MyCustomerSetFirstNameAction,
+  MyCustomerSetLastNameAction,
+} from '@commercetools/platform-sdk';
 
 interface UpdateAction {
   action: string;
   [key: string]: any;
 }
 
-type PersonalDataAction =
-  | ChangeEmailAction
-  | SetFirstNameAction
-  | SetLastNameAction
-  | SetDateOfBirthAction;
 // #region personal
-interface ChangeEmailAction {
-  action: 'changeEmail';
-  email: string;
-}
-
-interface SetFirstNameAction {
-  action: 'setFirstName';
-  firstName: string;
-}
-
-interface SetLastNameAction {
-  action: 'setLastName';
-  lastName: string;
-}
-
-interface SetDateOfBirthAction {
-  action: 'setDateOfBirth';
-  dateOfBirth: string;
-}
 
 export const PERSONAL_DATA_ACTION = {
-  changeEmail: (email: string): ChangeEmailAction => ({
+  changeEmail: (email: string): MyCustomerChangeEmailAction => ({
     action: 'changeEmail',
     email,
   }),
-  setFirstName: (firstName: string): SetFirstNameAction => ({
+  setFirstName: (firstName: string): MyCustomerSetFirstNameAction => ({
     action: 'setFirstName',
     firstName,
   }),
-  setLastName: (lastName: string): SetLastNameAction => ({
+  setLastName: (lastName: string): MyCustomerSetLastNameAction => ({
     action: 'setLastName',
     lastName,
   }),
-  setDateOfBirth: (dateOfBirth: Date): SetDateOfBirthAction => ({
+  setDateOfBirth: (dateOfBirth: Date): MyCustomerSetDateOfBirthAction => ({
     action: 'setDateOfBirth',
     dateOfBirth: formatDateForAPI(dateOfBirth),
-  }),
-};
-//#endregion personal
-
-type AddressAction =
-  | ChangeAddress
-  | RemoveAddress
-  | AddAddress
-  | SetDefaultShippingAddress
-  | SetDefaultBillingAddress;
-//#region address
-
-interface ChangeAddress {
-  action: 'changeAddress';
-  addressId: string;
-  address: BaseAddress;
-}
-interface RemoveAddress {
-  action: 'removeAddress';
-  addressId: string;
-}
-interface AddAddress {
-  action: 'addAddress';
-  address: BaseAddress;
-}
-interface SetDefaultShippingAddress {
-  action: 'setDefaultShippingAddress';
-  addressId: string;
-}
-interface SetDefaultBillingAddress {
-  action: 'setDefaultBillingAddress';
-  addressId: string;
-}
-
-export const ADDRESS_ACTION = {
-  change: (addressId: string, changes: BaseAddress): ChangeAddress => ({
-    action: 'changeAddress',
-    addressId,
-    address: changes,
-  }),
-  remove: (addressId: string): RemoveAddress => ({
-    action: 'removeAddress',
-    addressId,
-  }),
-  add: (address: BaseAddress): AddAddress => ({
-    action: 'addAddress',
-    address,
-  }),
-  setDefaultShipping: (addressId: string): SetDefaultShippingAddress => ({
-    action: 'setDefaultShippingAddress',
-    addressId: addressId,
-  }),
-  setDefaultBilling: (addressId: string): SetDefaultBillingAddress => ({
-    action: 'setDefaultBillingAddress',
-    addressId: addressId,
   }),
 };
 
@@ -112,4 +44,39 @@ function formatDateForAPI(date: Date): string {
 
   return `${year}-${month}-${day}`;
 }
+//#endregion personal
+
+//#region address
+
+export const ADDRESS_ACTION = {
+  change: (
+    addressId: string,
+    changes: BaseAddress,
+  ): MyCustomerChangeAddressAction => ({
+    action: 'changeAddress',
+    addressId,
+    address: changes,
+  }),
+  remove: (addressId: string): MyCustomerRemoveAddressAction => ({
+    action: 'removeAddress',
+    addressId,
+  }),
+  add: (address: BaseAddress): MyCustomerAddAddressAction => ({
+    action: 'addAddress',
+    address,
+  }),
+  setDefaultShipping: (
+    addressId: string,
+  ): MyCustomerSetDefaultShippingAddressAction => ({
+    action: 'setDefaultShippingAddress',
+    addressId: addressId,
+  }),
+  setDefaultBilling: (
+    addressId: string,
+  ): MyCustomerSetDefaultBillingAddressAction => ({
+    action: 'setDefaultBillingAddress',
+    addressId: addressId,
+  }),
+};
+
 //#endregion address
