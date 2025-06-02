@@ -12,13 +12,13 @@ const ProductCard = ({ product, onClick }: IProductCard) => {
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
+  const formatPrice = (centAmount: number, currency: string = 'USD') => {
+    return (centAmount / 100).toLocaleString('en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency,
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(price);
+    });
   };
 
   return (
