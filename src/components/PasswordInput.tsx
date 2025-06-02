@@ -8,6 +8,7 @@ interface PasswordInputProps {
   register: UseFormRegisterReturn;
   errorMessage?: string;
   isInvalid?: boolean;
+  isDisabled?: boolean;
   type?: string;
   placeholder?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -17,6 +18,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
   register,
   errorMessage,
   isInvalid,
+  isDisabled = false,
   onChange,
   ...props
 }) => {
@@ -51,6 +53,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
       }
       errorMessage={errorMessage}
       isInvalid={isInvalid}
+      isDisabled={isDisabled}
       onChange={handleChange}
       {...props}
     />

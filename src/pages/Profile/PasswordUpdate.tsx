@@ -94,6 +94,7 @@ export function PasswordUpdate() {
         setMode(!mode);
       }}
       onSave={handleSubmit(onSubmit)}
+      addressEdit={false}
     >
       {error && (
         <ProfileModal

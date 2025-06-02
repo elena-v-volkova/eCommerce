@@ -11,7 +11,10 @@ import { PasswordUpdate } from './PasswordUpdate';
 import { useAuth } from '@/shared/model/AuthContext';
 
 export function Profile() {
-  const { user }: { readonly user: Customer | null } = useAuth();
+  const {
+    user,
+    logout,
+  }: { readonly user: Customer | null; logout: () => void } = useAuth();
   const [subpage, setSubpage] = useState<string>('');
   const [content, setContent] = useState<ReactNode>(null);
 
@@ -24,6 +27,7 @@ export function Profile() {
         setContent(<PasswordUpdate />);
         break;
       case 'logout':
+        logout();
         break;
       case 'personal':
         setContent(<PersonalContent customer={user} />);
@@ -38,12 +42,12 @@ export function Profile() {
 
   return (
     <div className="w-full">
-      <h2 className="mb-10 flex w-full justify-center  self-center text-[2.3rem]   font-semibold leading-9 lg:text-5xl  ">
+      <h2 className="mb-10 flex w-full justify-center self-center text-[2.3rem] font-semibold leading-9 lg:text-5xl">
         User Profile Page
       </h2>
       <div className={styles.profile}>
         <Selectors onAction={(key) => setSubpage(key.toString())} />
-        <div className="mx-[20px] flex min-h-[180px] w-full justify-center  ">
+        <div className="mx-[20px] flex min-h-[180px] w-full justify-center">
           {content}
         </div>
       </div>
@@ -53,9 +57,9 @@ export function Profile() {
 
 function AddressesContent(customer: Customer | null) {
   return (
-    <div className="mx-[20px] flex w-full flex-col  gap-y-[20px]">
+    <div className="mx-[20px] flex w-full flex-col gap-y-[20px]">
       <p className="inline-flex self-center">Manage addresses</p>
-      <AddressContent customer={customer} />
+      {customer ? <AddressContent value={customer} /> : <></>}
     </div>
   );
 }

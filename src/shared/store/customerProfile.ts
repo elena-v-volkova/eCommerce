@@ -12,10 +12,7 @@ import { InvalidCurrentPasswordError } from '@commercetools/platform-sdk';
 import { useSession } from '../model/useSession';
 
 import { getCountryInfo } from './countries';
-import {
-  ADDRESS_ACTION,
-  PERSONAL_DATA_ACTION
-} from './updateUtils';
+import { ADDRESS_ACTION, PERSONAL_DATA_ACTION } from './updateUtils';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
 import { createPasswordFlowClient } from '@/commercetools/login';
