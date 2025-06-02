@@ -24,7 +24,6 @@ import {
   Divider,
   Pagination,
 } from '@heroui/react';
-import { useNavigate } from 'react-router';
 
 import { useRetroCarCategories } from '../module/useCategory';
 import {
@@ -34,6 +33,7 @@ import {
 
 import { SkeletonSidebar } from './SkeletonSidebar';
 import ProductCard from './ProductCard';
+import { useNavigate } from 'react-router';
 
 interface FiltersState {
   priceRange: [number, number];
