@@ -3,15 +3,47 @@ import { useEffect, useState, useMemo, useRef } from 'react';
 import { Card, CardBody, CardHeader, Chip, Spinner } from '@heroui/react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
+import type { Swiper as SwiperType } from 'swiper';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
+
+type AttributeValue =
+  | string
+  | number
+  | {
+      key: string;
+      label: string;
+    };
+
+interface Attribute {
+  name: string;
+  value: AttributeValue;
+}
+
+interface Price {
+  id: string;
+  value: {
+    type: string;
+    currencyCode: string;
+    centAmount: number;
+    fractionDigits: number;
+  };
+  validFrom?: string;
+  validUntil?: string;
+}
+
+interface Variant {
+  images?: { url: string; dimensions?: { w: number; h: number } }[];
+  prices?: Price[];
+  attributes?: Attribute[];
+}
 
 interface ProductProjection {
   id: string;
   name?: Record<string, string>;
   slug?: Record<string, string>;
   description?: Record<string, string>;
-  masterVariant: any;
+  masterVariant: Variant;
 }
 
 export default function ProductPage() {
@@ -21,7 +53,7 @@ export default function ProductPage() {
   const [product, setProduct] = useState<ProductProjection | null>(null);
   const [loading, setLoading] = useState(true);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const mainSwiperRef = useRef<any>(null);
+  const mainSwiperRef = useRef<SwiperType | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -56,13 +88,13 @@ export default function ProductPage() {
 
     const now = new Date();
     const allPrices = variant.prices.filter(
-      (pr: any) => pr.value.currencyCode === CURRENCY,
+      (pr: Price) => pr.value.currencyCode === CURRENCY,
     );
 
-    let activeDiscount: any = null;
-    let basePrice: any = null;
+    let activeDiscount: Price | null = null;
+    let basePrice: Price | null = null;
 
-    allPrices.forEach((pr: any) => {
+    allPrices.forEach((pr: Price) => {
       const { validFrom, validUntil } = pr;
       if (validFrom && validUntil) {
         const from = new Date(validFrom);
@@ -74,12 +106,13 @@ export default function ProductPage() {
     });
 
     if (activeDiscount) {
-      basePrice = allPrices.find((pr: any) => pr.id !== activeDiscount.id);
+      basePrice =
+        allPrices.find((pr) => pr.id !== activeDiscount!.id) || allPrices[0];
     } else {
       basePrice = allPrices[0];
     }
 
-    const format = (pr: any) =>
+    const format = (pr: Price) =>
       (pr.value.centAmount / 100).toLocaleString(undefined, {
         style: 'currency',
         currency: CURRENCY,
@@ -124,7 +157,7 @@ export default function ProductPage() {
                 mainSwiperRef.current = swiper;
               }}
             >
-              {variant.images?.map((img: any, idx: number) => (
+              {variant.images?.map((img, idx) => (
                 <SwiperSlide key={img.url}>
                   <div className="flex h-full items-center justify-center">
                     <button
@@ -179,7 +212,7 @@ export default function ProductPage() {
               <div>
                 <h2 className="mb-3 font-medium">Specifications</h2>
                 <div className="flex flex-wrap gap-2">
-                  {variant.attributes.map((attr: any) => (
+                  {variant.attributes.map((attr) => (
                     <Chip key={attr.name} color="primary" variant="bordered">
                       <span className="mr-1 text-xs text-gray-500">
                         {attr.name}:
@@ -230,7 +263,7 @@ export default function ProductPage() {
               slidesPerView={1}
               spaceBetween={10}
             >
-              {variant.images?.map((img: any) => (
+              {variant.images?.map((img) => (
                 <SwiperSlide key={img.url}>
                   <div className="flex h-full items-center justify-center">
                     <img
