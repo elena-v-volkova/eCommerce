@@ -138,7 +138,10 @@ export default function ProductPage() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-6">
-      <RouterLink className="text-sm text-gray-500 hover:underline" to="/">
+      <RouterLink
+        className="text-sm text-gray-500 hover:underline"
+        to="/catalog"
+      >
         &larr; Back
       </RouterLink>
 
