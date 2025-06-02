@@ -19,6 +19,7 @@ interface QueryArgs {
   fuzzyLevel?: number;
   filter?: string[];
   sort?: string;
+  [key: string]: string | number | boolean | string[] | undefined;
 }
 
 interface SearchParams {
@@ -113,8 +114,8 @@ const productSearchService = {
 };
 
 // Helper Functions
-const buildQueryArgs = (params: SearchParams): { [key: string]: any } => {
-  const queryArgs: { [key: string]: any } = {
+const buildQueryArgs = (params: SearchParams): QueryArgs => {
+  const queryArgs: QueryArgs = {
     limit: params.limit || 20,
     offset: params.offset || 0,
     staged: false,
