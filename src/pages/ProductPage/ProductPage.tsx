@@ -7,7 +7,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
-import { Price, ProductProjection } from './ProductPage.types';
+import { Price, ProductProjection } from './productPage.types';
 
 export default function ProductPage() {
   const { key } = useParams() as { key: string };
@@ -226,6 +226,8 @@ export default function ProductPage() {
         >
           <div
             className="absolute left-1/2 top-[10vh] h-[80vh] w-[90vw] md:w-[60vw] lg:w-[50vw] -translate-x-1/2 flex items-center justify-center"
+            role="presentation"
+            tabIndex={-1}
             onClick={(e) => e.stopPropagation()}
           >
             <button
