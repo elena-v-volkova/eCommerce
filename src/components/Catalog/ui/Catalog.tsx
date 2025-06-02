@@ -287,7 +287,7 @@ const Catalog = () => {
       {/* Brand Filter */}
       <div className="rounded-lg border border-divider bg-content1 p-4 shadow-sm">
         <h3 className="mb-3 font-semibold text-foreground">Brands</h3>
-        <div className="max-h-40 space-y-2 overflow-y-auto">
+        <div className="flex max-h-40 flex-col space-y-2 overflow-y-auto">
           {filterOptions.brands.map((brand) => (
             <Checkbox
               key={brand}
@@ -445,62 +445,83 @@ const Catalog = () => {
           {/* Main Content */}
           <div className="min-w-0 flex-1">
             {/* Toolbar */}
-            <div className="mb-6 flex items-center justify-between rounded-lg border border-divider bg-content1 p-4 shadow-sm">
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-foreground-600">
-                  {products.length} cars found
-                  {totalPages > 1 && ` • Page ${currentPage} of ${totalPages}`}
-                </span>
-
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-foreground-600">Sort by:</span>
-                  <Select
-                    aria-label="Select sorting option"
-                    className="w-32"
-                    label="Sort By"
-                    selectedKeys={[sortBy]}
-                    size="sm"
-                    onSelectionChange={handleSortChange}
-                  >
-                    <SelectItem key="name">Name</SelectItem>
-                    <SelectItem key="price">Price</SelectItem>
-                    <SelectItem key="year">Year</SelectItem>
-                  </Select>
-
-                  <Button
-                    isIconOnly
-                    aria-label={`Sort ${sortOrder === 'asc' ? 'descending' : 'ascending'}`}
-                    variant="light"
-                    onPress={toggleSortOrder}
-                  >
-                    {sortOrder === 'asc' ? (
-                      <SortAsc className="size-4" />
-                    ) : (
-                      <SortDesc className="size-4" />
+            <div className="mb-6 rounded-lg border border-divider bg-content1 p-4 shadow-sm">
+              <div className="flex flex-col gap-4 min-[475px]:flex-row min-[475px]:items-center min-[475px]:justify-between">
+                <div className="flex items-center justify-between min-[475px]:justify-start">
+                  <span className="text-sm text-foreground-600">
+                    {products.length} cars found
+                    {totalPages > 1 && (
+                      <span className="hidden min-[475px]:inline">
+                        {` • Page ${currentPage} of ${totalPages}`}
+                      </span>
                     )}
-                  </Button>
-                </div>
-              </div>
+                  </span>
 
-              <div className="flex items-center gap-2">
-                <Button
-                  isIconOnly
-                  aria-label="Grid view"
-                  color={viewMode === 'grid' ? 'primary' : 'default'}
-                  variant={viewMode === 'grid' ? 'solid' : 'light'}
-                  onPress={() => setViewMode('grid')}
-                >
-                  <Grid className="size-4" />
-                </Button>
-                <Button
-                  isIconOnly
-                  aria-label="List view"
-                  color={viewMode === 'list' ? 'primary' : 'default'}
-                  variant={viewMode === 'list' ? 'solid' : 'light'}
-                  onPress={() => setViewMode('list')}
-                >
-                  <List className="size-4" />
-                </Button>
+                  {totalPages > 1 && (
+                    <span className="text-xs text-foreground-500 min-[475px]:hidden">
+                      Page {currentPage} of {totalPages}
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between gap-2 min-[475px]:gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="hidden text-sm text-foreground-600 min-[475px]:inline">
+                      Sort by:
+                    </span>
+
+                    <Select
+                      aria-label="Select sorting option"
+                      className="w-36 min-[475px]:w-32"
+                      label="Sort By"
+                      selectedKeys={[sortBy]}
+                      size="sm"
+                      onSelectionChange={handleSortChange}
+                    >
+                      <SelectItem key="name">Name</SelectItem>
+                      <SelectItem key="price">Price</SelectItem>
+                      <SelectItem key="year">Year</SelectItem>
+                    </Select>
+
+                    <Button
+                      isIconOnly
+                      aria-label={`Sort ${sortOrder === 'asc' ? 'descending' : 'ascending'}`}
+                      size="sm"
+                      variant="light"
+                      onPress={toggleSortOrder}
+                    >
+                      {sortOrder === 'asc' ? (
+                        <SortAsc className="size-4" />
+                      ) : (
+                        <SortDesc className="size-4" />
+                      )}
+                    </Button>
+                  </div>
+
+                  {/* View Mode Buttons */}
+                  <div className="flex items-center gap-1">
+                    <Button
+                      isIconOnly
+                      aria-label="Grid view"
+                      color={viewMode === 'grid' ? 'primary' : 'default'}
+                      size="sm"
+                      variant={viewMode === 'grid' ? 'solid' : 'light'}
+                      onPress={() => setViewMode('grid')}
+                    >
+                      <Grid className="size-4" />
+                    </Button>
+                    <Button
+                      isIconOnly
+                      aria-label="List view"
+                      color={viewMode === 'list' ? 'primary' : 'default'}
+                      size="sm"
+                      variant={viewMode === 'list' ? 'solid' : 'light'}
+                      onPress={() => setViewMode('list')}
+                    >
+                      <List className="size-4" />
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
 

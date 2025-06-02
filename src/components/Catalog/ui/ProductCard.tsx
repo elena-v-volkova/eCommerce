@@ -2,11 +2,17 @@ import { useState } from 'react';
 import { Star, MapPin, Gauge, Car } from 'lucide-react';
 import { Card, CardBody, Image, Chip } from '@heroui/react';
 
-const ProductCard = ({ product, onClick }) => {
+import { ProductsSimpleNew } from '../module/useProductSearch';
+interface IProductCard {
+  product: ProductsSimpleNew;
+  onClick: (product: ProductsSimpleNew) => void;
+}
+
+const ProductCard = ({ product, onClick }: IProductCard) => {
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
-  const formatPrice = (price) => {
+  const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
@@ -44,7 +50,7 @@ const ProductCard = ({ product, onClick }) => {
           {/* Discount Badge */}
           {product.discount && (
             <Chip
-              className="absolute left-2 top-2 z-50"
+              className="absolute left-2 top-2 z-30"
               color="danger"
               size="sm"
               variant="solid"
@@ -55,7 +61,7 @@ const ProductCard = ({ product, onClick }) => {
 
           {/* Condition Badge */}
           <Chip
-            className="absolute right-2 top-2 z-50 bg-black/50 capitalize text-white"
+            className="absolute right-2 top-2 z-30 bg-black/50 capitalize text-white"
             color="default"
             size="sm"
             variant="solid"
