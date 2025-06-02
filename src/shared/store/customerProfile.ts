@@ -14,8 +14,7 @@ import { useSession } from '../model/useSession';
 import { getCountryInfo } from './countries';
 import {
   ADDRESS_ACTION,
-  PERSONAL_DATA_ACTION,
-  ActionsUpdate,
+  PERSONAL_DATA_ACTION
 } from './updateUtils';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
@@ -94,8 +93,9 @@ export function CustomerSettings() {
         setIsLoading(false);
       });
   };
+
   const updateAction = async (
-    bodyActions: typeof ActionsUpdate,
+    bodyActions: CustomerUpdateAction[],
     message: string,
   ): Promise<Customer | void> => {
     setIsLoading(true);
@@ -108,7 +108,7 @@ export function CustomerSettings() {
       .post({
         body: {
           version: version,
-          actions: [bodyActions],
+          actions: [...bodyActions],
         },
       })
       .execute()
@@ -160,21 +160,21 @@ export function CustomerSettings() {
 
     console.log(request);
 
-    return updateAction(request, 'Address successful changed!');
+    return updateAction([request], 'Address successful changed!');
   };
 
   const createAddress = async (
     newAddress: NewAddressFields,
   ): Promise<Customer | void> => {
     if (!newAddress) return;
-    const address = newAddress.address;
+    const address = JSON.parse(JSON.stringify(newAddress.address));
 
     console.log(newAddress);
     const request = ADDRESS_ACTION.add(prepareAddress(address));
 
     console.log(request);
 
-    return updateAction(request, 'Address successful created!');
+    return updateAction([request], 'Address successful created!');
   };
   const deleteAddress = async (addressId: string): Promise<Customer | void> => {
     if (!addressId) return;
@@ -182,7 +182,7 @@ export function CustomerSettings() {
 
     console.log(request);
 
-    return updateAction(request, 'Address deleted!');
+    return updateAction([request], 'Address deleted!');
   };
 
   const editPersonal = async (
