@@ -6,14 +6,11 @@ import Login from './pages/Login/LoginPage';
 import Register from './pages/Register/RegisterPage';
 import { RedirectIfAuthenticated } from './ProtectedRoute';
 import { RoootLayout } from './components/RootLayout/RoootLayout';
-
 import { CatalogPage } from './pages/Catalog/CatalogPage';
-
 import { Profile } from './pages/Profile/ProfilePage';
-
+import ProductPage from './pages/ProductPage/ProductPage';
 
 import { AppRoute } from '@/routes/appRoutes';
-import ProductPage from './pages/ProductPage/ProductPage';
 
 function App() {
   return (
@@ -40,7 +37,6 @@ function App() {
 
         <Route element={<CatalogPage />} path={AppRoute.catalog} />
 
-
         <Route
           element={
             <RedirectIfAuthenticated>
@@ -52,7 +48,7 @@ function App() {
 
         <Route element={<NotFound />} path={AppRoute.notFound} />
 
-        <Route path={AppRoute.product} element={<ProductPage />} />
+        <Route element={<ProductPage />} path={AppRoute.product} />
       </Route>
     </Routes>
     // </Provider>
