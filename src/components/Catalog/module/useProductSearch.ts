@@ -204,12 +204,15 @@ const transformProducts = (
         : String(attr.value || '');
     };
 
-    const price = product.masterVariant.prices?.[0]?.value.centAmount
-      ? product.masterVariant.prices[0].value.centAmount / 100
-      : 0;
-    const originalPrice = Math.round(price * 1.1);
+    const prices = product.masterVariant.prices?.[0];
+    const price = prices?.discounted?.value?.centAmount;
+    const originalPrice = prices?.value?.centAmount;
+
     const discount =
-      price > 0 && originalPrice > 0
+      typeof price === 'number' &&
+      typeof originalPrice === 'number' &&
+      price > 0 &&
+      originalPrice > 0
         ? Math.round(((originalPrice - price) / originalPrice) * 100)
         : 0;
 
@@ -230,8 +233,8 @@ const transformProducts = (
         product.description?.en ||
         Object.values(product.description || {})[0] ||
         '',
-      price,
-      originalPrice,
+      price: product.masterVariant.prices?.[0].discounted?.value.centAmount,
+      originalPrice: product.masterVariant.prices?.[0].value.centAmount,
       discount,
       images: product.masterVariant.images?.map((img) => img.url) || [],
       brand:

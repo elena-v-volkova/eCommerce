@@ -7,6 +7,7 @@ export async function logProductById(productKey: string) {
       .withKey({ key: productKey })
       .get({ queryArgs: { staged: false } })
       .execute();
+
     console.dir(product, { depth: null, colors: true });
   } catch (error) {
     console.error(`Не удалось получить товар ${productKey}:`, error);
