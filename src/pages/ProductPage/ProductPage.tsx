@@ -1,50 +1,13 @@
+import type { Swiper as SwiperType } from 'swiper';
+
 import { Link as RouterLink, useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { Card, CardBody, CardHeader, Chip, Spinner } from '@heroui/react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
-import type { Swiper as SwiperType } from 'swiper';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
-
-type AttributeValue =
-  | string
-  | number
-  | {
-      key: string;
-      label: string;
-    };
-
-interface Attribute {
-  name: string;
-  value: AttributeValue;
-}
-
-interface Price {
-  id: string;
-  value: {
-    type: string;
-    currencyCode: string;
-    centAmount: number;
-    fractionDigits: number;
-  };
-  validFrom?: string;
-  validUntil?: string;
-}
-
-interface Variant {
-  images?: { url: string; dimensions?: { w: number; h: number } }[];
-  prices?: Price[];
-  attributes?: Attribute[];
-}
-
-interface ProductProjection {
-  id: string;
-  name?: Record<string, string>;
-  slug?: Record<string, string>;
-  description?: Record<string, string>;
-  masterVariant: Variant;
-}
+import { Price, ProductProjection } from './ProductPage.types';
 
 export default function ProductPage() {
   const { key } = useParams() as { key: string };
@@ -54,6 +17,17 @@ export default function ProductPage() {
   const [loading, setLoading] = useState(true);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const mainSwiperRef = useRef<SwiperType | null>(null);
+
+  useEffect(() => {
+    if (openIndex !== null) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [openIndex]);
 
   useEffect(() => {
     let isMounted = true;
@@ -138,49 +112,54 @@ export default function ProductPage() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-6">
-      <RouterLink className="text-sm text-gray-500 hover:underline" to="/">
+      <RouterLink
+        className="text-sm text-gray-500 hover:underline"
+        to="/catalog"
+      >
         &larr; Back
       </RouterLink>
 
       <Card className="overflow-hidden" radius="lg" shadow="lg">
         <div className="grid gap-4 md:grid-cols-2">
-          <div className="p-4">
-            <Swiper
-              loop
-              navigation
-              className="h-full"
-              modules={[Navigation, Pagination]}
-              pagination={{ clickable: true }}
-              slidesPerView={1}
-              spaceBetween={10}
-              onSwiper={(swiper) => {
-                mainSwiperRef.current = swiper;
-              }}
-            >
-              {variant.images?.map((img, idx) => (
-                <SwiperSlide key={img.url}>
-                  <div className="flex h-full items-center justify-center">
-                    <button
-                      className="max-h-full max-w-full cursor-pointer overflow-hidden rounded-2xl border-none bg-transparent p-0"
-                      type="button"
-                      onClick={() => setOpenIndex(idx)}
-                    >
-                      <img
-                        alt={product.name?.[LOCALE] ?? 'Product image'}
-                        className="rounded-2xl"
-                        src={img.url}
-                        style={{ objectFit: 'contain' }}
-                      />
-                    </button>
-                  </div>
-                </SwiperSlide>
-              ))}
-            </Swiper>
+          <div className="order-2 md:order-1 p-4 flex justify-center md:block">
+            <div className="w-[70vw] md:w-full mx-auto md:mx-0 h-56 sm:h-64 md:h-80 lg:h-96 overflow-hidden">
+              <Swiper
+                loop
+                navigation
+                pagination={{ clickable: true }}
+                modules={[Navigation, Pagination]}
+                slidesPerView={1}
+                spaceBetween={10}
+                className="h-full w-full"
+                onSwiper={(swiper) => {
+                  mainSwiperRef.current = swiper;
+                }}
+              >
+                {variant.images?.map((img, idx) => (
+                  <SwiperSlide key={img.url}>
+                    <div className="flex h-full items-center justify-center">
+                      <button
+                        className="max-h-full max-w-full cursor-pointer overflow-hidden rounded-2xl border-none bg-transparent p-0"
+                        type="button"
+                        onClick={() => setOpenIndex(idx)}
+                      >
+                        <img
+                          alt={product.name?.[LOCALE] ?? 'Product image'}
+                          className="rounded-2xl"
+                          src={img.url}
+                          style={{ objectFit: 'contain' }}
+                        />
+                      </button>
+                    </div>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
           </div>
 
-          <div className="space-y-6 p-6">
+          <div className="order-1 md:order-2 space-y-6 p-6">
             <CardHeader className="p-0">
-              <h1 className="text-3xl font-bold">
+              <h1 className="text-3xl font-bold break-words whitespace-normal">
                 {product.name?.[LOCALE] ?? 'Untitled product'}
               </h1>
             </CardHeader>
@@ -202,7 +181,7 @@ export default function ProductPage() {
 
             {product.description?.[LOCALE] && (
               <CardBody className="p-0">
-                <p className="text-base leading-relaxed">
+                <p className="text-base leading-relaxed break-words whitespace-normal">
                   {product.description[LOCALE]}
                 </p>
               </CardBody>
@@ -210,16 +189,20 @@ export default function ProductPage() {
 
             {variant.attributes?.length && (
               <div>
-                <h2 className="mb-3 font-medium">Specifications</h2>
+                <h2 className="mb-3 font-medium break-words whitespace-normal">
+                  Specifications
+                </h2>
                 <div className="flex flex-wrap gap-2">
                   {variant.attributes.map((attr) => (
                     <Chip key={attr.name} color="primary" variant="bordered">
                       <span className="mr-1 text-xs text-gray-500">
                         {attr.name}:
                       </span>
-                      {typeof attr.value === 'object'
-                        ? (attr.value.label ?? attr.value.key)
-                        : attr.value?.toString()}
+                      <span className="break-words whitespace-normal">
+                        {typeof attr.value === 'object'
+                          ? (attr.value.label ?? attr.value.key)
+                          : attr.value.toString()}
+                      </span>
                     </Chip>
                   ))}
                 </div>
@@ -231,7 +214,7 @@ export default function ProductPage() {
 
       {openIndex !== null && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90"
+          className="fixed inset-0 z-50 bg-black bg-opacity-90"
           role="button"
           tabIndex={0}
           onClick={closeFullscreen}
@@ -241,14 +224,14 @@ export default function ProductPage() {
             }
           }}
         >
-          {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
           <div
-            className="relative flex w-full items-center justify-center"
+            className="absolute left-1/2 top-[10vh] h-[80vh] w-[90vw] md:w-[60vw] lg:w-[50vw] -translate-x-1/2 flex items-center justify-center"
             onClick={(e) => e.stopPropagation()}
           >
             <button
-              className="absolute right-4 top-4 z-50 text-3xl text-white"
+              className="absolute -top-2.5 -right-2.5 z-50 text-3xl text-white"
               onClick={closeFullscreen}
+              type="button"
             >
               &times;
             </button>
@@ -256,12 +239,12 @@ export default function ProductPage() {
             <Swiper
               loop
               navigation
-              className="w-full h-full"
-              initialSlide={openIndex}
-              modules={[Navigation, Pagination]}
               pagination={{ clickable: true }}
+              modules={[Navigation, Pagination]}
               slidesPerView={1}
               spaceBetween={10}
+              initialSlide={openIndex}
+              className="h-full w-full"
             >
               {variant.images?.map((img) => (
                 <SwiperSlide key={img.url}>
