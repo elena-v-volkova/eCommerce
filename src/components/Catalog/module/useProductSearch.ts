@@ -9,6 +9,19 @@ import {
 import { apiAnonRoot } from '@/commercetools/anonUser';
 
 // Interfaces
+
+interface QueryArgs {
+  limit: number;
+  offset: number;
+  staged: boolean;
+  'text.en-US'?: string;
+  fuzzy?: boolean;
+  fuzzyLevel?: number;
+  filter?: string[];
+  sort?: string;
+  [key: string]: string | number | boolean | string[] | undefined;
+}
+
 interface SearchParams {
   query?: string;
   categoryId?: string;
@@ -94,17 +107,15 @@ const productSearchService = {
           .execute();
 
       return extractFilterOptions(response.body.results);
-    } catch (error) {
-      console.error('Error loading filter options:', error);
-
+    } catch {
       return { brands: [], conditions: [], transmissions: [] };
     }
   },
 };
 
 // Helper Functions
-const buildQueryArgs = (params: SearchParams): { [key: string]: any } => {
-  const queryArgs: { [key: string]: any } = {
+const buildQueryArgs = (params: SearchParams): QueryArgs => {
+  const queryArgs: QueryArgs = {
     limit: params.limit || 20,
     offset: params.offset || 0,
     staged: false,
