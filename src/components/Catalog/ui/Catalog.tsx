@@ -90,15 +90,10 @@ const Catalog = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  console.log(products);
-
   const navigate = useNavigate();
   const handleProductClick = useCallback(
     (product: ProductsSimpleNew) => {
-      const slug =
-        typeof product.slug === 'string'
-          ? product.slug
-          : Object.values(product.slug)[0];
+      const slug = product.slug;
 
       navigate(`/products/${slug}`);
     },
