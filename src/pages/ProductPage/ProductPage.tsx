@@ -25,7 +25,6 @@ export default function ProductPage() {
 
   useEffect(() => {
     let isMounted = true;
-
     setLoading(true);
 
     apiAnonRoot
@@ -50,18 +49,46 @@ export default function ProductPage() {
   const CURRENCY = 'USD';
   const variant = product?.masterVariant;
 
-  const price = useMemo(() => {
-    if (!variant) return null;
-    const p = variant.prices?.find(
+  const { regularPrice, discountedPrice } = useMemo(() => {
+    if (!variant?.prices?.length) {
+      return { regularPrice: null, discountedPrice: null };
+    }
+
+    const now = new Date();
+    const allPrices = variant.prices.filter(
       (pr: any) => pr.value.currencyCode === CURRENCY,
     );
 
-    return p
-      ? (p.value.centAmount / 100).toLocaleString(undefined, {
-          style: 'currency',
-          currency: CURRENCY,
-        })
-      : null;
+    let activeDiscount: any = null;
+    let basePrice: any = null;
+
+    allPrices.forEach((pr: any) => {
+      const { validFrom, validUntil } = pr;
+      if (validFrom && validUntil) {
+        const from = new Date(validFrom);
+        const until = new Date(validUntil);
+        if (from <= now && now <= until) {
+          activeDiscount = pr;
+        }
+      }
+    });
+
+    if (activeDiscount) {
+      basePrice = allPrices.find((pr: any) => pr.id !== activeDiscount.id);
+    } else {
+      basePrice = allPrices[0];
+    }
+
+    const format = (pr: any) =>
+      (pr.value.centAmount / 100).toLocaleString(undefined, {
+        style: 'currency',
+        currency: CURRENCY,
+      });
+
+    return {
+      regularPrice: basePrice ? format(basePrice) : null,
+      discountedPrice: activeDiscount ? format(activeDiscount) : null,
+    };
   }, [variant, CURRENCY]);
 
   if (loading) {
@@ -125,7 +152,20 @@ export default function ProductPage() {
               </h1>
             </CardHeader>
 
-            {price && <p className="text-2xl font-semibold">{price}</p>}
+            {regularPrice && !discountedPrice && (
+              <p className="text-2xl font-semibold">{regularPrice}</p>
+            )}
+
+            {regularPrice && discountedPrice && (
+              <p className="flex items-baseline gap-4">
+                <span className="text-gray-500 line-through">
+                  {regularPrice}
+                </span>
+                <span className="text-2xl font-semibold">
+                  {discountedPrice}
+                </span>
+              </p>
+            )}
 
             {product.description?.[LOCALE] && (
               <CardBody className="p-0">
@@ -170,7 +210,7 @@ export default function ProductPage() {
         >
           {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
           <div
-            className="relative flex size-full items-center justify-center"
+            className="relative flex w-full items-center justify-center"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -183,7 +223,7 @@ export default function ProductPage() {
             <Swiper
               loop
               navigation
-              className="size-full"
+              className="w-full h-full"
               initialSlide={openIndex}
               modules={[Navigation, Pagination]}
               pagination={{ clickable: true }}
