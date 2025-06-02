@@ -3,5 +3,6 @@ export enum AppRoute {
   login = 'login',
   register = 'register',
   home = '/',
+  product = 'products/:key',
   notFound = '*',
 }

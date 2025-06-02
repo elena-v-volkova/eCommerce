@@ -9,6 +9,7 @@ import { RoootLayout } from './components/RootLayout/RoootLayout';
 import { Profile } from './pages/Profile/ProfilePage';
 
 import { AppRoute } from '@/routes/appRoutes';
+import ProductPage from './pages/ProductPage/ProductPage';
 
 function App() {
   return (
@@ -41,6 +42,8 @@ function App() {
           path={AppRoute.profile}
         />
         <Route element={<NotFound />} path={AppRoute.notFound} />
+
+        <Route path={AppRoute.product} element={<ProductPage />} />
       </Route>
     </Routes>
     // </Provider>
