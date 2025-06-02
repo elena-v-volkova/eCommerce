@@ -1,5 +1,3 @@
-// ProductPage.tsx
-
 import { Link as RouterLink, useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { Card, CardBody, CardHeader, Chip, Spinner } from '@heroui/react';
