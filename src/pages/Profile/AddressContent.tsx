@@ -3,7 +3,7 @@ import { Chip, useDisclosure } from '@heroui/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CircleCheckBig } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 
 import { EditableCard } from './EditableCard';
@@ -32,11 +32,12 @@ export function AddressContent({ customer }: { customer: Customer | null }) {
               key={item.id}
               address={item}
               id={item.id ?? ''}
+              newAddress={false}
               prop={info}
             />
           );
         })}
-      <CardAddress />
+      <CardAddress newAddress={true} />
     </div>
   );
 }
@@ -55,16 +56,24 @@ function checkVariants(id: string, customer: Customer): AddressType {
 
 const ADDRESS_SCHEMA = REGISTER_SCHEMA.pick({ address: true });
 
-type AddressFields = Pick<TRegisterFieldsSchema, 'address'>;
-
+export type AddressFields = Pick<TRegisterFieldsSchema, 'address'>;
+export type NewAddressFields = {
+  address: AddressFields;
+  shipping?: boolean;
+  billing?: boolean;
+  defaultShipping?: boolean;
+  defaultBilling?: boolean;
+};
 function CardAddress({
   address,
   prop,
   id,
+  newAddress = false,
 }: {
   address?: BaseAddress;
   prop?: AddressType;
   id?: string;
+  newAddress: boolean;
 }) {
   const {
     register,
@@ -74,22 +83,27 @@ function CardAddress({
     reset,
     control,
     getValues,
+    watch,
     formState: { errors },
   } = useForm<AddressFields>({
     resolver: zodResolver(ADDRESS_SCHEMA),
     mode: 'onChange',
-    defaultValues: address
+    defaultValues: newAddress
       ? {
+          address: {
+            country: undefined,
+            city: '',
+            postalCode: '',
+            streetName: '',
+          },
+        }
+      : {
           address: {
             country: CodeToCountry(address.country) || '',
             city: address.city || '',
             postalCode: address.postalCode || '',
             streetName: address.streetName || '',
           },
-        }
-      : {
-          address: { country: '', city: '', postalCode: '' },
-          streetName: '',
         },
   });
   const [mode, setMode] = useState(false);
@@ -103,12 +117,24 @@ function CardAddress({
     return 'Address';
   })();
 
-  const { isLoading, error, resetError, editAddress } = CustomerSettings();
+  const {
+    isLoading,
+    error,
+    resetError,
+    editAddress,
+    createAddress,
+    deleteAddress,
+  } = CustomerSettings();
   const addressId = id;
+
   const onSubmit = async (data: boolean) => {
     if (Object.keys(errors).length === 0) {
       try {
-        await editAddress(addressId, getValues().address);
+        if (newAddress) {
+          await createAddress(getValues());
+        } else {
+          await editAddress(addressId, getValues().address);
+        }
         setMode(!mode);
       } catch (error) {
         console.log(error);
@@ -125,10 +151,17 @@ function CardAddress({
 
   const [createMode, setCreateMode] = useState(false);
 
-  return address || createMode ? (
+  useEffect(() => {
+    if (createMode) {
+      trigger('address');
+    }
+  }, [createMode]);
+  deleteAddress;
+
+  return !newAddress || createMode ? (
     <EditableCard
       className="col-span-12 h-fit min-h-[410px] w-[320px] p-[20px] sm:col-span-4"
-      editmode={createMode ? true : false}
+      editmode={createMode}
       headerChildren={
         prop ? (
           prop.default && (
@@ -141,7 +174,7 @@ function CardAddress({
             </Chip>
           )
         ) : (
-          <CheckBoxes />
+          <CheckBoxes register={register} watch={watch} />
         )
       }
       headerClass={
@@ -149,7 +182,7 @@ function CardAddress({
       }
       isLoading={isLoading}
       noErrors={!Boolean(errors)}
-      onestate={createMode ? true : false}
+      onestate={createMode}
       title={title ? title : 'New Address'}
       onCancel={(value: boolean) => {
         if (createMode) {
@@ -162,6 +195,8 @@ function CardAddress({
         setMode(!value);
       }}
       onSave={onSubmit}
+      addressEdit={Boolean(!createMode)}
+      onDelete={() => deleteAddress(addressId)}
     >
       {error && (
         <ProfileModal
@@ -175,10 +210,10 @@ function CardAddress({
       <div className="flex flex-col items-start gap-2">
         <AddressFields
           control={control}
-          disabled={!address ? Boolean(!createMode) : Boolean(!mode)}
+          disabled={newAddress ? Boolean(!createMode) : Boolean(!mode)}
           // disabled={false }
           errors={errors}
-          newAddress={createMode ? true : false}
+          newAddress={createMode}
           prefix="address"
           register={register}
           setValue={setValue}
@@ -189,8 +224,14 @@ function CardAddress({
     </EditableCard>
   ) : (
     <div
+      aria-label="Add new address"
       className="flex h-[410px] w-[320px] cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-[20px] text-primary transition-colors hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 sm:col-span-4"
+      role="button"
+      tabIndex={0}
       onClick={() => setCreateMode(true)}
+      onKeyDown={(e) =>
+        e.key === 'Enter' || e.key === ' ' ? setCreateMode(true) : null
+      }
     >
       <Plus absoluteStrokeWidth size={64} strokeWidth={3} />
     </div>

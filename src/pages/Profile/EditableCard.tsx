@@ -1,5 +1,6 @@
 import React, { JSX, useState } from 'react';
 import { Card, CardHeader, CardBody, CardFooter, Button } from '@heroui/react';
+import { Trash2 } from 'lucide-react';
 
 interface EditableCardProps {
   onestate?: boolean;
@@ -11,9 +12,11 @@ interface EditableCardProps {
   className?: string;
   onEdit?: (key: any) => void;
   onSave?: (key: any) => Promise<void> | void;
+  onDelete?: (key: any) => Promise<void> | void;
   onCancel?: (key: any) => void;
   isLoading?: boolean;
   noErrors: boolean;
+  addressEdit: boolean;
 }
 
 export function EditableCard({
@@ -29,6 +32,8 @@ export function EditableCard({
   onCancel,
   isLoading = false,
   noErrors = true,
+  addressEdit,
+  onDelete,
 }: EditableCardProps): JSX.Element {
   const [mode, setMode] = useState(editmode);
 
@@ -48,7 +53,11 @@ export function EditableCard({
     if (!onestate) setMode(false);
     onCancel?.(mode);
   };
-
+  const handleDelete = (e: React.FormEvent) => {
+    e.preventDefault();
+    onDelete?.();
+    if (!onestate) setMode(false);
+  };
   return (
     <form onReset={onCancel} onSubmit={onSave}>
       <Card className={`${className}`}>
@@ -80,7 +89,13 @@ export function EditableCard({
           )}
 
           {mode && (
-            <div className="flex gap-2">
+            <div
+              className={
+                Boolean(addressEdit)
+                  ? 'flex flex-row justify-between w-full'
+                  : 'flex gap-[32px]'
+              }
+            >
               <Button
                 className="text-tiny"
                 color="warning"
@@ -105,6 +120,17 @@ export function EditableCard({
               >
                 Cancel
               </Button>
+              {Boolean(addressEdit) && (
+                <Button
+                  color="danger"
+                  radius="full"
+                  size="sm"
+                  type="reset"
+                  isDisabled={isLoading}
+                  onClick={handleDelete}
+                  endContent={<Trash2 color="#ffffff" absoluteStrokeWidth />}
+                />
+              )}
             </div>
           )}
         </CardFooter>

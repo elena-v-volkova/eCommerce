@@ -1,9 +1,24 @@
 import { useState } from 'react';
 import { Checkbox } from '@heroui/react';
+import { UseFormRegister } from 'react-hook-form';
 
-export function CheckBoxes() {
+type CheckBoxes = {
+  shipping: boolean;
+  billing: boolean;
+  defaultShipping: boolean;
+  defaultBilling: boolean;
+};
+interface CheckBoxesProps {
+  register: UseFormRegister<CheckBoxValues>;
+  watch: any;
+}
+
+export function CheckBoxes({ register, watch }: CheckBoxesProps) {
   const [selected, setSelected] = useState<string[]>([]);
   const [defaultSelected, setDefaultSelected] = useState<string[]>([]);
+
+  const shippingValue = watch?.('selected');
+  const billingValue = watch?.('defaultSelected');
 
   const handleMainCheckboxChange = (value: string, isChecked: boolean) => {
     if (isChecked) {
@@ -11,7 +26,7 @@ export function CheckBoxes() {
     } else {
       setSelected((prev) => prev.filter((item) => item !== value));
       setDefaultSelected((prev) =>
-        prev.filter((item) => item !== `default-${value}`),
+        prev.filter((item) => item !== `default${value}`),
       );
     }
   };
@@ -30,20 +45,24 @@ export function CheckBoxes() {
         <Checkbox
           color="success"
           isSelected={selected.includes('shipping')}
+          name="shipping"
           radius="full"
           onValueChange={(isChecked) =>
             handleMainCheckboxChange('shipping', isChecked)
           }
+          {...register(`shipping`)}
         >
           Shipping
         </Checkbox>
         {selected.includes('shipping') && (
           <Checkbox
             color="warning"
-            isSelected={defaultSelected.includes('default-shipping')}
+            isSelected={defaultSelected.includes('defaultShipping')}
+            name="defaultShipping"
             onValueChange={(isChecked) =>
-              handleDefaultCheckboxChange('default-shipping', isChecked)
+              handleDefaultCheckboxChange('defaultShipping', isChecked)
             }
+            {...register(`defaultShipping`)}
           >
             Default
           </Checkbox>
@@ -53,20 +72,24 @@ export function CheckBoxes() {
         <Checkbox
           color="success"
           isSelected={selected.includes('billing')}
+          name="billing"
           radius="full"
           onValueChange={(isChecked) =>
             handleMainCheckboxChange('billing', isChecked)
           }
+          {...register(`billing`)}
         >
           Billing
         </Checkbox>
         {selected.includes('billing') && (
           <Checkbox
             color="warning"
-            isSelected={defaultSelected.includes('default-billing')}
+            isSelected={defaultSelected.includes('defaultBilling')}
+            name="defaultBilling"
             onValueChange={(isChecked) =>
-              handleDefaultCheckboxChange('default-billing', isChecked)
+              handleDefaultCheckboxChange('defaultBilling', isChecked)
             }
+            {...register(`defaultBilling`)}
           >
             Default
           </Checkbox>

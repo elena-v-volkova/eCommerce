@@ -18,6 +18,7 @@ import { apiAnonRoot } from '@/commercetools/anonUser';
 import { createPasswordFlowClient } from '@/commercetools/login';
 import { ResponseError } from '@/types/commercetools';
 import { PersonalFields } from '@/pages/Profile/PersonalContent';
+import { NewAddressFields } from '@/pages/Profile/AddressContent';
 
 export function CustomerSettings() {
   const [isLoading, setIsLoading] = useState(false);
@@ -39,6 +40,7 @@ export function CustomerSettings() {
       },
     });
   };
+
   const changePassword = async (
     data: MyCustomerChangePassword,
   ): Promise<Customer | void> => {
@@ -86,15 +88,37 @@ export function CustomerSettings() {
         setIsLoading(false);
       });
   };
-
-  const editAddress = async (
-    addressId: string,
-    address: BaseAddress,
+  const updateAction = async (
+    bodyActions: ActionsUpdate,
+    message: string,
   ): Promise<Customer | void> => {
     setIsLoading(true);
     setError(null);
-    if (!addressId || !address) return;
+    if (!bodyActions) return;
 
+    return await apiAnonRoot
+      .customers()
+      .withId({ ID: user.id })
+      .post({
+        body: {
+          version: version,
+          actions: bodyActions,
+        },
+      })
+      .execute()
+      .then((data: ClientResponse<Customer>) => {
+        notifyToast(message);
+        updateLocalClient(data.body);
+      })
+      .catch((error: ResponseError) => {
+        setError(error.message);
+        throw new Error(error.message);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+  const prepareAddress = (address: BaseAddress): BaseAddress => {
     const draft = JSON.parse(JSON.stringify(address));
 
     Object.defineProperties(draft, {
@@ -107,35 +131,44 @@ export function CustomerSettings() {
         enumerable: true,
       },
       country: {
-        value: getCountryInfo(address.country)?.code,
+        value: getCountryInfo(draft.country)?.code,
         enumerable: true,
       },
     });
-    const request = ADDRESS_ACTION.change(addressId, draft);
+
+    return draft;
+  };
+
+  const editAddress = async (
+    addressId: string,
+    address: BaseAddress,
+  ): Promise<Customer | void> => {
+    if (!addressId || !address) return;
+
+    const request = ADDRESS_ACTION.change(addressId, prepareAddress(address));
 
     console.log(request);
+    await updateAction(request, 'Address successful changed!');
+  };
 
-    await apiAnonRoot
-      .customers()
-      .withId({ ID: user.id })
-      .post({
-        body: {
-          version: version,
-          actions: [request],
-        },
-      })
-      .execute()
-      .then((data: ClientResponse<Customer>) => {
-        notifyToast('Address successful changed!');
-        updateLocalClient(data.body);
-      })
-      .catch((error: ResponseError) => {
-        setError(error.message);
-        throw new Error(error.message);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+  const createAddress = async (
+    newAddress: NewAddressFields,
+  ): Promise<Customer | void> => {
+    if (!newAddress) return;
+    const address = newAddress.address;
+
+    console.log(newAddress);
+    // const request = ADDRESS_ACTION.add(prepareAddress(address));
+
+    // console.log(request);
+    //  await updateAction(request, 'Address successful created!');
+  };
+  const deleteAddress = async (addressId: string): Promise<Customer | void> => {
+    if (!addressId) return;
+    const request = ADDRESS_ACTION.remove(addressId);
+
+    console.log(request);
+     await updateAction(request, 'Address deleted!');
   };
 
   const editPersonal = async (personal: PersonalFields): Promise<void> => {
@@ -148,27 +181,7 @@ export function CustomerSettings() {
       PERSONAL_DATA_ACTION.setDateOfBirth(personal.dateOfBirth),
     ];
 
-    await apiAnonRoot
-      .customers()
-      .withId({ ID: user.id })
-      .post({
-        body: {
-          version: version,
-          actions: request,
-        },
-      })
-      .execute()
-      .then((data: ClientResponse<Customer>) => {
-        notifyToast('Personal data changed!');
-        updateLocalClient(data.body);
-      })
-      .catch((error: ResponseError) => {
-        setError(error.message);
-        throw new Error(error.message);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    await updateAction(request, 'Personal data changed!');
   };
 
   return {
@@ -178,6 +191,8 @@ export function CustomerSettings() {
     resetError,
     editAddress,
     editPersonal,
+    createAddress,
+    deleteAddress,
   };
 }
 
