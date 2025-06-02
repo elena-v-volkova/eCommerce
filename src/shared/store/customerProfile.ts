@@ -12,7 +12,11 @@ import { InvalidCurrentPasswordError } from '@commercetools/platform-sdk';
 import { useSession } from '../model/useSession';
 
 import { getCountryInfo } from './countries';
-import { ADDRESS_ACTION, PERSONAL_DATA_ACTION } from './updateUtils';
+import {
+  ADDRESS_ACTION,
+  PERSONAL_DATA_ACTION,
+  ActionsUpdate,
+} from './updateUtils';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
 import { createPasswordFlowClient } from '@/commercetools/login';
@@ -76,7 +80,9 @@ export function CustomerSettings() {
         );
         const { body: updatedCustomer } = await newClient.me().get().execute();
 
-        updateLocalClient(updatedCustomer);
+        await updateLocalClient(updatedCustomer);
+
+        return customer;
       })
       .catch((error) => {
         isInvalidCurrentPasswordError(error)
@@ -89,7 +95,7 @@ export function CustomerSettings() {
       });
   };
   const updateAction = async (
-    bodyActions: ActionsUpdate,
+    bodyActions: typeof ActionsUpdate,
     message: string,
   ): Promise<Customer | void> => {
     setIsLoading(true);
@@ -102,13 +108,17 @@ export function CustomerSettings() {
       .post({
         body: {
           version: version,
-          actions: bodyActions,
+          actions: [bodyActions],
         },
       })
       .execute()
       .then((data: ClientResponse<Customer>) => {
+        const customer = data.body;
+
         notifyToast(message);
-        updateLocalClient(data.body);
+        updateLocalClient(customer);
+
+        return customer;
       })
       .catch((error: ResponseError) => {
         setError(error.message);
@@ -118,6 +128,7 @@ export function CustomerSettings() {
         setIsLoading(false);
       });
   };
+
   const prepareAddress = (address: BaseAddress): BaseAddress => {
     const draft = JSON.parse(JSON.stringify(address));
 
@@ -148,7 +159,8 @@ export function CustomerSettings() {
     const request = ADDRESS_ACTION.change(addressId, prepareAddress(address));
 
     console.log(request);
-    await updateAction(request, 'Address successful changed!');
+
+    return updateAction(request, 'Address successful changed!');
   };
 
   const createAddress = async (
@@ -158,20 +170,24 @@ export function CustomerSettings() {
     const address = newAddress.address;
 
     console.log(newAddress);
-    // const request = ADDRESS_ACTION.add(prepareAddress(address));
+    const request = ADDRESS_ACTION.add(prepareAddress(address));
 
-    // console.log(request);
-    //  await updateAction(request, 'Address successful created!');
+    console.log(request);
+
+    return updateAction(request, 'Address successful created!');
   };
   const deleteAddress = async (addressId: string): Promise<Customer | void> => {
     if (!addressId) return;
     const request = ADDRESS_ACTION.remove(addressId);
 
     console.log(request);
-     await updateAction(request, 'Address deleted!');
+
+    return updateAction(request, 'Address deleted!');
   };
 
-  const editPersonal = async (personal: PersonalFields): Promise<void> => {
+  const editPersonal = async (
+    personal: PersonalFields,
+  ): Promise<Customer | void> => {
     setIsLoading(true);
     setError(null);
     const request: CustomerUpdateAction[] = [
@@ -181,7 +197,7 @@ export function CustomerSettings() {
       PERSONAL_DATA_ACTION.setDateOfBirth(personal.dateOfBirth),
     ];
 
-    await updateAction(request, 'Personal data changed!');
+    return updateAction(request, 'Personal data changed!');
   };
 
   return {

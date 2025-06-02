@@ -58,6 +58,7 @@ export function EditableCard({
     onDelete?.();
     if (!onestate) setMode(false);
   };
+
   return (
     <form onReset={onCancel} onSubmit={onSave}>
       <Card className={`${className}`}>
@@ -92,7 +93,7 @@ export function EditableCard({
             <div
               className={
                 Boolean(addressEdit)
-                  ? 'flex flex-row justify-between w-full'
+                  ? 'flex w-full flex-row justify-between'
                   : 'flex gap-[32px]'
               }
             >
@@ -123,12 +124,12 @@ export function EditableCard({
               {Boolean(addressEdit) && (
                 <Button
                   color="danger"
+                  endContent={<Trash2 absoluteStrokeWidth color="#ffffff" />}
+                  isDisabled={isLoading}
                   radius="full"
                   size="sm"
                   type="reset"
-                  isDisabled={isLoading}
                   onClick={handleDelete}
-                  endContent={<Trash2 color="#ffffff" absoluteStrokeWidth />}
                 />
               )}
             </div>
