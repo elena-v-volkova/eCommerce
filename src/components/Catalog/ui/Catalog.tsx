@@ -33,6 +33,7 @@ import {
 
 import { SkeletonSidebar } from './SkeletonSidebar';
 import ProductCard from './ProductCard';
+import { useNavigate } from 'react-router';
 
 interface FiltersState {
   priceRange: [number, number];
@@ -89,11 +90,20 @@ const Catalog = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  const handleProductClick = useCallback((product: ProductsSimpleNew) => {
-    alert(
-      `Переход на страницу продукта: ${product.name}\nURL: /products/${product.slug}`,
-    );
-  }, []);
+  console.log(products);
+
+  const navigate = useNavigate();
+  const handleProductClick = useCallback(
+    (product: ProductsSimpleNew) => {
+      const slug =
+        typeof product.slug === 'string'
+          ? product.slug
+          : Object.values(product.slug)[0];
+
+      navigate(`/products/${slug}`);
+    },
+    [navigate],
+  );
 
   const handleBrandFilter = useCallback((brand: string) => {
     setFilters((prev) => ({

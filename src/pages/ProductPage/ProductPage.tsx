@@ -1,16 +1,14 @@
+// ProductPage.tsx
+
 import { Link as RouterLink, useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useMemo } from 'react';
 
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Image as HeroImage,
-  Chip,
-  Spinner,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Chip, Spinner } from '@heroui/react';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
+
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination } from 'swiper/modules';
 
 interface ProductProjection {
   id: string;
@@ -30,6 +28,7 @@ export default function ProductPage() {
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
+
     apiAnonRoot
       .productProjections()
       .withKey({ key })
@@ -50,7 +49,6 @@ export default function ProductPage() {
 
   const LOCALE = 'en-US';
   const CURRENCY = 'USD';
-
   const variant = product?.masterVariant;
 
   const price = useMemo(() => {
@@ -84,19 +82,35 @@ export default function ProductPage() {
 
       <Card shadow="lg" radius="lg" className="overflow-hidden">
         <div className="grid md:grid-cols-2 gap-4">
-          <div className="space-y-4 p-4">
-            {variant.images?.map((img: any) => (
-              <HeroImage
-                key={img.url}
-                src={img.url}
-                alt={product.name?.[LOCALE] ?? 'Product image'}
-                width={img.dimensions.w}
-                height={img.dimensions.h}
-                isZoomed
-                radius="lg"
-              />
-            ))}
+          <div className="p-4">
+            <Swiper
+              modules={[Navigation, Pagination]}
+              navigation
+              pagination={{ clickable: true }}
+              spaceBetween={10}
+              slidesPerView={1}
+              loop
+              className="h-full"
+            >
+              {variant.images?.map((img: any) => (
+                <SwiperSlide key={img.url}>
+                  <div className="flex items-center justify-center h-full">
+                    <img
+                      src={img.url}
+                      alt={product.name?.[LOCALE] ?? 'Product image'}
+                      className="rounded-2xl"
+                      style={{
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        objectFit: 'contain',
+                      }}
+                    />
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
           </div>
+
           <div className="space-y-6 p-6">
             <CardHeader className="p-0">
               <h1 className="text-3xl font-bold">
