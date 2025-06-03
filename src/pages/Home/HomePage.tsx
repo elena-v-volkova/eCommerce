@@ -2,34 +2,32 @@ import { Link } from '@heroui/link';
 import { Snippet } from '@heroui/snippet';
 import { Code } from '@heroui/code';
 import { button as buttonStyles } from '@heroui/theme';
-import { Button } from '@heroui/react';
+import { Image } from '@heroui/react';
 
 import { SITE_CONFIG } from '@/config/site';
 import { TITLE, SUBTITLE } from '@/components/primitives';
-import { loadMockUser } from '@/shared/utils/utils';
+// import { loadMockUser } from '@/shared/utils/utils';
+import car from '../../assets/car.jpg';
 
 function Home() {
   return (
     <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
-      <Button
+      {/* <Button
         className="text-tiny"
         color="default"
         onClick={() => loadMockUser()}
       >
         Load Mock data
-      </Button>
+      </Button>*/}
       <div className="inline-block max-w-lg justify-center text-center">
-        <span className={TITLE()}>Make&nbsp;</span>
+        <span className={TITLE()}>Buy&nbsp;</span>
         <span className={TITLE({ color: 'violet' })}>beautiful&nbsp;</span>
-        <br />
-        <span className={TITLE()}>
-          websites regardless of your design experience.
+        <span className={SUBTITLE()}>
+          Discover classic cars in pristine condition, where timeless elegance
+          meets unmatched performance.
         </span>
-        <div className={SUBTITLE({ class: 'mt-4' })}>
-          Beautiful, fast and modern React UI library.
-        </div>
       </div>
-
+      <Image alt="Main Image" src={car} className="dark:invert" />
       <div className="flex gap-3">
         <Link
           isExternal
