@@ -9,6 +9,7 @@ import { Plus } from 'lucide-react';
 import { EditableCard } from './EditableCard';
 import { CheckBoxes } from './Checkboxes';
 import { ProfileModal } from './Modal';
+import styles from './ProfilePage.module.scss';
 
 import { CustomerSettings } from '@/shared/store/customerProfile';
 import {
@@ -37,7 +38,9 @@ export function AddressContent({ value }: { value: Customer | null }) {
       const customer = value || user;
 
       return (
-        <div className=" flex min-h-[180px] w-full flex-wrap content-center gap-[20px]">
+        <div
+          className={` flex min-h-[180px] w-full flex-wrap  content-center ${styles.address} gap-[20px]`}
+        >
           {customer &&
             customer.addresses.length > 0 &&
             customer.addresses.map((item: BaseAddress) => {
@@ -256,7 +259,6 @@ function CardAddress({
         <AddressFields
           control={control}
           disabled={newAddress ? Boolean(!createMode) : Boolean(!mode)}
-          // disabled={false }
           errors={errors}
           newAddress={createMode}
           prefix="address"
@@ -274,6 +276,11 @@ function CardAddress({
       role="button"
       tabIndex={0}
       onClick={() => setCreateMode(true)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          setCreateMode(true);
+        }
+      }}
     >
       <Plus absoluteStrokeWidth size={64} strokeWidth={3} />
     </div>

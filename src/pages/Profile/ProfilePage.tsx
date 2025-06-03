@@ -41,7 +41,7 @@ export function Profile() {
   }, [subpage]);
 
   return (
-    <div className="flex flex-wrap w-full flex-col items-stretch">
+    <div className="flex w-full flex-col flex-wrap items-stretch">
       <h2 className="mb-10 flex w-full justify-center self-center text-[2.3rem] font-semibold leading-9 lg:text-5xl">
         User Profile Page
       </h2>

@@ -186,33 +186,30 @@ export function CustomerSettings() {
     console.log(request);
     console.log(newAddress);
 
-    return updateAction([request], 'Address successful created!')
-      .then((updated) => {
+    return updateAction([request], 'Address successful created!', false)
+      .then(async (updated) => {
         if (updated) {
           const newId: string | undefined =
             getIds(updated)
               .filter((item) => !oldIds.includes(item))
               .pop()
               ?.toString() || '';
-          const promises: Array<Promise<Customer | void>> = []; // Теперь массив промисов, а не функций
-          const notify = false;
+          const canNotify = false;
 
           if (newAddress.billing === true) {
-            promises.push(setBilling(newId, notify));
+            await setBilling(newId, canNotify);
             if (newAddress.defaultBilling === true) {
-              promises.push(setDefaultBilling(newId, notify));
+              await setDefaultBilling(newId, canNotify);
             }
           }
           if (newAddress.shipping === true) {
-            promises.push(setShipping(newId, notify));
+            await setShipping(newId, canNotify);
             if (newAddress.defaultShipping === true) {
-              promises.push(setDefaultShipping(newId, notify));
+              await setDefaultShipping(newId, canNotify);
             }
           }
 
-          return Promise.all(promises).then((values) => {
-            console.log(values);
-          });
+          notifyToast('Address successful created!');
         }
       })
       .catch();

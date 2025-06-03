@@ -10,15 +10,15 @@ type CheckBoxes = {
 };
 interface CheckBoxesProps {
   register: UseFormRegister<CheckBoxes>;
-  watch: any;
+  watch?: any;
 }
 
 export function CheckBoxes({ register, watch }: CheckBoxesProps) {
   const [selected, setSelected] = useState<string[]>([]);
   const [defaultSelected, setDefaultSelected] = useState<string[]>([]);
 
-  const shippingValue = watch?.('selected');
-  const billingValue = watch?.('defaultSelected');
+  // const shippingValue = watch?.('selected');
+  // const billingValue = watch?.('defaultSelected');
 
   const handleMainCheckboxChange = (value: string, isChecked: boolean) => {
     if (isChecked) {
