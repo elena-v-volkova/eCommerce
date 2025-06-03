@@ -14,6 +14,9 @@ export default defineConfig({
     open: '/',
     hmr: true,
   },
+  build: {
+    emptyOutDir: true,
+  },
   root: './src/',
   css: {
     postcss: {

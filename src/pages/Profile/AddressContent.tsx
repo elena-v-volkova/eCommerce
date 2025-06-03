@@ -173,7 +173,7 @@ function CardAddress({
           });
         }
       } catch (error) {
-        console.log(error);
+        // console.log(error);
         onOpen();
       }
     }
@@ -185,7 +185,7 @@ function CardAddress({
         onUpdate(customer);
       });
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       onOpen();
     }
   };

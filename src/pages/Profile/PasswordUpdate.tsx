@@ -81,6 +81,7 @@ export function PasswordUpdate() {
 
   return (
     <EditableCard
+      addressEdit={false}
       className="col-span-12 h-fit min-h-[410px] w-[320px] p-[20px] sm:col-span-4"
       headerClass="flex-col items-center flex-start p-0"
       isLoading={isLoading}
@@ -94,7 +95,6 @@ export function PasswordUpdate() {
         setMode(!mode);
       }}
       onSave={handleSubmit(onSubmit)}
-      addressEdit={false}
     >
       {error && (
         <ProfileModal

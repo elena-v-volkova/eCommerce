@@ -52,7 +52,7 @@ export function CustomerSettings() {
     setIsLoading(true);
     setError(null);
     if (!data) return;
-    console.log(data);
+    // console.log(data);
     await passwordClient
       .me()
       .password()
@@ -166,12 +166,54 @@ export function CustomerSettings() {
     if (!newAddress) return;
     const address = JSON.parse(JSON.stringify(newAddress.address));
 
-    console.log(newAddress);
+    const getIds = (user: Customer): String[] => {
+      return user.addresses.reduce<String[]>(
+        (reducer, item: BaseAddress) => {
+          reducer.push(item.id || '');
+
+          return reducer;
+        },
+        [''],
+      );
+    };
+    const oldIds = getIds(user);
     const request = ADDRESS_ACTION.add(prepareAddress(address));
 
-    console.log(request);
+    console.log(oldIds);
 
-    return updateAction([request], 'Address successful created!');
+    console.log(request);
+    console.log(newAddress);
+
+    return updateAction([request], 'Address successful created!')
+      .then((updated) => {
+        if (updated) {
+          const newId: string | undefined =
+            getIds(updated)
+              .filter((item) => !oldIds.includes(item))
+              .pop()
+              ?.toString() || '';
+
+          const promises: Array<Promise<Customer | void>> = []; // Теперь массив промисов, а не функций
+
+          if (newAddress.billing === true) {
+            promises.push(setBilling(newId));
+            if (newAddress.defaultBilling === true) {
+              promises.push(setDefaultBilling(newId));
+            }
+          }
+          if (newAddress.shipping === true) {
+            promises.push(setShipping(newId));
+            if (newAddress.defaultShipping === true) {
+              promises.push(setDefaultShipping(newId));
+            }
+          }
+
+          return Promise.all(promises).then((values) => {
+            console.log(values);
+          });
+        }
+      })
+      .catch();
   };
   const deleteAddress = async (addressId: string): Promise<Customer | void> => {
     if (!addressId) return;
@@ -180,6 +222,30 @@ export function CustomerSettings() {
     console.log(request);
 
     return updateAction([request], 'Address deleted!');
+  };
+
+  const setShipping = async (addressId: string): Promise<Customer | void> => {
+    return updateAction([ADDRESS_ACTION.setShipping(addressId)], 'successful');
+  };
+  const setBilling = async (addressId: string): Promise<Customer | void> => {
+    return updateAction([ADDRESS_ACTION.setBilling(addressId)], 'successful');
+  };
+
+  const setDefaultBilling = async (
+    addressId: string,
+  ): Promise<Customer | void> => {
+    return updateAction(
+      [ADDRESS_ACTION.setDefaultBilling(addressId)],
+      'successful',
+    );
+  };
+  const setDefaultShipping = async (
+    addressId: string,
+  ): Promise<Customer | void> => {
+    return updateAction(
+      [ADDRESS_ACTION.setDefaultShipping(addressId)],
+      'successful',
+    );
   };
 
   const editPersonal = async (

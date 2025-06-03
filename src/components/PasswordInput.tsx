@@ -52,8 +52,8 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
         </button>
       }
       errorMessage={errorMessage}
-      isInvalid={isInvalid}
       isDisabled={isDisabled}
+      isInvalid={isInvalid}
       onChange={handleChange}
       {...props}
     />

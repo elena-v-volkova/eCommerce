@@ -1,9 +1,10 @@
+import type { Swiper as SwiperType } from 'swiper';
+
 import { Link as RouterLink, useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { Card, CardBody, CardHeader, Chip, Spinner } from '@heroui/react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
-import type { Swiper as SwiperType } from 'swiper';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
 
@@ -57,6 +58,7 @@ export default function ProductPage() {
 
   useEffect(() => {
     let isMounted = true;
+
     setLoading(true);
 
     apiAnonRoot
@@ -96,9 +98,11 @@ export default function ProductPage() {
 
     allPrices.forEach((pr: Price) => {
       const { validFrom, validUntil } = pr;
+
       if (validFrom && validUntil) {
         const from = new Date(validFrom);
         const until = new Date(validUntil);
+
         if (from <= now && now <= until) {
           activeDiscount = pr;
         }
@@ -256,7 +260,7 @@ export default function ProductPage() {
             <Swiper
               loop
               navigation
-              className="w-full h-full"
+              className="size-full"
               initialSlide={openIndex}
               modules={[Navigation, Pagination]}
               pagination={{ clickable: true }}

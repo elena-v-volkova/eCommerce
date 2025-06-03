@@ -83,6 +83,14 @@ export const ADDRESS_ACTION = {
     action: 'setDefaultBillingAddress',
     addressId: addressId,
   }),
+  setShipping: (addressId: string): MyCustomerAddShippingAddressIdAction => ({
+    action: 'addShippingAddressId',
+    addressId: addressId,
+  }),
+  setBilling: (addressId: string): MyCustomerAddBillingAddressIdAction => ({
+    action: 'addBillingAddressId',
+    addressId: addressId,
+  }),
 };
 
 //#endregion address

@@ -53,7 +53,7 @@ export function PersonalContent({ customer }: { customer: Customer | null }) {
 
   const onSubmit = async (data: PersonalFields) => {
     if (Object.keys(errors).length === 0) {
-      console.log(data);
+      // console.log(data);
       try {
         await editPersonal(data);
         setMode(!mode);
