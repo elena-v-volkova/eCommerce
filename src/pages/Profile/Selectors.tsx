@@ -6,7 +6,7 @@ export function Selectors({
   onAction: (key: React.Key) => void;
 }) {
   return (
-    <div className="w-full max-w-[180px] rounded-small border-small border-default-200 px-1 py-2 dark:border-default-100">
+    <div className="  w-[180px] h-fit rounded-small border-small border-default-200 px-1 py-2 dark:border-default-100">
       <Listbox
         disallowEmptySelection
         aria-label="Profile sections menu"

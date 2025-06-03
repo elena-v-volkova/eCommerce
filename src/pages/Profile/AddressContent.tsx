@@ -37,7 +37,7 @@ export function AddressContent({ value }: { value: Customer | null }) {
       const customer = value || user;
 
       return (
-        <div className="flex min-h-[180px] w-full justify-center gap-[20px]">
+        <div className=" flex min-h-[180px] w-full flex-wrap content-center gap-[20px]">
           {customer &&
             customer.addresses.length > 0 &&
             customer.addresses.map((item: BaseAddress) => {
@@ -207,7 +207,6 @@ function CardAddress({
     <EditableCard
       addressEdit={Boolean(!createMode)}
       className=" h-fit min-h-[410px]  w-[320px] p-[20px] sm:col-span-1  md:col-span-2 lg:col-span-3"
-      classNames={{}}
       editmode={createMode}
       headerChildren={
         prop ? (

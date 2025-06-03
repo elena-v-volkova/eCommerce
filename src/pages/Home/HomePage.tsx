@@ -4,10 +4,11 @@ import { Code } from '@heroui/code';
 import { button as buttonStyles } from '@heroui/theme';
 import { Image } from '@heroui/react';
 
+import car from '../../assets/car.jpg';
+
 import { SITE_CONFIG } from '@/config/site';
 import { TITLE, SUBTITLE } from '@/components/primitives';
 // import { loadMockUser } from '@/shared/utils/utils';
-import car from '../../assets/car.jpg';
 
 function Home() {
   return (
@@ -27,7 +28,7 @@ function Home() {
           meets unmatched performance.
         </span>
       </div>
-      <Image alt="Main Image" src={car} className="dark:invert" />
+      <Image alt="Main Image" className="dark:invert" src={car} />
       <div className="flex gap-3">
         <Link
           isExternal

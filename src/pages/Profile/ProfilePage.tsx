@@ -21,7 +21,7 @@ export function Profile() {
   useEffect(() => {
     switch (subpage) {
       case 'addresses':
-        setContent(AddressesContent(user));
+        setContent(<AddressContent value={user} />);
         break;
       case 'password':
         setContent(<PasswordUpdate />);
@@ -41,25 +41,16 @@ export function Profile() {
   }, [subpage]);
 
   return (
-    <div className="w-full">
+    <div className="flex flex-wrap w-full flex-col items-stretch">
       <h2 className="mb-10 flex w-full justify-center self-center text-[2.3rem] font-semibold leading-9 lg:text-5xl">
         User Profile Page
       </h2>
       <div className={styles.profile}>
         <Selectors onAction={(key) => setSubpage(key.toString())} />
-        <div className="mx-[20px] flex min-h-[180px] w-full justify-center">
+        <div className="mx-[20px]  flex   min-h-[180px] w-full justify-center ">
           {content}
         </div>
       </div>
-    </div>
-  );
-}
-
-function AddressesContent(customer: Customer | null) {
-  return (
-    <div className="mx-[20px] flex w-full flex-col gap-y-[20px]">
-      <p className="inline-flex self-center">Manage addresses</p>
-      {customer ? <AddressContent value={customer} /> : <></>}
     </div>
   );
 }

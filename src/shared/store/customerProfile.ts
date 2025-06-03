@@ -22,14 +22,15 @@ import { NewAddressFields } from '@/pages/Profile/AddressContent';
 
 export function CustomerSettings() {
   const [isLoading, setIsLoading] = useState(false);
-  const { updateUser, user } = useSession();
+  const { updateUser, user, setUser } = useSession();
   const [error, setError] = useState<string | null>(null);
   const resetError = (): void => setError(null);
   const [version, setVersion] = useState(user?.version || 1);
 
-  const updateLocalClient = async (value: Customer): Promise<void> => {
+  const updateLocalClient = (value: Customer): void => {
     setVersion(value.version);
     updateUser(value);
+    setUser(value);
   };
   const notifyToast = (msg: string) => {
     toast.success(msg, {
@@ -94,6 +95,7 @@ export function CustomerSettings() {
   const updateAction = async (
     bodyActions: CustomerUpdateAction[],
     message: string,
+    isNotify = true,
   ): Promise<Customer | void> => {
     setIsLoading(true);
     setError(null);
@@ -112,7 +114,7 @@ export function CustomerSettings() {
       .then((data: ClientResponse<Customer>) => {
         const customer = data.body;
 
-        notifyToast(message);
+        if (isNotify) notifyToast(message);
         updateLocalClient(customer);
 
         return customer;
@@ -192,19 +194,19 @@ export function CustomerSettings() {
               .filter((item) => !oldIds.includes(item))
               .pop()
               ?.toString() || '';
-
           const promises: Array<Promise<Customer | void>> = []; // Теперь массив промисов, а не функций
+          const notify = false;
 
           if (newAddress.billing === true) {
-            promises.push(setBilling(newId));
+            promises.push(setBilling(newId, notify));
             if (newAddress.defaultBilling === true) {
-              promises.push(setDefaultBilling(newId));
+              promises.push(setDefaultBilling(newId, notify));
             }
           }
           if (newAddress.shipping === true) {
-            promises.push(setShipping(newId));
+            promises.push(setShipping(newId, notify));
             if (newAddress.defaultShipping === true) {
-              promises.push(setDefaultShipping(newId));
+              promises.push(setDefaultShipping(newId, notify));
             }
           }
 
@@ -224,27 +226,45 @@ export function CustomerSettings() {
     return updateAction([request], 'Address deleted!');
   };
 
-  const setShipping = async (addressId: string): Promise<Customer | void> => {
-    return updateAction([ADDRESS_ACTION.setShipping(addressId)], 'successful');
+  const setShipping = async (
+    addressId: string,
+    isNotified = true,
+  ): Promise<Customer | void> => {
+    return updateAction(
+      [ADDRESS_ACTION.setShipping(addressId)],
+      'successful',
+      isNotified,
+    );
   };
-  const setBilling = async (addressId: string): Promise<Customer | void> => {
-    return updateAction([ADDRESS_ACTION.setBilling(addressId)], 'successful');
+  const setBilling = async (
+    addressId: string,
+    isNotified = true,
+  ): Promise<Customer | void> => {
+    return updateAction(
+      [ADDRESS_ACTION.setBilling(addressId)],
+      'successful',
+      isNotified,
+    );
   };
 
   const setDefaultBilling = async (
     addressId: string,
+    isNotified = true,
   ): Promise<Customer | void> => {
     return updateAction(
       [ADDRESS_ACTION.setDefaultBilling(addressId)],
       'successful',
+      isNotified,
     );
   };
   const setDefaultShipping = async (
     addressId: string,
+    isNotified = true,
   ): Promise<Customer | void> => {
     return updateAction(
       [ADDRESS_ACTION.setDefaultShipping(addressId)],
       'successful',
+      isNotified,
     );
   };
 
