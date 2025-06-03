@@ -15,7 +15,7 @@
     "test UI": "vitest --ui --coverage.enabled=true",
     "coverage": "vitest run --coverage",
     "clean": "rm -rf dist node_modules/.tmp",
-    "build": "tsc -b --verbose && vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "prepare": "husky"
   },
