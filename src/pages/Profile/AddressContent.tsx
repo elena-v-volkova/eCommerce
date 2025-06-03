@@ -7,7 +7,7 @@ import { useState, useEffect, ReactNode, useCallback } from 'react';
 import { Plus } from 'lucide-react';
 
 import { EditableCard } from './EditableCard';
-import { CheckBoxes } from './CheckBoxes';
+import { CheckBoxes } from './Checkboxes';
 import { ProfileModal } from './Modal';
 
 import { CustomerSettings } from '@/shared/store/customerProfile';
