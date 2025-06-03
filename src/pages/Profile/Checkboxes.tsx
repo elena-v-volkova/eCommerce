@@ -9,7 +9,7 @@ type CheckBoxes = {
   defaultBilling: boolean;
 };
 interface CheckBoxesProps {
-  register: UseFormRegister<CheckBoxValues>;
+  register: UseFormRegister<CheckBoxes>;
   watch: any;
 }
 
@@ -45,7 +45,6 @@ export function CheckBoxes({ register, watch }: CheckBoxesProps) {
         <Checkbox
           color="success"
           isSelected={selected.includes('shipping')}
-          name="shipping"
           radius="full"
           onValueChange={(isChecked) =>
             handleMainCheckboxChange('shipping', isChecked)
@@ -58,7 +57,6 @@ export function CheckBoxes({ register, watch }: CheckBoxesProps) {
           <Checkbox
             color="warning"
             isSelected={defaultSelected.includes('defaultShipping')}
-            name="defaultShipping"
             onValueChange={(isChecked) =>
               handleDefaultCheckboxChange('defaultShipping', isChecked)
             }
@@ -72,7 +70,6 @@ export function CheckBoxes({ register, watch }: CheckBoxesProps) {
         <Checkbox
           color="success"
           isSelected={selected.includes('billing')}
-          name="billing"
           radius="full"
           onValueChange={(isChecked) =>
             handleMainCheckboxChange('billing', isChecked)
@@ -85,7 +82,6 @@ export function CheckBoxes({ register, watch }: CheckBoxesProps) {
           <Checkbox
             color="warning"
             isSelected={defaultSelected.includes('defaultBilling')}
-            name="defaultBilling"
             onValueChange={(isChecked) =>
               handleDefaultCheckboxChange('defaultBilling', isChecked)
             }

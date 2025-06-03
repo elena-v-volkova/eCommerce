@@ -160,12 +160,14 @@ function CardAddress({
       try {
         if (newAddress) {
           await createAddress(getValues()).then((customer) => {
+            resetError();
             setMode(!mode);
             onUpdate(customer);
           });
           setCreateMode(false);
         } else {
           await editAddress(addressId, getValues().address).then((customer) => {
+            resetError();
             setMode(!mode);
             onUpdate(customer);
           });
@@ -273,9 +275,6 @@ function CardAddress({
       role="button"
       tabIndex={0}
       onClick={() => setCreateMode(true)}
-      onKeyDown={(e) =>
-        e.key === 'Enter' || e.key === ' ' ? setCreateMode(true) : null
-      }
     >
       <Plus absoluteStrokeWidth size={64} strokeWidth={3} />
     </div>

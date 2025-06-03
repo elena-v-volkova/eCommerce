@@ -42,9 +42,9 @@ export function EditableCard({
     onEdit?.(mode);
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave?.(mode);
+    await onSave?.(mode);
     if (!onestate && noErrors) setMode(false);
   };
 
