@@ -8,12 +8,12 @@ type CheckBoxes = {
   defaultShipping: boolean;
   defaultBilling: boolean;
 };
+
 interface CheckBoxesProps {
   register: UseFormRegister<CheckBoxes>;
-  watch?: any;
 }
 
-export function CheckBoxes({ register, watch }: CheckBoxesProps) {
+export function CheckBoxes({ register }: CheckBoxesProps) {
   const [selected, setSelected] = useState<string[]>([]);
   const [defaultSelected, setDefaultSelected] = useState<string[]>([]);
 

@@ -32,7 +32,7 @@ export function PersonalContent({ customer }: { customer: Customer | null }) {
     reset,
     control,
     register,
-    handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm<PersonalFields>({
     resolver: zodResolver(PERSONAL_SCHEMA),
@@ -41,7 +41,9 @@ export function PersonalContent({ customer }: { customer: Customer | null }) {
       email: customer?.email,
       firstName: customer?.firstName,
       lastName: customer?.lastName,
-      dateOfBirth: parseDate(customer?.dateOfBirth?.toString() || ''),
+      dateOfBirth: customer?.dateOfBirth
+        ? parseDate(customer.dateOfBirth)
+        : undefined,
       password: undefined,
     },
   });
@@ -51,12 +53,15 @@ export function PersonalContent({ customer }: { customer: Customer | null }) {
   const { isLoading, error, resetError, editPersonal } = CustomerSettings();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  const onSubmit = async (data: PersonalFields) => {
+  const onSubmit = async (value: boolean): Promise<true | undefined> => {
+    // handleSubmit();
     if (Object.keys(errors).length === 0) {
-      // console.log(data);
       try {
-        await editPersonal(data);
-        setMode(!mode);
+        await editPersonal(getValues());
+        setMode(!value);
+        resetError();
+
+        return true;
       } catch {
         onOpen();
       }
@@ -69,6 +74,7 @@ export function PersonalContent({ customer }: { customer: Customer | null }) {
 
   return (
     <EditableCard
+      addressEdit={false}
       className="col-span-12 h-fit min-h-[410px] w-[320px] p-[20px] sm:col-span-4"
       headerClass="flex-col items-center p-0"
       isLoading={isLoading}
@@ -81,7 +87,7 @@ export function PersonalContent({ customer }: { customer: Customer | null }) {
       onEdit={(value: boolean) => {
         setMode(!value);
       }}
-      onSave={handleSubmit(onSubmit)}
+      onSave={(value: boolean) => onSubmit(value)}
     >
       {error && (
         <ProfileModal

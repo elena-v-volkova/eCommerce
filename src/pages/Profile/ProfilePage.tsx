@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { UserRoundCog } from 'lucide-react';
 import { Customer } from '@commercetools/platform-sdk';
 
@@ -9,36 +9,43 @@ import { AddressContent } from './AddressContent';
 import { PasswordUpdate } from './PasswordUpdate';
 
 import { useAuth } from '@/shared/model/AuthContext';
+import { useSession } from '@/shared/model/useSession.ts';
 
 export function Profile() {
-  const {
-    user,
-    logout,
-  }: { readonly user: Customer | null; logout: () => void } = useAuth();
+  const { logout }: { logout: () => void } = useAuth();
+  const { user } = useSession();
   const [subpage, setSubpage] = useState<string>('');
-  const [content, setContent] = useState<ReactNode>(null);
 
+  const copyCustomer = (value: Customer): Customer => {
+    return JSON.parse(JSON.stringify(value));
+  };
+
+  let customer: Customer;
+
+  if (user) customer = copyCustomer(user);
   useEffect(() => {
+    console.log('>>> User сменился :', { user });
+    customer = copyCustomer(user as Customer);
+  }, [user]);
+
+  const content = useMemo(() => {
     switch (subpage) {
       case 'addresses':
-        setContent(<AddressContent value={user} />);
-        break;
+        return <AddressContent value={customer} />;
       case 'password':
-        setContent(<PasswordUpdate />);
-        break;
+        return <PasswordUpdate />;
       case 'logout':
         logout();
-        break;
+
+        return null;
       case 'personal':
-        setContent(<PersonalContent customer={user} />);
-        break;
+        return <PersonalContent customer={customer} />;
       default:
-        setContent(
-          <UserRoundCog className="size-full max-w-[350px] stroke-[#eeeec3] dark:stroke-[#777773]" />,
+        return (
+          <UserRoundCog className="size-full max-w-[350px] stroke-[#eeeec3] dark:stroke-[#777773]" />
         );
-        break;
     }
-  }, [subpage]);
+  }, [subpage, user]);
 
   return (
     <div className="flex w-full flex-col flex-wrap items-stretch">

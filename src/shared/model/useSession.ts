@@ -17,16 +17,14 @@ export function useSession() {
     return stored ? JSON.parse(stored) : null;
   });
 
-  const [user, setUser] = useState(() => {
+  const [user, setUser] = useState<Customer | null>(() => {
     const stored = localStorage.getItem(USER_DATA);
 
     return stored ? JSON.parse(stored) : null;
   });
-
   const updateUser = (data: Customer): void => {
     localStorage.setItem(USER_DATA, JSON.stringify(data));
   };
-
   const login = (result: Customer) => {
     const customer = result;
     const userData = {

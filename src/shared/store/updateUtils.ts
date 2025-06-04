@@ -7,22 +7,14 @@ import {
   MyCustomerSetDateOfBirthAction,
   MyCustomerSetDefaultBillingAddressAction,
   MyCustomerSetDefaultShippingAddressAction,
+  MyCustomerAddShippingAddressIdAction,
+  MyCustomerAddBillingAddressIdAction,
   MyCustomerSetFirstNameAction,
   MyCustomerSetLastNameAction,
 } from '@commercetools/platform-sdk';
 import { DateValue } from '@heroui/react';
 
 // #region personal
-export type ActionsUpdate =
-  | MyCustomerAddAddressAction
-  | MyCustomerChangeAddressAction
-  | MyCustomerChangeEmailAction
-  | MyCustomerRemoveAddressAction
-  | MyCustomerSetDateOfBirthAction
-  | MyCustomerSetDefaultBillingAddressAction
-  | MyCustomerSetDefaultShippingAddressAction
-  | MyCustomerSetFirstNameAction
-  | MyCustomerSetLastNameAction;
 
 export const PERSONAL_DATA_ACTION = {
   changeEmail: (email: string): MyCustomerChangeEmailAction => ({

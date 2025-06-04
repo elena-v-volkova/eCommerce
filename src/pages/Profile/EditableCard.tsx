@@ -1,5 +1,5 @@
 import React, { JSX, useState } from 'react';
-import { Card, CardHeader, CardBody, CardFooter, Button } from '@heroui/react';
+import { Button, Card, CardBody, CardFooter, CardHeader } from '@heroui/react';
 import { Trash2 } from 'lucide-react';
 
 interface EditableCardProps {
@@ -11,12 +11,12 @@ interface EditableCardProps {
   children: React.ReactNode;
   className?: string;
   onEdit?: (key: any) => void;
-  onSave?: (key: any) => Promise<void> | void;
-  onDelete?: (key: any) => Promise<void> | void;
+  onSave: (key: any) => Promise<boolean | undefined>;
+  onDelete?: (key: any) => Promise<boolean | undefined>;
   onCancel?: (key: any) => void;
   isLoading?: boolean;
   noErrors: boolean;
-  addressEdit: boolean;
+  addressEdit?: boolean;
 }
 
 export function EditableCard({
@@ -32,7 +32,7 @@ export function EditableCard({
   onCancel,
   isLoading = false,
   noErrors = true,
-  addressEdit,
+  addressEdit = false,
   onDelete,
 }: EditableCardProps): JSX.Element {
   const [mode, setMode] = useState(editmode);
@@ -44,7 +44,9 @@ export function EditableCard({
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSave?.(mode);
+    await onSave?.(mode).then((value) => {
+      setMode(!value);
+    });
     if (!onestate && noErrors) setMode(false);
   };
 
@@ -55,8 +57,8 @@ export function EditableCard({
   };
   const handleDelete = (e: React.FormEvent) => {
     e.preventDefault();
-    onDelete?.();
     if (!onestate) setMode(false);
+    onDelete?.(mode);
   };
 
   return (
@@ -70,7 +72,7 @@ export function EditableCard({
           }
         >
           <h4 className="text-large font-medium text-teal-600">{title}</h4>
-          {headerChildren !== null && headerChildren}
+          {headerChildren !== null && !editmode && headerChildren}
         </CardHeader>
 
         <CardBody className="overflow-visible p-0">{children}</CardBody>

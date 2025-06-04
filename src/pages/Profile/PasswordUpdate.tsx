@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { Customer } from '@commercetools/platform-sdk';
 import { Input, useDisclosure } from '@heroui/react';
 import { useState } from 'react';
 
@@ -11,7 +10,7 @@ import { EditableCard } from './EditableCard';
 import { REGISTER_SCHEMA } from '@/components/RegisterForm/lib/utils';
 import { PasswordInput } from '@/components/PasswordInput';
 import { CustomerSettings } from '@/shared/store/customerProfile';
-import { useAuth } from '@/shared/model/AuthContext';
+import { useSession } from '@/shared/model/useSession.ts';
 
 const PASSWORD_UPDATE_SCHEMA = z
   .object({
@@ -45,12 +44,13 @@ export function PasswordUpdate() {
     handleSubmit,
     setValue,
     trigger,
+    getValues,
     formState: { errors },
   } = useForm<PasswordFields>({
     resolver: zodResolver(PASSWORD_UPDATE_SCHEMA),
     mode: 'onChange',
   });
-  const { user }: { readonly user: Customer | null } = useAuth();
+  const { user } = useSession();
   const { changePassword, isLoading, error, resetError } = CustomerSettings();
 
   const [mode, setMode] = useState(false);
@@ -65,9 +65,11 @@ export function PasswordUpdate() {
       };
 
       try {
-        await changePassword(request);
+        await changePassword(getValues());
         reset();
         setMode(!mode);
+
+        return true;
       } catch {
         onOpen();
       }
@@ -88,13 +90,14 @@ export function PasswordUpdate() {
       noErrors={!Boolean(errors)}
       title="Change password"
       onCancel={() => {
-        resetError(), reset();
+        resetError();
+        reset();
         setMode(false);
       }}
       onEdit={() => {
         setMode(!mode);
       }}
-      onSave={handleSubmit(onSubmit)}
+      onSave={(value: boolean) => onSubmit(value)}
     >
       {error && (
         <ProfileModal

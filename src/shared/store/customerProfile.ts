@@ -3,11 +3,11 @@ import {
   ClientResponse,
   Customer,
   CustomerUpdateAction,
+  InvalidCurrentPasswordError,
   MyCustomerChangePassword,
 } from '@commercetools/platform-sdk';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { InvalidCurrentPasswordError } from '@commercetools/platform-sdk';
 
 import { useSession } from '../model/useSession';
 
@@ -18,20 +18,30 @@ import { apiAnonRoot } from '@/commercetools/anonUser';
 import { createPasswordFlowClient } from '@/commercetools/login';
 import { ResponseError } from '@/types/commercetools';
 import { PersonalFields } from '@/pages/Profile/PersonalContent';
-import { NewAddressFields } from '@/pages/Profile/AddressContent';
+import {
+  AddressFields,
+  NewAddressFields,
+} from '@/pages/Profile/AddressContent';
+
+function getVersion(): number {
+  const stored = JSON.parse(localStorage.getItem('userData') || '') as Customer;
+
+  return stored ? stored.version : 1;
+}
 
 export function CustomerSettings() {
   const [isLoading, setIsLoading] = useState(false);
   const { updateUser, user, setUser } = useSession();
   const [error, setError] = useState<string | null>(null);
-  const resetError = (): void => setError(null);
-  const [version, setVersion] = useState(user?.version || 1);
 
-  const updateLocalClient = (value: Customer): void => {
-    setVersion(value.version);
+  const resetError = (): void => {
+    setError(null);
+  };
+  const updateLocalClient = (value: Customer) => {
     updateUser(value);
     setUser(value);
   };
+
   const notifyToast = (msg: string) => {
     toast.success(msg, {
       duration: 5000,
@@ -46,14 +56,13 @@ export function CustomerSettings() {
     data: MyCustomerChangePassword,
   ): Promise<Customer | void> => {
     const passwordClient = createPasswordFlowClient(
-      user.email,
+      user?.email || '123',
       data.currentPassword,
     );
 
     setIsLoading(true);
     setError(null);
     if (!data) return;
-    // console.log(data);
     await passwordClient
       .me()
       .password()
@@ -61,23 +70,21 @@ export function CustomerSettings() {
         body: {
           currentPassword: data.currentPassword,
           newPassword: data.newPassword,
-          version: version,
+          version: user?.version || 1,
         },
       })
       .execute()
       .then(async (response: ClientResponse<Customer>) => {
         const customer = response.originalRequest;
 
-        console.log(customer);
-
         notifyToast('Password successful changed!');
         const newClient = createPasswordFlowClient(
-          user.email,
+          user?.email || '123',
           data.newPassword,
         );
         const { body: updatedCustomer } = await newClient.me().get().execute();
 
-        await updateLocalClient(updatedCustomer);
+        updateLocalClient(updatedCustomer);
 
         return customer;
       })
@@ -103,10 +110,10 @@ export function CustomerSettings() {
 
     return await apiAnonRoot
       .customers()
-      .withId({ ID: user.id })
+      .withId({ ID: user?.id || '1' })
       .post({
         body: {
-          version: version,
+          version: getVersion(),
           actions: [...bodyActions],
         },
       })
@@ -128,7 +135,9 @@ export function CustomerSettings() {
       });
   };
 
-  const prepareAddress = (address: BaseAddress): BaseAddress => {
+  const prepareAddress = (
+    address: BaseAddress | AddressFields,
+  ): BaseAddress => {
     const draft = JSON.parse(JSON.stringify(address));
 
     Object.defineProperties(draft, {
@@ -151,13 +160,18 @@ export function CustomerSettings() {
 
   const editAddress = async (
     addressId: string,
-    address: BaseAddress,
+    editedAddress: NewAddressFields,
   ): Promise<Customer | void> => {
-    if (!addressId || !address) return;
+    if (!addressId || !editedAddress) return;
+    const request = ADDRESS_ACTION.change(
+      addressId,
+      prepareAddress(editedAddress.address),
+    );
 
-    const request = ADDRESS_ACTION.change(addressId, prepareAddress(address));
-
-    console.log(request);
+    if (editedAddress.shipping || editedAddress.billing) {
+      await setAddressTypes(editedAddress, addressId);
+      setIsLoading(false);
+    }
 
     return updateAction([request], 'Address successful changed!');
   };
@@ -169,24 +183,16 @@ export function CustomerSettings() {
     const address = JSON.parse(JSON.stringify(newAddress.address));
 
     const getIds = (user: Customer): String[] => {
-      return user.addresses.reduce<String[]>(
-        (reducer, item: BaseAddress) => {
-          reducer.push(item.id || '');
+      return user.addresses.reduce<String[]>((reducer, item: BaseAddress) => {
+        reducer.push(item.id || '');
 
-          return reducer;
-        },
-        [''],
-      );
+        return reducer;
+      }, []);
     };
-    const oldIds = getIds(user);
+    const oldIds = getIds(user as Customer);
     const request = ADDRESS_ACTION.add(prepareAddress(address));
 
-    console.log(oldIds);
-
-    console.log(request);
-    console.log(newAddress);
-
-    return updateAction([request], 'Address successful created!', false)
+    return await updateAction([request], 'Address successful created!', false)
       .then(async (updated) => {
         if (updated) {
           const newId: string | undefined =
@@ -194,20 +200,8 @@ export function CustomerSettings() {
               .filter((item) => !oldIds.includes(item))
               .pop()
               ?.toString() || '';
-          const canNotify = false;
 
-          if (newAddress.billing === true) {
-            await setBilling(newId, canNotify);
-            if (newAddress.defaultBilling === true) {
-              await setDefaultBilling(newId, canNotify);
-            }
-          }
-          if (newAddress.shipping === true) {
-            await setShipping(newId, canNotify);
-            if (newAddress.defaultShipping === true) {
-              await setDefaultShipping(newId, canNotify);
-            }
-          }
+          await setAddressTypes(newAddress, newId);
 
           notifyToast('Address successful created!');
         }
@@ -217,8 +211,6 @@ export function CustomerSettings() {
   const deleteAddress = async (addressId: string): Promise<Customer | void> => {
     if (!addressId) return;
     const request = ADDRESS_ACTION.remove(addressId);
-
-    console.log(request);
 
     return updateAction([request], 'Address deleted!');
   };
@@ -248,7 +240,7 @@ export function CustomerSettings() {
     addressId: string,
     isNotified = true,
   ): Promise<Customer | void> => {
-    return updateAction(
+    await updateAction(
       [ADDRESS_ACTION.setDefaultBilling(addressId)],
       'successful',
       isNotified,
@@ -258,13 +250,32 @@ export function CustomerSettings() {
     addressId: string,
     isNotified = true,
   ): Promise<Customer | void> => {
-    return updateAction(
+    await updateAction(
       [ADDRESS_ACTION.setDefaultShipping(addressId)],
       'successful',
       isNotified,
     );
   };
 
+  const setAddressTypes = async (
+    addr: NewAddressFields,
+    addressId: string,
+  ): Promise<void> => {
+    const canNotify = false;
+
+    if (addr.billing === true) {
+      await setBilling(addressId, canNotify);
+      if (addr.defaultBilling === true) {
+        await setDefaultBilling(addressId, canNotify);
+      }
+    }
+    if (addr.shipping === true) {
+      await setShipping(addressId, canNotify);
+      if (addr.defaultShipping === true) {
+        await setDefaultShipping(addressId, canNotify);
+      }
+    }
+  };
   const editPersonal = async (
     personal: PersonalFields,
   ): Promise<Customer | void> => {
@@ -277,7 +288,7 @@ export function CustomerSettings() {
       PERSONAL_DATA_ACTION.setDateOfBirth(personal.dateOfBirth),
     ];
 
-    return updateAction(request, 'Personal data changed!');
+    return await updateAction(request, 'Personal data changed!');
   };
 
   return {

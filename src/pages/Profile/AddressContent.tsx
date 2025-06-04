@@ -2,9 +2,9 @@ import { BaseAddress, Customer } from '@commercetools/platform-sdk';
 import { Chip, useDisclosure } from '@heroui/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CircleCheckBig } from 'lucide-react';
-import { useState, useEffect, ReactNode, useCallback } from 'react';
-import { Plus } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { CircleCheckBig, Plus } from 'lucide-react';
+import { undefined } from 'zod';
 
 import { EditableCard } from './EditableCard';
 import { CheckBoxes } from './Checkboxes';
@@ -23,63 +23,74 @@ import { useSession } from '@/shared/model/useSession.ts';
 
 export function AddressContent({ value }: { value: Customer | null }) {
   const { user } = useSession();
-  const [content, setContent] = useState<ReactNode>(null);
+  const [addresses, setAddresses] = useState<BaseAddress[]>(user.addresses);
   //TODO доработать обновление
-  const handleUpdate = useCallback(
-    (data: Customer) => {
-      cosole.log(data);
-      setContent(renderData());
-    },
-    [user, value],
+  const handleUpdate = (data: Customer) => {
+    console.log(data);
+  };
+
+  // useEffect(() => {
+  // console.log('>>> Устанавливаю новый контент:', { addresses });
+  // }, [addresses]);
+
+  return (
+    <div
+      className={` flex min-h-[180px] w-full flex-wrap  content-center ${styles.address} gap-[20px]`}
+    >
+      {addresses &&
+        addresses.length > 0 &&
+        addresses.map((item: BaseAddress) => {
+          const info = checkVariants(item.id || '', user);
+
+          return (
+            <CardAddress
+              key={item.id}
+              address={item}
+              id={item.id ?? ''}
+              isNewAddress={false}
+              prop={info}
+              onUpdate={handleUpdate}
+            />
+          );
+        })}
+      <CardAddress isNewAddress={true} onUpdate={handleUpdate} />
+    </div>
   );
-
-  const renderData = useCallback(
-    (value): ReactNode => {
-      const customer = value || user;
-
-      return (
-        <div
-          className={` flex min-h-[180px] w-full flex-wrap  content-center ${styles.address} gap-[20px]`}
-        >
-          {customer &&
-            customer.addresses.length > 0 &&
-            customer.addresses.map((item: BaseAddress) => {
-              const info = checkVariants(item.id || '', customer);
-
-              return (
-                <CardAddress
-                  key={item.id}
-                  address={item}
-                  id={item.id ?? ''}
-                  newAddress={false}
-                  prop={info}
-                  onUpdate={handleUpdate}
-                />
-              );
-            })}
-          <CardAddress newAddress={true} onUpdate={handleUpdate} />
-        </div>
-      );
-    },
-    [value, user, handleUpdate],
-  );
-
-  useEffect(() => {
-    setContent(renderData());
-  }, [renderData]);
-
-  return content;
 }
+
 function checkVariants(id: string, customer: Customer): AddressType {
   const isDefaultShipping = (customer.defaultShippingAddressId || '') === id;
   const isDefaultBilling = (customer.defaultBillingAddressId || '') === id;
   const isShipping = customer.shippingAddressIds?.includes(id);
   const isBilling = customer.billingAddressIds?.includes(id);
 
-  if (isShipping) return { type: 'shipping', default: isDefaultShipping };
-  if (isBilling) return { type: 'billing', default: isDefaultBilling };
+  let isDefault: boolean;
+  let type: string;
 
-  return { type: undefined, default: false };
+  if (isDefaultShipping && isDefaultBilling) {
+    isDefault = true;
+    type = 'universal';
+  } else if (isDefaultShipping) {
+    isDefault = isDefaultShipping;
+    type = 'shipping';
+  } else {
+    isDefault = isDefaultBilling;
+    type = isDefaultBilling ? 'billing' : undefined;
+  }
+
+  if (isShipping && isBilling) {
+    return {
+      label: 'Shipping & Billing',
+      default: isDefault,
+      type: type,
+    };
+  }
+  if (isShipping)
+    return { label: 'Shipping Address', default: isDefault, type: type };
+  if (isBilling)
+    return { label: 'Billing Address', default: isDefault, type: type };
+
+  return { label: 'Address', default: false, type: undefined };
 }
 
 const ADDRESS_SCHEMA = REGISTER_SCHEMA.pick({ address: true });
@@ -97,13 +108,13 @@ function CardAddress({
   address,
   prop,
   id,
-  newAddress = false,
+  isNewAddress,
   onUpdate = (value: Customer) => {},
 }: {
   address?: BaseAddress;
   prop?: AddressType;
   id?: string;
-  newAddress: boolean;
+  isNewAddress: boolean;
   onUpdate: (value: Customer) => void;
 }) {
   const {
@@ -119,8 +130,12 @@ function CardAddress({
   } = useForm<AddressFields>({
     resolver: zodResolver(ADDRESS_SCHEMA),
     mode: 'onChange',
-    defaultValues: newAddress
+    defaultValues: isNewAddress
       ? {
+          shipping: false,
+          billing: false,
+          defaultShipping: false,
+          defaultBilling: false,
           address: {
             country: undefined,
             city: '',
@@ -129,6 +144,10 @@ function CardAddress({
           },
         }
       : {
+          shipping: false,
+          billing: false,
+          defaultShipping: false,
+          defaultBilling: false,
           address: {
             country: CodeToCountry(address.country) || '',
             city: address.city || '',
@@ -137,15 +156,14 @@ function CardAddress({
           },
         },
   });
-  const [mode, setMode] = useState(false);
-  const title = (() => {
-    if (prop && prop.type) {
-      return prop.type === 'billing' ? 'Billing Address' : 'Shipping Address';
-    } else {
-      if (newAddress) return 'NEW';
-    }
+  const [mode, setMode] = useState<boolean>(isNewAddress);
 
-    return 'Address';
+  const title = (() => {
+    if (prop && prop.label) {
+      return prop.label;
+    } else {
+      if (isNewAddress) return 'NEW';
+    }
   })();
 
   const {
@@ -158,25 +176,28 @@ function CardAddress({
   } = CustomerSettings();
   const addressId = id;
 
-  const onSubmit = async (data: boolean) => {
+  const onSubmit = async (value: boolean) => {
     if (Object.keys(errors).length === 0) {
       try {
-        if (newAddress) {
-          await createAddress(getValues()).then((customer) => {
+        if (isNewAddress) {
+          await createAddress(getValues()).then((customer: Customer) => {
             resetError();
-            setMode(!mode);
-            onUpdate(customer);
+            setMode(!value);
+            setCreateMode(!createMode);
+            // setUser(customer);
           });
-          setCreateMode(false);
         } else {
-          await editAddress(addressId, getValues().address).then((customer) => {
-            resetError();
-            setMode(!mode);
-            onUpdate(customer);
-          });
+          await editAddress(addressId, getValues()).then(
+            (customer: Customer) => {
+              resetError();
+              setMode(!value);
+              // setUser(customer);
+            },
+          );
         }
-      } catch (error) {
-        // console.log(error);
+
+        return true;
+      } catch {
         onOpen();
       }
     }
@@ -184,11 +205,10 @@ function CardAddress({
   const handleDelete = async () => {
     try {
       await deleteAddress(addressId).then((customer) => {
-        setMode(!mode);
-        onUpdate(customer);
+        reset();
+        setMode(false);
       });
-    } catch (error) {
-      // console.log(error);
+    } catch {
       onOpen();
     }
   };
@@ -205,34 +225,42 @@ function CardAddress({
       trigger('address');
     }
   }, [createMode]);
+  const isDefaultAddress = prop ? prop.default : false;
 
-  return !newAddress || createMode ? (
+  return !isNewAddress || createMode ? (
     <EditableCard
       addressEdit={Boolean(!createMode)}
       className=" h-fit min-h-[410px]  w-[320px] p-[20px] sm:col-span-1  md:col-span-2 lg:col-span-3"
       editmode={createMode}
       headerChildren={
-        prop ? (
-          prop.default && (
+        <div
+          className={
+            mode
+              ? 'mb-[20px] content-center justify-between'
+              : ' absolute right-5  top-5'
+          }
+        >
+          {prop?.default && !mode && (
             <Chip
               color="secondary"
               endContent={<CircleCheckBig size={18} />}
               variant="faded"
             >
-              Default
+              {prop.type}
             </Chip>
-          )
-        ) : (
-          <CheckBoxes register={register} watch={watch} />
-        )
+          )}
+          {(mode || createMode) && (
+            <CheckBoxes register={register} watch={watch()} />
+          )}
+        </div>
       }
       headerClass={
         createMode ? 'mb-[20px] content-center justify-between' : undefined
       }
       isLoading={isLoading}
       noErrors={!Boolean(errors)}
-      onestate={createMode}
-      title={title ? title : 'New Address'}
+      onestate={isNewAddress}
+      title={title}
       onCancel={(value: boolean) => {
         if (createMode) {
           setCreateMode(false);
@@ -244,7 +272,7 @@ function CardAddress({
       onEdit={(value: boolean) => {
         setMode(!value);
       }}
-      onSave={onSubmit}
+      onSave={(value: boolean) => onSubmit(value)}
     >
       {error && (
         <ProfileModal
@@ -258,9 +286,15 @@ function CardAddress({
       <div className="flex flex-col items-start gap-2">
         <AddressFields
           control={control}
-          disabled={newAddress ? Boolean(!createMode) : Boolean(!mode)}
+          // disabled={isNewAddress ? Boolean(!createMode) : Boolean(!mode)}
+          disabled={
+            isNewAddress
+              ? Boolean(!createMode & Boolean(!isLoading))
+              : Boolean(!mode & Boolean(!isLoading))
+          }
+          editmode={mode}
           errors={errors}
-          newAddress={createMode}
+          newAddress={isNewAddress}
           prefix="address"
           register={register}
           setValue={setValue}
@@ -279,6 +313,7 @@ function CardAddress({
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           setCreateMode(true);
+          setMode(true);
         }
       }}
     >

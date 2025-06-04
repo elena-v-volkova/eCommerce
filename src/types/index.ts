@@ -29,6 +29,7 @@ export interface FormFieldsProps<T extends FieldValues> {
 }
 
 export type AddressType = {
-  type: 'billing' | 'shipping' | undefined;
+  label: 'Shipping Address' | 'Billing Address' | 'Shipping & Billing' | 'NEW';
   default: boolean;
+  type: 'billing' | 'shipping' | 'universal' | undefined;
 };
