@@ -1,5 +1,6 @@
 import { Checkbox, Input, Select, SelectItem } from '@heroui/react';
 import { Controller, UseFormRegister } from 'react-hook-form';
+import React from 'react';
 
 import { TRegisterFieldsSchema } from '../lib/utils';
 
@@ -81,7 +82,7 @@ export const AddressFields = ({
             {...register(`${prefix}.city`)}
             errorMessage={errors[prefix]?.city?.message}
             isDisabled={disabled}
-            isInvalid={errors[prefix]?.city?.message ? true : false}
+            isInvalid={!!errors[prefix]?.city?.message}
             {...field}
           />
         )}
@@ -97,7 +98,7 @@ export const AddressFields = ({
             {...register(`${prefix}.streetName`)}
             errorMessage={errors[prefix]?.streetName?.message}
             isDisabled={disabled}
-            isInvalid={errors[prefix]?.streetName?.message ? true : false}
+            isInvalid={!!errors[prefix]?.streetName?.message}
             {...field}
           />
         )}
@@ -113,7 +114,7 @@ export const AddressFields = ({
             {...register(`${prefix}.postalCode`)}
             errorMessage={errors[prefix]?.postalCode?.message}
             isDisabled={disabled}
-            isInvalid={errors[prefix]?.postalCode?.message ? true : false}
+            isInvalid={!!errors[prefix]?.postalCode?.message}
             {...field}
           />
         )}

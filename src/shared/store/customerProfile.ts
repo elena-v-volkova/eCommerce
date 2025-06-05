@@ -56,7 +56,7 @@ export function CustomerSettings() {
     data: MyCustomerChangePassword,
   ): Promise<Customer | void> => {
     const passwordClient = createPasswordFlowClient(
-      user?.email,
+      user ? user.email : '_',
       data.currentPassword,
     );
 
@@ -79,7 +79,7 @@ export function CustomerSettings() {
 
         notifyToast('Password successful changed!');
         const newClient = createPasswordFlowClient(
-          user?.email || '123',
+          user ? user.email : '_',
           data.newPassword,
         );
         const { body: updatedCustomer } = await newClient.me().get().execute();

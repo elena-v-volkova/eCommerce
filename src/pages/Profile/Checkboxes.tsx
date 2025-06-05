@@ -17,9 +17,6 @@ export function CheckBoxes({ register }: CheckBoxesProps) {
   const [selected, setSelected] = useState<string[]>([]);
   const [defaultSelected, setDefaultSelected] = useState<string[]>([]);
 
-  // const shippingValue = watch?.('selected');
-  // const billingValue = watch?.('defaultSelected');
-
   const handleMainCheckboxChange = (value: string, isChecked: boolean) => {
     if (isChecked) {
       setSelected((prev) => [...prev, value]);

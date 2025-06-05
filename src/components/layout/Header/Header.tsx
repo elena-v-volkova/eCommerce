@@ -74,20 +74,31 @@ export function Header() {
               />
             </DropdownTrigger>
             <DropdownMenu aria-label="Profile Actions" variant="flat">
-              <DropdownItem key="profile" className="h-14 gap-2 ">
+              <DropdownItem
+                key="profile"
+                className="h-14 gap-2"
+                textValue={`Hello ${user.firstName} ${user.lastName}`} // Add this
+              >
                 <p className="font-semibold">
                   Hello {user.firstName} {user.lastName}
                 </p>
               </DropdownItem>
+
               <DropdownItem
                 key="settings"
                 showDivider
+                textValue="My Profile"
                 onPressUp={() => navigate(AppRoute.profile, { replace: true })}
               >
                 My Profile
               </DropdownItem>
 
-              <DropdownItem key="logout" color="danger" onPressUp={logout}>
+              <DropdownItem
+                key="logout"
+                color="danger"
+                textValue="Log Out"
+                onPressUp={logout}
+              >
                 Log Out
               </DropdownItem>
             </DropdownMenu>

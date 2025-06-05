@@ -20,12 +20,13 @@ import { AddressFields } from '@/components/RegisterForm/ui/Address';
 import { CodeToCountry } from '@/shared/store/countries';
 import { AddressType } from '@/types';
 import { useSession } from '@/shared/model/useSession.ts';
+//TODO решить конфликты с типами
 
 export function AddressContent() {
   const { user } = useSession();
   const [addresses, setAddresses] = useState<BaseAddress[]>(user?.addresses);
   const [customer, setCustomer] = useState<Customer>(user);
-  //TODO доработать обновление
+
   const handleUpdate = (data: Customer) => {
     setAddresses(data.addresses);
     setCustomer(data);
@@ -184,7 +185,7 @@ function CardAddress({
   const onSubmit = async (value: boolean) => {
     if (Object.keys(errors).length === 0) {
       try {
-        let customer: Customer | null = null;
+        let customer: Customer | null;
 
         if (isNewAddress) {
           customer = await createAddress(getValues());
