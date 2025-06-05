@@ -2,7 +2,7 @@ import { BaseAddress, Customer } from '@commercetools/platform-sdk';
 import { Chip, useDisclosure } from '@heroui/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { CircleCheckBig, Plus } from 'lucide-react';
 import { undefined } from 'zod';
 
@@ -23,17 +23,13 @@ import { useSession } from '@/shared/model/useSession.ts';
 
 export function AddressContent() {
   const { user } = useSession();
-  const [addresses, setAddresses] = useState<BaseAddress[]>(user.addresses);
+  const [addresses, setAddresses] = useState<BaseAddress[]>(user?.addresses);
   const [customer, setCustomer] = useState<Customer>(user);
   //TODO доработать обновление
   const handleUpdate = (data: Customer) => {
     setAddresses(data.addresses);
     setCustomer(data);
   };
-
-  useEffect(() => {
-    console.log('>>> Устанавливаю новый контент:', { addresses });
-  }, [addresses, customer]);
 
   return (
     <div
@@ -131,7 +127,6 @@ function CardAddress({
     register,
     trigger,
     setValue,
-    handleSubmit,
     reset,
     control,
     getValues,
@@ -189,7 +184,7 @@ function CardAddress({
   const onSubmit = async (value: boolean) => {
     if (Object.keys(errors).length === 0) {
       try {
-        let customer: Customer;
+        let customer: Customer | null = null;
 
         if (isNewAddress) {
           customer = await createAddress(getValues());
@@ -198,13 +193,16 @@ function CardAddress({
         }
         // reset();
         resetError();
-        setCreateMode(!value);
-        setMode(!value);
         if (isNewAddress) reset();
+        setCreateMode(!value);
+        if (!isNewAddress) setMode(!value);
         onUpdate(customer);
+
         return true;
       } catch {
         onOpen();
+
+        return false;
       }
     }
   };
@@ -213,18 +211,19 @@ function CardAddress({
 
     try {
       customer = await deleteAddress(addressId);
+
       resetError();
       setCreateMode(!value);
       setMode(!value);
+      if (customer !== null) {
+        onUpdate(customer);
+      }
 
       return true;
     } catch {
       onOpen();
 
       return false;
-    }
-    if (customer !== null) {
-      onUpdate(customer);
     }
   };
   const { isOpen, onOpen, onOpenChange } = useDisclosure();

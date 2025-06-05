@@ -201,13 +201,23 @@ export function CustomerSettings() {
               .pop()
               ?.toString() || '';
 
-          await setAddressTypes(newAddress, newId);
+          const result = await setAddressTypes(newAddress, newId);
 
-          notifyToast('Address successful created!');
+          if (result) {
+            return result;
+          }
         }
+
+        return updated;
+      })
+      .then((data) => {
+        notifyToast('Address successful created!');
+
+        return data;
       })
       .catch();
   };
+
   const deleteAddress = async (addressId: string): Promise<Customer | void> => {
     if (!addressId) return;
     const request = ADDRESS_ACTION.remove(addressId);
@@ -240,7 +250,7 @@ export function CustomerSettings() {
     addressId: string,
     isNotified = true,
   ): Promise<Customer | void> => {
-    await updateAction(
+    return updateAction(
       [ADDRESS_ACTION.setDefaultBilling(addressId)],
       'successful',
       isNotified,
@@ -250,7 +260,7 @@ export function CustomerSettings() {
     addressId: string,
     isNotified = true,
   ): Promise<Customer | void> => {
-    await updateAction(
+    return updateAction(
       [ADDRESS_ACTION.setDefaultShipping(addressId)],
       'successful',
       isNotified,
@@ -260,7 +270,7 @@ export function CustomerSettings() {
   const setAddressTypes = async (
     addr: NewAddressFields,
     addressId: string,
-  ): Promise<void> => {
+  ): Promise<Customer | void> => {
     const canNotify = false;
 
     if (addr.billing === true) {
@@ -313,3 +323,14 @@ function isInvalidCurrentPasswordError(
     error.code === 'InvalidCurrentPassword'
   );
 }
+
+// function isCustomer(obj: any): obj is Customer {
+//   return (
+//     obj !== null &&
+//     typeof obj === 'object' &&
+//     typeof obj.id === 'string' &&
+//     typeof obj.version === 'number' &&
+//     typeof obj.email === 'string' &&
+//     Array.isArray(obj.addresses)
+//   );
+// }

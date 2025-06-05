@@ -6,7 +6,9 @@ import { TRegisterFieldsSchema } from '../lib/utils';
 import { COUNTRIES } from '@/shared/store/countries';
 import { AddressFieldsProps } from '@/types';
 
-type AddressFields = AddressFieldsProps<Pick<TRegisterFieldsSchema, 'address'>>;
+type TAddressFields = AddressFieldsProps<
+  Pick<TRegisterFieldsSchema, 'address'>
+>;
 
 export const AddressFields = ({
   title,
@@ -18,7 +20,7 @@ export const AddressFields = ({
   disabled = false,
   newAddress = true,
   control,
-}: AddressFieldsProps<AddressFields>) => {
+}: AddressFieldsProps<TAddressFields>) => {
   return (
     <>
       <h4 className="mb-2.5">{title}</h4>

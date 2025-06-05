@@ -18,7 +18,7 @@ export const RedirectIfAuthenticated = ({
     return <Navigate replace to="/" />;
   }
   if (!token && location.pathname === '/profile') {
-    return <Navigate replace to="/" />;
+    return <Navigate replace to="/login" />;
   }
 
   return <div>{children}</div>;
