@@ -1,0 +1,21 @@
+.profile {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.address {
+  align-items: flex-start;
+  justify-content: center;
+}
+
+@media (width <= 550px) {
+  .profile {
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .address {
+    justify-content: center;
+  }
+}

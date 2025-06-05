@@ -24,12 +24,12 @@ export const useLogin = () => {
 
     try {
       const loginClient = createPasswordFlowClient(email, password);
-      const response = await loginClient
-        .login()
-        .post({ body: { email, password } })
-        .execute();
+      const { body: customer } = await loginClient.me().get().execute();
+      // .login()
+      // .post({ body: { email, password } })
+      // .execute();
 
-      login(response.body.customer);
+      login(customer);
       navigate(AppRoute.home, { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');

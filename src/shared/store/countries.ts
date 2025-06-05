@@ -23,3 +23,14 @@ export function getCountryInfo(country: string): SelectCountryRule | null {
     regex: new RegExp(data.validate),
   };
 }
+
+export function CodeToCountry(code: string) {
+  const names: Record<string, string> = {
+    RU: 'Russia',
+    JP: 'Japan',
+    CA: 'Canada',
+    GB: 'UnitedKingdom',
+  };
+
+  return names[code];
+}

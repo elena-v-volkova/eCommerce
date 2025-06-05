@@ -12,6 +12,10 @@ export const SITE_CONFIG = {
       label: 'About',
       href: '/about',
     },
+    {
+      label: 'Catalog',
+      href: '/catalog',
+    },
   ],
 
   authLinks: [
