@@ -1,4 +1,3 @@
-import { TRegisterFieldsSchema } from '@/components/RegisterForm/lib/utils';
 import { SVGProps } from 'react';
 import {
   UseFormRegister,
@@ -6,22 +5,31 @@ import {
   UseFormSetValue,
   UseFormTrigger,
   Control,
+  FieldValues,
 } from 'react-hook-form';
 
 export type IconSvgProps = SVGProps<SVGSVGElement> & {
   size?: number;
 };
 
-export interface AddressFieldsProps<T extends TRegisterFieldsSchema>
+export interface AddressFieldsProps<T extends FieldValues>
   extends FormFieldsProps<T> {
   prefix: 'billingAddress' | 'address';
+  disabled?: boolean;
+  newAddress?: boolean;
 }
 
-export interface FormFieldsProps<T extends TRegisterFieldsSchema> {
-  title: string;
+export interface FormFieldsProps<T extends FieldValues> {
+  title?: string;
   register: UseFormRegister<T>;
   errors: FieldErrors<T>;
   setValue: UseFormSetValue<T>;
   trigger: UseFormTrigger<T>;
   control?: Control<T>;
 }
+
+export type AddressType = {
+  label: 'Shipping Address' | 'Billing Address' | 'Shipping & Billing' | 'NEW';
+  default: boolean;
+  type: 'billing' | 'shipping' | 'universal' | undefined;
+};

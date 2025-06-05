@@ -42,7 +42,7 @@ export function Header() {
         <NavbarBrand>
           <Link className="flex items-center gap-2" color="foreground" href="/">
             <Logo />
-            <p className="font-bold text-inherit">ACME</p>
+            <p className="font-bold text-inherit">Car House</p>
           </Link>
         </NavbarBrand>
       </NavbarContent>

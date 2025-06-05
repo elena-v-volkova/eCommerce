@@ -1,0 +1,148 @@
+import React, { JSX, useState } from 'react';
+import { Button, Card, CardBody, CardFooter, CardHeader } from '@heroui/react';
+import { Trash2 } from 'lucide-react';
+
+interface EditableCardProps {
+  onestate?: boolean;
+  editmode?: boolean;
+  title: string;
+  headerClass?: string;
+  headerChildren?: React.ReactNode | null;
+  children: React.ReactNode;
+  className?: string;
+  onEdit?: (key: any) => void;
+  onSave: (key: any) => Promise<boolean | undefined>;
+  onDelete?: (key: any) => Promise<boolean | undefined>;
+  onCancel?: (key: any) => void;
+  isLoading?: boolean;
+  noErrors: boolean;
+  addressEdit?: boolean;
+}
+
+export function EditableCard({
+  onestate = false,
+  editmode = false,
+  title,
+  headerClass,
+  headerChildren = null,
+  children,
+  className = '',
+  onEdit,
+  onSave,
+  onCancel,
+  isLoading = false,
+  noErrors = true,
+  addressEdit = false,
+  onDelete,
+}: EditableCardProps): JSX.Element {
+  const [mode, setMode] = useState(editmode);
+
+  const handleEdit = () => {
+    if (!onestate) setMode(true);
+    onEdit?.(mode);
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await onSave?.(mode).then((value) => {
+      setMode(!value);
+    });
+    if (!onestate && noErrors) setMode(false);
+  };
+
+  const handleCancel = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!onestate) setMode(false);
+    onCancel?.(mode);
+  };
+  const handleDelete = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await onDelete?.(mode).then((value) => {
+      setMode(!value);
+    });
+    if (!onestate) setMode(false);
+  };
+
+  return (
+    <form onReset={onCancel} onSubmit={onSave}>
+      <Card className={`${className}`}>
+        <CardHeader
+          className={
+            Boolean(headerClass)
+              ? `flex ${headerClass} h-8 `
+              : 'flex h-8 flex-row content-center justify-between'
+          }
+        >
+          <h4
+            dangerouslySetInnerHTML={{ __html: title }}
+            className="text-large font-medium text-teal-600"
+          />
+          {headerChildren !== null && !editmode && headerChildren}
+        </CardHeader>
+
+        <CardBody className="overflow-visible p-0">{children}</CardBody>
+
+        <CardFooter className="relative top-[10px] justify-start gap-x-4 border-t-1 border-zinc-100/50 bg-white/30 dark:bg-black/30">
+          {!mode && (
+            <Button
+              className="text-tiny"
+              color="primary"
+              radius="full"
+              size="sm"
+              type="button"
+              onClick={handleEdit}
+            >
+              Edit
+            </Button>
+          )}
+
+          {mode && (
+            <div
+              className={
+                Boolean(addressEdit)
+                  ? 'flex w-full flex-row justify-between'
+                  : 'flex gap-[32px]'
+              }
+            >
+              <Button
+                className="text-tiny"
+                color="warning"
+                isDisabled={isLoading}
+                isLoading={isLoading}
+                radius="full"
+                size="sm"
+                type="submit"
+                onClick={handleSave}
+              >
+                Save
+              </Button>
+
+              <Button
+                className="text-tiny"
+                color="default"
+                isDisabled={isLoading}
+                radius="full"
+                size="sm"
+                type="reset"
+                onClick={handleCancel}
+              >
+                Cancel
+              </Button>
+              {Boolean(addressEdit) && (
+                <Button
+                  color="danger"
+                  endContent={<Trash2 absoluteStrokeWidth color="#ffffff" />}
+                  isDisabled={isLoading}
+                  radius="full"
+                  size="sm"
+                  type="reset"
+                  onClick={handleDelete}
+                />
+              )}
+            </div>
+          )}
+        </CardFooter>
+      </Card>
+    </form>
+  );
+}

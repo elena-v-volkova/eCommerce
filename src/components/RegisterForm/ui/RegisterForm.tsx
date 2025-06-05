@@ -73,6 +73,7 @@ export const RegisterForm = ({ step, onDeliveryChange }: RegisterFormProps) => {
         {(step === 'shipping' || !step) && (
           <div className={styles.shipping}>
             <AddressFields
+              control={control}
               errors={errors}
               prefix="address"
               register={register}
@@ -107,6 +108,7 @@ export const RegisterForm = ({ step, onDeliveryChange }: RegisterFormProps) => {
         {(step === 'billing' || !step) && !sameAsDelivery && (
           <div className={styles.show_billing}>
             <AddressFields
+              control={control}
               errors={errors}
               prefix="billingAddress"
               register={register}

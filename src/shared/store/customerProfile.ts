@@ -1,0 +1,315 @@
+import {
+  BaseAddress,
+  ClientResponse,
+  Customer,
+  CustomerUpdateAction,
+  InvalidCurrentPasswordError,
+  MyCustomerChangePassword,
+} from '@commercetools/platform-sdk';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+
+import { useSession } from '../model/useSession';
+
+import { getCountryInfo } from './countries';
+import { ADDRESS_ACTION, PERSONAL_DATA_ACTION } from './updateUtils';
+
+import { apiAnonRoot } from '@/commercetools/anonUser';
+import { createPasswordFlowClient } from '@/commercetools/login';
+import { ResponseError } from '@/types/commercetools';
+import { PersonalFields } from '@/pages/Profile/PersonalContent';
+import {
+  AddressFields,
+  NewAddressFields,
+} from '@/pages/Profile/AddressContent';
+
+function getVersion(): number {
+  const stored = JSON.parse(localStorage.getItem('userData') || '') as Customer;
+
+  return stored ? stored.version : 1;
+}
+
+export function CustomerSettings() {
+  const [isLoading, setIsLoading] = useState(false);
+  const { updateUser, user, setUser } = useSession();
+  const [error, setError] = useState<string | null>(null);
+
+  const resetError = (): void => {
+    setError(null);
+  };
+  const updateLocalClient = (value: Customer) => {
+    updateUser(value);
+    setUser(value);
+  };
+
+  const notifyToast = (msg: string) => {
+    toast.success(msg, {
+      duration: 5000,
+      style: {
+        fontSize: '1.25rem',
+        padding: '16px 24px',
+      },
+    });
+  };
+
+  const changePassword = async (
+    data: MyCustomerChangePassword,
+  ): Promise<Customer | void> => {
+    const passwordClient = createPasswordFlowClient(
+      user?.email,
+      data.currentPassword,
+    );
+
+    setIsLoading(true);
+    setError(null);
+    if (!data) return;
+    await passwordClient
+      .me()
+      .password()
+      .post({
+        body: {
+          currentPassword: data.currentPassword,
+          newPassword: data.newPassword,
+          version: user?.version || 1,
+        },
+      })
+      .execute()
+      .then(async (response: ClientResponse<Customer>) => {
+        const customer = response.originalRequest;
+
+        notifyToast('Password successful changed!');
+        const newClient = createPasswordFlowClient(
+          user?.email || '123',
+          data.newPassword,
+        );
+        const { body: updatedCustomer } = await newClient.me().get().execute();
+
+        updateLocalClient(updatedCustomer);
+
+        return customer;
+      })
+      .catch((error) => {
+        isInvalidCurrentPasswordError(error)
+          ? setError('Invalid Current Password')
+          : setError(error.code);
+        throw new Error();
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  const updateAction = async (
+    bodyActions: CustomerUpdateAction[],
+    message: string,
+    isNotify = true,
+  ): Promise<Customer | void> => {
+    setIsLoading(true);
+    setError(null);
+    if (!bodyActions) return;
+
+    return await apiAnonRoot
+      .customers()
+      .withId({ ID: user?.id || '1' })
+      .post({
+        body: {
+          version: getVersion(),
+          actions: [...bodyActions],
+        },
+      })
+      .execute()
+      .then((data: ClientResponse<Customer>) => {
+        const customer = data.body;
+
+        if (isNotify) notifyToast(message);
+        updateLocalClient(customer);
+
+        return customer;
+      })
+      .catch((error: ResponseError) => {
+        setError(error.message);
+        throw new Error(error.message);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  const prepareAddress = (
+    address: BaseAddress | AddressFields,
+  ): BaseAddress => {
+    const draft = JSON.parse(JSON.stringify(address));
+
+    Object.defineProperties(draft, {
+      firstName: {
+        value: user?.firstName,
+        enumerable: true,
+      },
+      lastName: {
+        value: user?.lastName,
+        enumerable: true,
+      },
+      country: {
+        value: getCountryInfo(draft.country)?.code,
+        enumerable: true,
+      },
+    });
+
+    return draft;
+  };
+
+  const editAddress = async (
+    addressId: string,
+    editedAddress: NewAddressFields,
+  ): Promise<Customer | void> => {
+    if (!addressId || !editedAddress) return;
+    const request = ADDRESS_ACTION.change(
+      addressId,
+      prepareAddress(editedAddress.address),
+    );
+
+    if (editedAddress.shipping || editedAddress.billing) {
+      await setAddressTypes(editedAddress, addressId);
+      setIsLoading(false);
+    }
+
+    return updateAction([request], 'Address successful changed!');
+  };
+
+  const createAddress = async (
+    newAddress: NewAddressFields,
+  ): Promise<Customer | void> => {
+    if (!newAddress) return;
+    const address = JSON.parse(JSON.stringify(newAddress.address));
+
+    const getIds = (user: Customer): String[] => {
+      return user.addresses.reduce<String[]>((reducer, item: BaseAddress) => {
+        reducer.push(item.id || '');
+
+        return reducer;
+      }, []);
+    };
+    const oldIds = getIds(user as Customer);
+    const request = ADDRESS_ACTION.add(prepareAddress(address));
+
+    return await updateAction([request], 'Address successful created!', false)
+      .then(async (updated) => {
+        if (updated) {
+          const newId: string | undefined =
+            getIds(updated)
+              .filter((item) => !oldIds.includes(item))
+              .pop()
+              ?.toString() || '';
+
+          await setAddressTypes(newAddress, newId);
+
+          notifyToast('Address successful created!');
+        }
+      })
+      .catch();
+  };
+  const deleteAddress = async (addressId: string): Promise<Customer | void> => {
+    if (!addressId) return;
+    const request = ADDRESS_ACTION.remove(addressId);
+
+    return updateAction([request], 'Address deleted!');
+  };
+
+  const setShipping = async (
+    addressId: string,
+    isNotified = true,
+  ): Promise<Customer | void> => {
+    return updateAction(
+      [ADDRESS_ACTION.setShipping(addressId)],
+      'successful',
+      isNotified,
+    );
+  };
+  const setBilling = async (
+    addressId: string,
+    isNotified = true,
+  ): Promise<Customer | void> => {
+    return updateAction(
+      [ADDRESS_ACTION.setBilling(addressId)],
+      'successful',
+      isNotified,
+    );
+  };
+
+  const setDefaultBilling = async (
+    addressId: string,
+    isNotified = true,
+  ): Promise<Customer | void> => {
+    await updateAction(
+      [ADDRESS_ACTION.setDefaultBilling(addressId)],
+      'successful',
+      isNotified,
+    );
+  };
+  const setDefaultShipping = async (
+    addressId: string,
+    isNotified = true,
+  ): Promise<Customer | void> => {
+    await updateAction(
+      [ADDRESS_ACTION.setDefaultShipping(addressId)],
+      'successful',
+      isNotified,
+    );
+  };
+
+  const setAddressTypes = async (
+    addr: NewAddressFields,
+    addressId: string,
+  ): Promise<void> => {
+    const canNotify = false;
+
+    if (addr.billing === true) {
+      await setBilling(addressId, canNotify);
+      if (addr.defaultBilling === true) {
+        await setDefaultBilling(addressId, canNotify);
+      }
+    }
+    if (addr.shipping === true) {
+      await setShipping(addressId, canNotify);
+      if (addr.defaultShipping === true) {
+        await setDefaultShipping(addressId, canNotify);
+      }
+    }
+  };
+  const editPersonal = async (
+    personal: PersonalFields,
+  ): Promise<Customer | void> => {
+    setIsLoading(true);
+    setError(null);
+    const request: CustomerUpdateAction[] = [
+      PERSONAL_DATA_ACTION.changeEmail(personal.email),
+      PERSONAL_DATA_ACTION.setFirstName(personal.firstName),
+      PERSONAL_DATA_ACTION.setLastName(personal.lastName),
+      PERSONAL_DATA_ACTION.setDateOfBirth(personal.dateOfBirth),
+    ];
+
+    return await updateAction(request, 'Personal data changed!');
+  };
+
+  return {
+    changePassword,
+    isLoading,
+    error,
+    resetError,
+    editAddress,
+    editPersonal,
+    createAddress,
+    deleteAddress,
+  };
+}
+
+function isInvalidCurrentPasswordError(
+  error: unknown,
+): error is InvalidCurrentPasswordError {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    error.code === 'InvalidCurrentPassword'
+  );
+}
