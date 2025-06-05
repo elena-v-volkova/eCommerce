@@ -20,10 +20,6 @@ export function Profile() {
     return JSON.parse(JSON.stringify(value));
   };
 
-  let customer: Customer;
-
-  if (user) customer = copyCustomer(user);
-
   const content = useMemo(() => {
     switch (subpage) {
       case 'addresses':
@@ -41,7 +37,7 @@ export function Profile() {
           <UserRoundCog className="size-full max-w-[350px] stroke-[#eeeec3] dark:stroke-[#777773]" />
         );
     }
-  }, [subpage ]);
+  }, [subpage]);
 
   return (
     <div className="flex w-full flex-col flex-wrap items-stretch">

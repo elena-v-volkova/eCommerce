@@ -127,7 +127,6 @@ function CardAddress({
     register,
     trigger,
     setValue,
-    handleSubmit,
     reset,
     control,
     getValues,
