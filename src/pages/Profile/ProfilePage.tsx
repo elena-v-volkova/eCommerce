@@ -31,7 +31,7 @@ export function Profile() {
   const content = useMemo(() => {
     switch (subpage) {
       case 'addresses':
-        return <AddressContent value={customer} />;
+        return <AddressContent />;
       case 'password':
         return <PasswordUpdate />;
       case 'logout':
@@ -39,7 +39,7 @@ export function Profile() {
 
         return null;
       case 'personal':
-        return <PersonalContent customer={customer} />;
+        return <PersonalContent />;
       default:
         return (
           <UserRoundCog className="size-full max-w-[350px] stroke-[#eeeec3] dark:stroke-[#777773]" />

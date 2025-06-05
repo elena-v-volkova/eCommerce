@@ -21,17 +21,19 @@ import { CodeToCountry } from '@/shared/store/countries';
 import { AddressType } from '@/types';
 import { useSession } from '@/shared/model/useSession.ts';
 
-export function AddressContent({ value }: { value: Customer | null }) {
+export function AddressContent() {
   const { user } = useSession();
   const [addresses, setAddresses] = useState<BaseAddress[]>(user.addresses);
+  const [customer, setCustomer] = useState<Customer>(user);
   //TODO доработать обновление
   const handleUpdate = (data: Customer) => {
-    console.log(data);
+    setAddresses(data.addresses);
+    setCustomer(data);
   };
 
-  // useEffect(() => {
-  // console.log('>>> Устанавливаю новый контент:', { addresses });
-  // }, [addresses]);
+  useEffect(() => {
+    console.log('>>> Устанавливаю новый контент:', { addresses });
+  }, [addresses, customer]);
 
   return (
     <div
@@ -40,7 +42,7 @@ export function AddressContent({ value }: { value: Customer | null }) {
       {addresses &&
         addresses.length > 0 &&
         addresses.map((item: BaseAddress) => {
-          const info = checkVariants(item.id || '', user);
+          const info = checkVariants(item.id || '', customer);
 
           return (
             <CardAddress
@@ -69,26 +71,34 @@ function checkVariants(id: string, customer: Customer): AddressType {
 
   if (isDefaultShipping && isDefaultBilling) {
     isDefault = true;
-    type = 'universal';
+    type = 'Default';
   } else if (isDefaultShipping) {
     isDefault = isDefaultShipping;
-    type = 'shipping';
+    type = 'Default shipping';
   } else {
     isDefault = isDefaultBilling;
-    type = isDefaultBilling ? 'billing' : undefined;
+    type = isDefaultBilling ? 'Default billing' : undefined;
   }
 
   if (isShipping && isBilling) {
     return {
-      label: 'Shipping & Billing',
+      label: isDefault ? 'Shipping<br>& Billing' : 'Shipping & Billing',
       default: isDefault,
       type: type,
     };
   }
   if (isShipping)
-    return { label: 'Shipping Address', default: isDefault, type: type };
+    return {
+      label: !isDefault ? 'Shipping' : 'Address',
+      default: isDefault,
+      type: type,
+    };
   if (isBilling)
-    return { label: 'Billing Address', default: isDefault, type: type };
+    return {
+      label: !isDefault ? 'Billing' : 'Address',
+      default: isDefault,
+      type: type,
+    };
 
   return { label: 'Address', default: false, type: undefined };
 }
@@ -137,7 +147,7 @@ function CardAddress({
           defaultShipping: false,
           defaultBilling: false,
           address: {
-            country: undefined,
+            country: '',
             city: '',
             postalCode: '',
             streetName: '',
@@ -179,37 +189,42 @@ function CardAddress({
   const onSubmit = async (value: boolean) => {
     if (Object.keys(errors).length === 0) {
       try {
-        if (isNewAddress) {
-          await createAddress(getValues()).then((customer: Customer) => {
-            resetError();
-            setMode(!value);
-            setCreateMode(!createMode);
-            // setUser(customer);
-          });
-        } else {
-          await editAddress(addressId, getValues()).then(
-            (customer: Customer) => {
-              resetError();
-              setMode(!value);
-              // setUser(customer);
-            },
-          );
-        }
+        let customer: Customer;
 
+        if (isNewAddress) {
+          customer = await createAddress(getValues());
+        } else {
+          customer = await editAddress(addressId, getValues());
+        }
+        // reset();
+        resetError();
+        setCreateMode(!value);
+        setMode(!value);
+        if (isNewAddress) reset();
+        onUpdate(customer);
         return true;
       } catch {
         onOpen();
       }
     }
   };
-  const handleDelete = async () => {
+  const handleDelete = async (value: boolean) => {
+    let customer = null;
+
     try {
-      await deleteAddress(addressId).then((customer) => {
-        reset();
-        setMode(false);
-      });
+      customer = await deleteAddress(addressId);
+      resetError();
+      setCreateMode(!value);
+      setMode(!value);
+
+      return true;
     } catch {
       onOpen();
+
+      return false;
+    }
+    if (customer !== null) {
+      onUpdate(customer);
     }
   };
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -225,7 +240,6 @@ function CardAddress({
       trigger('address');
     }
   }, [createMode]);
-  const isDefaultAddress = prop ? prop.default : false;
 
   return !isNewAddress || createMode ? (
     <EditableCard
@@ -265,7 +279,7 @@ function CardAddress({
         if (createMode) {
           setCreateMode(false);
         }
-        setMode(!value);
+        if (!isNewAddress) setMode(!value);
         reset();
       }}
       onDelete={handleDelete}
@@ -286,12 +300,13 @@ function CardAddress({
       <div className="flex flex-col items-start gap-2">
         <AddressFields
           control={control}
+          disabled={!mode || isLoading}
           // disabled={isNewAddress ? Boolean(!createMode) : Boolean(!mode)}
-          disabled={
-            isNewAddress
-              ? Boolean(!createMode & Boolean(!isLoading))
-              : Boolean(!mode & Boolean(!isLoading))
-          }
+          // disabled={
+          //   isNewAddress
+          //     ? Boolean(!createMode & Boolean(!isLoading))
+          //     : Boolean(!mode & Boolean(!isLoading))
+          // }
           editmode={mode}
           errors={errors}
           newAddress={isNewAddress}

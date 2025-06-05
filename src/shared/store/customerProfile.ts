@@ -56,7 +56,7 @@ export function CustomerSettings() {
     data: MyCustomerChangePassword,
   ): Promise<Customer | void> => {
     const passwordClient = createPasswordFlowClient(
-      user?.email || '123',
+      user?.email,
       data.currentPassword,
     );
 

@@ -41,7 +41,6 @@ export function PasswordUpdate() {
   const {
     reset,
     register,
-    handleSubmit,
     setValue,
     trigger,
     getValues,
@@ -55,8 +54,9 @@ export function PasswordUpdate() {
 
   const [mode, setMode] = useState(false);
 
-  const onSubmit = async (data: PasswordFields) => {
+  const onSubmit = async (value: boolean) => {
     if (Object.keys(errors).length === 0) {
+      const data = getValues();
       const request = {
         // id: user?.id || '',
         version: user?.version || 1,
@@ -64,14 +64,17 @@ export function PasswordUpdate() {
         newPassword: data.password || '',
       };
 
+      console.log(request);
       try {
-        await changePassword(getValues());
+        await changePassword(request);
         reset();
-        setMode(!mode);
+        setMode(!value);
 
         return true;
       } catch {
         onOpen();
+
+        return false;
       }
     }
   };
@@ -112,7 +115,7 @@ export function PasswordUpdate() {
           isRequired
           type="password"
           {...register('current')}
-          isDisabled={!mode}
+          isDisabled={!mode || isLoading}
           label="Enter current password"
           onChange={(e) => {
             const value = e.target.value;
@@ -124,7 +127,7 @@ export function PasswordUpdate() {
         <div className="mt-5">{mode ? 'Write new password' : ''}</div>
         <PasswordInput
           errorMessage={errors.password?.message}
-          isDisabled={!mode}
+          isDisabled={!mode || isLoading}
           isInvalid={!!errors.password}
           register={register('password')}
           onChange={(e) => {
@@ -138,7 +141,7 @@ export function PasswordUpdate() {
         <div className="mt-5">{mode ? 'Repeat new password' : ''}</div>
         <PasswordInput
           errorMessage={errors.repeat?.message}
-          isDisabled={!mode}
+          isDisabled={!mode || isLoading}
           isInvalid={!!errors.repeat}
           register={register('repeat')}
           onChange={(e) => {

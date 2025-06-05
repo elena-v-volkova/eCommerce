@@ -55,10 +55,12 @@ export function EditableCard({
     if (!onestate) setMode(false);
     onCancel?.(mode);
   };
-  const handleDelete = (e: React.FormEvent) => {
+  const handleDelete = async (e: React.FormEvent) => {
     e.preventDefault();
+    await onDelete?.(mode).then((value) => {
+      setMode(!value);
+    });
     if (!onestate) setMode(false);
-    onDelete?.(mode);
   };
 
   return (
@@ -71,7 +73,10 @@ export function EditableCard({
               : 'flex h-8 flex-row content-center justify-between'
           }
         >
-          <h4 className="text-large font-medium text-teal-600">{title}</h4>
+          <h4
+            dangerouslySetInnerHTML={{ __html: title }}
+            className="text-large font-medium text-teal-600"
+          />
           {headerChildren !== null && !editmode && headerChildren}
         </CardHeader>
 

@@ -2,7 +2,7 @@ import { Customer } from '@commercetools/platform-sdk';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { parseDate } from '@internationalized/date';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDisclosure } from '@heroui/react';
 
 import { ProfileModal } from './Modal';
@@ -14,6 +14,7 @@ import {
   REGISTER_SCHEMA,
   TRegisterFieldsSchema,
 } from '@/components/RegisterForm/lib/utils';
+import { useSession } from '@/shared/model/useSession.ts';
 
 const PERSONAL_SCHEMA = REGISTER_SCHEMA.pick({
   email: true,
@@ -27,7 +28,13 @@ export type PersonalFields = Pick<
   'email' | 'firstName' | 'lastName' | 'dateOfBirth' | 'password'
 >;
 
-export function PersonalContent({ customer }: { customer: Customer | null }) {
+export function PersonalContent() {
+  const { user } = useSession();
+  const [customer, setCustomer] = useState<Customer>(user);
+
+  useEffect(() => {
+    console.log('>>> Устанавливаю новый контент:', { customer });
+  }, [customer]);
   const {
     reset,
     control,
@@ -57,7 +64,11 @@ export function PersonalContent({ customer }: { customer: Customer | null }) {
     // handleSubmit();
     if (Object.keys(errors).length === 0) {
       try {
-        await editPersonal(getValues());
+        await editPersonal(getValues()).then((data) => {
+          if (data) {
+            setCustomer(data);
+          }
+        });
         setMode(!value);
         resetError();
 
@@ -106,7 +117,7 @@ export function PersonalContent({ customer }: { customer: Customer | null }) {
           errors={errors}
           personalProps={{
             user: customer,
-            disabled: !mode,
+            disabled: !mode || isLoading,
             showPassword: false,
           }}
           register={register}
