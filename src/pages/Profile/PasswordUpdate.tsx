@@ -64,7 +64,6 @@ export function PasswordUpdate() {
         newPassword: data.password || '',
       };
 
-      console.log(request);
       try {
         await changePassword(request);
         reset();

@@ -2,7 +2,7 @@ import { Customer } from '@commercetools/platform-sdk';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { parseDate } from '@internationalized/date';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useDisclosure } from '@heroui/react';
 
 import { ProfileModal } from './Modal';
@@ -32,9 +32,6 @@ export function PersonalContent() {
   const { user } = useSession();
   const [customer, setCustomer] = useState<Customer>(user);
 
-  useEffect(() => {
-    console.log('>>> Устанавливаю новый контент:', { customer });
-  }, [customer]);
   const {
     reset,
     control,

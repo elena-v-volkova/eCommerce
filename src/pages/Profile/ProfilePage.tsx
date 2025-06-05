@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { UserRoundCog } from 'lucide-react';
 import { Customer } from '@commercetools/platform-sdk';
 
@@ -23,10 +23,6 @@ export function Profile() {
   let customer: Customer;
 
   if (user) customer = copyCustomer(user);
-  useEffect(() => {
-    console.log('>>> User сменился :', { user });
-    customer = copyCustomer(user as Customer);
-  }, [user]);
 
   const content = useMemo(() => {
     switch (subpage) {
@@ -45,7 +41,7 @@ export function Profile() {
           <UserRoundCog className="size-full max-w-[350px] stroke-[#eeeec3] dark:stroke-[#777773]" />
         );
     }
-  }, [subpage, user]);
+  }, [subpage ]);
 
   return (
     <div className="flex w-full flex-col flex-wrap items-stretch">
