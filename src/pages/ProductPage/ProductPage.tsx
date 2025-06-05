@@ -218,9 +218,9 @@ export default function ProductPage() {
       </Card>
 
       {openIndex !== null && (
-        <button
+        <div
           className="fixed inset-0 z-50 bg-black/90"
-          tabIndex={0}
+          role="presentation"
           type="button"
           onClick={closeFullscreen}
           onKeyDown={(e) => {
@@ -229,8 +229,9 @@ export default function ProductPage() {
             }
           }}
         >
-          <button
+          <div
             className="absolute left-1/2 top-[10vh] flex h-[80vh] w-[90vw] -translate-x-1/2 items-center justify-center md:w-[60vw] lg:w-[50vw]"
+            role="presentation"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -268,8 +269,8 @@ export default function ProductPage() {
                 </SwiperSlide>
               ))}
             </Swiper>
-          </button>
-        </button>
+          </div>
+        </div>
       )}
     </div>
   );

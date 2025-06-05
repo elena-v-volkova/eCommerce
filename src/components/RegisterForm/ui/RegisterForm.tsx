@@ -44,7 +44,7 @@ export const RegisterForm = ({ step, onDeliveryChange }: RegisterFormProps) => {
   });
   const { createCustomer, isLoading, error } = useRegister();
   const onSubmit = async (data: TRegisterFieldsSchema) => {
-    createCustomer(prepareData(data, sameAsDelivery));
+    await createCustomer(prepareData(data, sameAsDelivery));
   };
   const sameAsDelivery = watch('sameAsDelivery');
 

@@ -7,10 +7,17 @@ import Register from './pages/Register/RegisterPage';
 import { RedirectIfAuthenticated } from './ProtectedRoute';
 import { RoootLayout } from './components/RootLayout/RoootLayout';
 import { CatalogPage } from './pages/Catalog/CatalogPage';
-import { Profile } from './pages/Profile/ProfilePage';
+import {
+  DefaultProfileContent,
+  Profile,
+  LogoutHandler,
+} from './pages/Profile/ProfilePage';
 import ProductPage from './pages/ProductPage/ProductPage';
 
 import { AppRoute } from '@/routes/appRoutes';
+import { PersonalContent } from '@/pages/Profile/PersonalContent';
+import { AddressContent } from '@/pages/Profile/AddressContent';
+import { PasswordUpdate } from '@/pages/Profile/PasswordUpdate';
 
 function App() {
   return (
@@ -44,7 +51,13 @@ function App() {
             </RedirectIfAuthenticated>
           }
           path={AppRoute.profile}
-        />
+        >
+          <Route index element={<DefaultProfileContent />} />
+          <Route element={<PersonalContent />} path="personal" />
+          <Route element={<AddressContent />} path="addresses" />
+          <Route element={<PasswordUpdate />} path="password" />
+          <Route element={<LogoutHandler />} path="logout" />
+        </Route>
 
         <Route element={<NotFound />} path={AppRoute.notFound} />
 

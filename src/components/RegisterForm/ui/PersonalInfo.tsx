@@ -55,7 +55,7 @@ export function PersonalInfo({
             {...register('email')}
             errorMessage={errors.email?.message}
             isDisabled={personalProps?.disabled}
-            isInvalid={errors.email?.message ? true : false}
+            isInvalid={!!errors.email?.message}
             {...field}
           />
         )}
@@ -63,7 +63,7 @@ export function PersonalInfo({
       {Boolean(personalProps?.showPassword) && (
         <PasswordInput
           errorMessage={errors.password?.message}
-          isInvalid={errors.password?.message ? true : false}
+          isInvalid={!!errors.password?.message}
           register={register('password')}
         />
       )}
@@ -78,7 +78,7 @@ export function PersonalInfo({
             {...register('firstName')}
             errorMessage={errors.firstName?.message}
             isDisabled={personalProps?.disabled}
-            isInvalid={errors.firstName?.message ? true : false}
+            isInvalid={!!errors.firstName?.message}
             {...field}
           />
         )}
@@ -94,7 +94,7 @@ export function PersonalInfo({
             {...register('lastName')}
             errorMessage={errors.lastName?.message}
             isDisabled={personalProps?.disabled}
-            isInvalid={errors.lastName?.message ? true : false}
+            isInvalid={!!errors.lastName?.message}
             {...field}
           />
         )}
