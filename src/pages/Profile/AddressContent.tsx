@@ -1,25 +1,25 @@
 import { BaseAddress, Customer } from '@commercetools/platform-sdk';
 import { Chip, useDisclosure } from '@heroui/react';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useState } from 'react';
 import { CircleCheckBig, Plus } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { undefined } from 'zod';
 
-import { EditableCard } from './EditableCard';
 import { CheckBoxes } from './Checkboxes';
+import { EditableCard } from './EditableCard';
 import { ProfileModal } from './Modal';
 import styles from './ProfilePage.module.scss';
 
-import { CustomerSettings } from '@/shared/store/customerProfile';
 import {
   REGISTER_SCHEMA,
   TRegisterFieldsSchema,
 } from '@/components/RegisterForm/lib/utils';
 import { AddressFields } from '@/components/RegisterForm/ui/Address';
+import { useSession } from '@/shared/model/useSession';
 import { CodeToCountry } from '@/shared/store/countries';
+import { CustomerSettings } from '@/shared/store/customerProfile';
 import { AddressType } from '@/types';
-import { useSession } from '@/shared/model/useSession.ts';
 //TODO решить конфликты с типами
 
 export function AddressContent() {
@@ -180,7 +180,7 @@ function CardAddress({
     createAddress,
     deleteAddress,
   } = CustomerSettings();
-  const addressId = id;
+  const addressId = id || '';
 
   const onSubmit = async (value: boolean) => {
     if (Object.keys(errors).length === 0) {
@@ -246,6 +246,7 @@ function CardAddress({
       addressEdit={Boolean(!createMode)}
       className=" h-fit min-h-[410px]  w-[320px] p-[20px] sm:col-span-1  md:col-span-2 lg:col-span-3"
       editmode={createMode}
+      createAddress={isNewAddress}
       headerChildren={
         <div
           className={
@@ -254,7 +255,7 @@ function CardAddress({
               : ' absolute right-5  top-5'
           }
         >
-          {prop?.default && !mode && (
+          {prop?.default && !mode && !isNewAddress && (
             <Chip
               color="secondary"
               endContent={<CircleCheckBig size={18} />}
@@ -263,9 +264,7 @@ function CardAddress({
               {prop.type}
             </Chip>
           )}
-          {(mode || createMode) && (
-            <CheckBoxes register={register} watch={watch()} />
-          )}
+          {(mode || createMode) && <CheckBoxes register={register} />}
         </div>
       }
       headerClass={
@@ -301,12 +300,6 @@ function CardAddress({
         <AddressFields
           control={control}
           disabled={!mode || isLoading}
-          // disabled={isNewAddress ? Boolean(!createMode) : Boolean(!mode)}
-          // disabled={
-          //   isNewAddress
-          //     ? Boolean(!createMode & Boolean(!isLoading))
-          //     : Boolean(!mode & Boolean(!isLoading))
-          // }
           editmode={mode}
           errors={errors}
           newAddress={isNewAddress}
@@ -324,7 +317,10 @@ function CardAddress({
       className="flex h-[410px] w-[320px] cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-[20px] text-primary transition-colors hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 sm:col-span-4"
       role="button"
       tabIndex={0}
-      onClick={() => setCreateMode(true)}
+      onClick={() => {
+        setCreateMode(true);
+        setMode(true);
+      }}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           setCreateMode(true);

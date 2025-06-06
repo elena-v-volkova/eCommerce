@@ -5,6 +5,8 @@ import {
   CustomerUpdateAction,
   InvalidCurrentPasswordError,
   MyCustomerChangePassword,
+  ErrorResponse,
+  ErrorObject,
 } from '@commercetools/platform-sdk';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -16,7 +18,6 @@ import { ADDRESS_ACTION, PERSONAL_DATA_ACTION } from './updateUtils';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
 import { createPasswordFlowClient } from '@/commercetools/login';
-import { ResponseError } from '@/types/commercetools';
 import { PersonalFields } from '@/pages/Profile/PersonalContent';
 import {
   AddressFields,
@@ -88,7 +89,7 @@ export function CustomerSettings() {
 
         return customer;
       })
-      .catch((error) => {
+      .catch((error: ErrorObject) => {
         isInvalidCurrentPasswordError(error)
           ? setError('Invalid Current Password')
           : setError(error.code);
@@ -126,7 +127,7 @@ export function CustomerSettings() {
 
         return customer;
       })
-      .catch((error: ResponseError) => {
+      .catch((error: ErrorResponse) => {
         setError(error.message);
         throw new Error(error.message);
       })
@@ -182,8 +183,8 @@ export function CustomerSettings() {
     if (!newAddress) return;
     const address = JSON.parse(JSON.stringify(newAddress.address));
 
-    const getIds = (user: Customer): String[] => {
-      return user.addresses.reduce<String[]>((reducer, item: BaseAddress) => {
+    const getIds = (user: Customer): string[] => {
+      return user.addresses.reduce((reducer: string[], item: BaseAddress) => {
         reducer.push(item.id || '');
 
         return reducer;

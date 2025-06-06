@@ -14,7 +14,7 @@ import {
   REGISTER_SCHEMA,
   TRegisterFieldsSchema,
 } from '@/components/RegisterForm/lib/utils';
-import { useSession } from '@/shared/model/useSession.ts';
+import { useSession } from '@/shared/model/useSession';
 
 const PERSONAL_SCHEMA = REGISTER_SCHEMA.pick({
   email: true,
