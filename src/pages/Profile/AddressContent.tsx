@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { undefined } from 'zod';
 
-import { CheckBoxes } from './Checkboxes';
+import { CheckBoxes } from './AddressCheckBoxes.tsx';
 import { EditableCard } from './EditableCard';
 import { ProfileModal } from './Modal';
 import styles from './ProfilePage.module.scss';
@@ -20,7 +20,7 @@ import { useSession } from '@/shared/model/useSession';
 import { CodeToCountry } from '@/shared/store/countries';
 import { CustomerSettings } from '@/shared/store/customerProfile';
 import { AddressType } from '@/types';
-//TODO решить конфликты с типами
+import { showAddressType } from '@/pages/Profile/showAddressType.ts';
 
 export function AddressContent() {
   const { user } = useSession();
@@ -39,7 +39,7 @@ export function AddressContent() {
       {addresses &&
         addresses.length > 0 &&
         addresses.map((item: BaseAddress) => {
-          const info = checkVariants(item.id || '', customer);
+          const info = showAddressType(item.id || '', customer);
 
           return (
             <CardAddress
@@ -57,58 +57,15 @@ export function AddressContent() {
   );
 }
 
-function checkVariants(id: string, customer: Customer): AddressType {
-  const isDefaultShipping = (customer.defaultShippingAddressId || '') === id;
-  const isDefaultBilling = (customer.defaultBillingAddressId || '') === id;
-  const isShipping = customer.shippingAddressIds?.includes(id);
-  const isBilling = customer.billingAddressIds?.includes(id);
-
-  let isDefault: boolean;
-  let type: string;
-
-  if (isDefaultShipping && isDefaultBilling) {
-    isDefault = true;
-    type = 'Default';
-  } else if (isDefaultShipping) {
-    isDefault = isDefaultShipping;
-    type = 'Default shipping';
-  } else {
-    isDefault = isDefaultBilling;
-    type = isDefaultBilling ? 'Default billing' : undefined;
-  }
-
-  if (isShipping && isBilling) {
-    return {
-      label: isDefault ? 'Shipping<br>& Billing' : 'Shipping & Billing',
-      default: isDefault,
-      type: type,
-    };
-  }
-  if (isShipping)
-    return {
-      label: !isDefault ? 'Shipping' : 'Address',
-      default: isDefault,
-      type: type,
-    };
-  if (isBilling)
-    return {
-      label: !isDefault ? 'Billing' : 'Address',
-      default: isDefault,
-      type: type,
-    };
-
-  return { label: 'Address', default: false, type: undefined };
-}
-
 const ADDRESS_SCHEMA = REGISTER_SCHEMA.pick({ address: true });
 
 export type AddressFields = Pick<TRegisterFieldsSchema, 'address'>;
-export type NewAddressFields = {
+export type ProfileAddressFields = {
   address: AddressFields;
-  shipping?: boolean;
-  billing?: boolean;
-  defaultShipping?: boolean;
-  defaultBilling?: boolean;
+  shipping: boolean;
+  billing: boolean;
+  defaultShipping: boolean;
+  defaultBilling: boolean;
 };
 
 function CardAddress({
@@ -131,39 +88,40 @@ function CardAddress({
     reset,
     control,
     getValues,
-    watch,
     formState: { errors },
-  } = useForm<AddressFields>({
+  } = useForm<ProfileAddressFields>({
     resolver: zodResolver(ADDRESS_SCHEMA),
     mode: 'onChange',
-    defaultValues: isNewAddress
-      ? {
-          shipping: false,
-          billing: false,
-          defaultShipping: false,
-          defaultBilling: false,
-          address: {
-            country: '',
-            city: '',
-            postalCode: '',
-            streetName: '',
-          },
-        }
-      : {
-          shipping: false,
-          billing: false,
-          defaultShipping: false,
-          defaultBilling: false,
-          address: {
-            country: CodeToCountry(address.country) || '',
-            city: address.city || '',
-            postalCode: address.postalCode || '',
-            streetName: address.streetName || '',
-          },
-        },
+    defaultValues: {
+      shipping: prop?.shipping || false,
+      billing: prop?.billing || false,
+      defaultShipping: prop?.defaultShipping || false,
+      defaultBilling: prop?.defaultBilling || false,
+      address: {
+        country: CodeToCountry(address?.country) || '',
+        city: address?.city || '',
+        postalCode: address?.postalCode || '',
+        streetName: address?.streetName || '',
+      },
+    },
   });
-  const [mode, setMode] = useState<boolean>(isNewAddress);
 
+  useEffect(() => {
+    reset({
+      shipping: prop?.shipping || false,
+      billing: prop?.billing || false,
+      defaultShipping: prop?.defaultShipping || false,
+      defaultBilling: prop?.defaultBilling || false,
+      address: {
+        country: CodeToCountry(address?.country) || '',
+        city: address?.city || '',
+        postalCode: address?.postalCode || '',
+        streetName: address?.streetName || '',
+      },
+    });
+  }, [prop, address]);
+
+  const [mode, setMode] = useState<boolean>(isNewAddress);
   const title = (() => {
     if (prop && prop.label) {
       return prop.label;
@@ -192,7 +150,7 @@ function CardAddress({
         } else {
           customer = await editAddress(addressId, getValues());
         }
-        // reset();
+        // reset( );
         resetError();
         if (isNewAddress) reset();
         setCreateMode(!value);
@@ -245,8 +203,8 @@ function CardAddress({
     <EditableCard
       addressEdit={Boolean(!createMode)}
       className=" h-fit min-h-[410px]  w-[320px] p-[20px] sm:col-span-1  md:col-span-2 lg:col-span-3"
-      editmode={createMode}
       createAddress={isNewAddress}
+      editmode={createMode}
       headerChildren={
         <div
           className={

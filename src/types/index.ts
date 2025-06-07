@@ -7,6 +7,7 @@ import {
   Control,
   FieldValues,
 } from 'react-hook-form';
+import { AddressCheckBoxes } from '@/pages/Profile/AddressCheckBoxes.tsx';
 
 export type IconSvgProps = SVGProps<SVGSVGElement> & {
   size?: number;
@@ -32,4 +33,4 @@ export type AddressType = {
   label: 'Shipping Address' | 'Billing Address' | 'Shipping & Billing' | 'NEW';
   default: boolean;
   type: 'billing' | 'shipping' | 'universal' | undefined;
-};
+} & AddressCheckBoxes;

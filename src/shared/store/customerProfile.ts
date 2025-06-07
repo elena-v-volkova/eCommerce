@@ -21,7 +21,7 @@ import { createPasswordFlowClient } from '@/commercetools/login';
 import { PersonalFields } from '@/pages/Profile/PersonalContent';
 import {
   AddressFields,
-  NewAddressFields,
+  ProfileAddressFields,
 } from '@/pages/Profile/AddressContent';
 
 function getVersion(): number {
@@ -161,7 +161,7 @@ export function CustomerSettings() {
 
   const editAddress = async (
     addressId: string,
-    editedAddress: NewAddressFields,
+    editedAddress: ProfileAddressFields,
   ): Promise<Customer | void> => {
     if (!addressId || !editedAddress) return;
     const request = ADDRESS_ACTION.change(
@@ -178,7 +178,7 @@ export function CustomerSettings() {
   };
 
   const createAddress = async (
-    newAddress: NewAddressFields,
+    newAddress: ProfileAddressFields,
   ): Promise<Customer | void> => {
     if (!newAddress) return;
     const address = JSON.parse(JSON.stringify(newAddress.address));
@@ -269,7 +269,7 @@ export function CustomerSettings() {
   };
 
   const setAddressTypes = async (
-    addr: NewAddressFields,
+    addr: ProfileAddressFields,
     addressId: string,
   ): Promise<Customer | void> => {
     const canNotify = false;
