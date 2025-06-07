@@ -7,7 +7,7 @@ import {
   Control,
   FieldValues,
 } from 'react-hook-form';
-import { AddressCheckBoxes } from '@/pages/Profile/AddressCheckBoxes.tsx';
+import { AddressCheckBoxes } from '@/pages/Profile/AddressCheckBoxes';
 
 export type IconSvgProps = SVGProps<SVGSVGElement> & {
   size?: number;

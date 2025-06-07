@@ -2,7 +2,7 @@ import { Customer } from '@commercetools/platform-sdk';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { parseDate } from '@internationalized/date';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDisclosure } from '@heroui/react';
 
 import { ProfileModal } from './Modal';
@@ -30,7 +30,7 @@ export type PersonalFields = Pick<
 
 export function PersonalContent() {
   const { user } = useSession();
-  const [customer, setCustomer] = useState<Customer>(user);
+  const [customer, setCustomer] = useState<Customer | null>(user);
 
   const {
     reset,
@@ -42,9 +42,9 @@ export function PersonalContent() {
     resolver: zodResolver(PERSONAL_SCHEMA),
     mode: 'onChange',
     defaultValues: {
-      email: customer?.email,
-      firstName: customer?.firstName,
-      lastName: customer?.lastName,
+      email: customer?.email || undefined,
+      firstName: customer?.firstName || undefined,
+      lastName: customer?.lastName || undefined,
       dateOfBirth: customer?.dateOfBirth
         ? parseDate(customer.dateOfBirth)
         : undefined,
@@ -52,13 +52,23 @@ export function PersonalContent() {
     },
   });
 
+  useEffect(() => {
+    reset({
+      email: customer?.email,
+      firstName: customer?.firstName,
+      lastName: customer?.lastName,
+      dateOfBirth: customer?.dateOfBirth
+        ? parseDate(customer.dateOfBirth)
+        : undefined,
+      password: undefined,
+    });
+  }, [customer]);
   const [mode, setMode] = useState(false);
 
   const { isLoading, error, resetError, editPersonal } = CustomerSettings();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const onSubmit = async (value: boolean): Promise<true | undefined> => {
-    // handleSubmit();
     if (Object.keys(errors).length === 0) {
       try {
         await editPersonal(getValues()).then((data) => {

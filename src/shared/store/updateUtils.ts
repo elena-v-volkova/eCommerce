@@ -11,6 +11,8 @@ import {
   MyCustomerAddBillingAddressIdAction,
   MyCustomerSetFirstNameAction,
   MyCustomerSetLastNameAction,
+  MyCustomerRemoveShippingAddressIdAction,
+  MyCustomerRemoveBillingAddressIdAction,
 } from '@commercetools/platform-sdk';
 import { DateValue } from '@heroui/react';
 
@@ -81,6 +83,27 @@ export const ADDRESS_ACTION = {
   }),
   setBilling: (addressId: string): MyCustomerAddBillingAddressIdAction => ({
     action: 'addBillingAddressId',
+    addressId: addressId,
+  }),
+
+  unsetDefaultShipping: (): MyCustomerSetDefaultShippingAddressAction => ({
+    action: 'setDefaultShippingAddress',
+    addressId: undefined,
+  }),
+  unsetDefaultBilling: (): MyCustomerSetDefaultBillingAddressAction => ({
+    action: 'setDefaultBillingAddress',
+    addressId: undefined,
+  }),
+  unsetShipping: (
+    addressId: string,
+  ): MyCustomerRemoveShippingAddressIdAction => ({
+    action: 'removeShippingAddressId',
+    addressId: addressId,
+  }),
+  unsetBilling: (
+    addressId: string,
+  ): MyCustomerRemoveBillingAddressIdAction => ({
+    action: 'removeBillingAddressId',
     addressId: addressId,
   }),
 };

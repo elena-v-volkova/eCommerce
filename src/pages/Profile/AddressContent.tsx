@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { undefined } from 'zod';
 
-import { CheckBoxes } from './AddressCheckBoxes.tsx';
+import { CheckBoxes } from './AddressCheckBoxes';
 import { EditableCard } from './EditableCard';
 import { ProfileModal } from './Modal';
 import styles from './ProfilePage.module.scss';
@@ -20,7 +20,7 @@ import { useSession } from '@/shared/model/useSession';
 import { CodeToCountry } from '@/shared/store/countries';
 import { CustomerSettings } from '@/shared/store/customerProfile';
 import { AddressType } from '@/types';
-import { showAddressType } from '@/pages/Profile/showAddressType.ts';
+import { showAddressType } from '@/pages/Profile/showAddressType';
 
 export function AddressContent() {
   const { user } = useSession();
@@ -81,6 +81,18 @@ function CardAddress({
   isNewAddress: boolean;
   onUpdate: (value: Customer) => void;
 }) {
+  let initialValues: ProfileAddressFields = {
+    shipping: prop?.shipping || false,
+    billing: prop?.billing || false,
+    defaultShipping: prop?.defaultShipping || false,
+    defaultBilling: prop?.defaultBilling || false,
+    address: {
+      country: CodeToCountry(address?.country) || '',
+      city: address?.city || '',
+      postalCode: address?.postalCode || '',
+      streetName: address?.streetName || '',
+    },
+  };
   const {
     register,
     trigger,
@@ -92,22 +104,11 @@ function CardAddress({
   } = useForm<ProfileAddressFields>({
     resolver: zodResolver(ADDRESS_SCHEMA),
     mode: 'onChange',
-    defaultValues: {
-      shipping: prop?.shipping || false,
-      billing: prop?.billing || false,
-      defaultShipping: prop?.defaultShipping || false,
-      defaultBilling: prop?.defaultBilling || false,
-      address: {
-        country: CodeToCountry(address?.country) || '',
-        city: address?.city || '',
-        postalCode: address?.postalCode || '',
-        streetName: address?.streetName || '',
-      },
-    },
+    defaultValues: initialValues,
   });
 
   useEffect(() => {
-    reset({
+    initialValues = {
       shipping: prop?.shipping || false,
       billing: prop?.billing || false,
       defaultShipping: prop?.defaultShipping || false,
@@ -118,7 +119,8 @@ function CardAddress({
         postalCode: address?.postalCode || '',
         streetName: address?.streetName || '',
       },
-    });
+    };
+    reset(initialValues);
   }, [prop, address]);
 
   const [mode, setMode] = useState<boolean>(isNewAddress);
@@ -137,6 +139,7 @@ function CardAddress({
     editAddress,
     createAddress,
     deleteAddress,
+    unsetAddressTypes,
   } = CustomerSettings();
   const addressId = id || '';
 
@@ -148,6 +151,7 @@ function CardAddress({
         if (isNewAddress) {
           customer = await createAddress(getValues());
         } else {
+          await unsetAddressTypes(initialValues, getValues(), addressId);
           customer = await editAddress(addressId, getValues());
         }
         // reset( );

@@ -226,67 +226,55 @@ export function CustomerSettings() {
     return updateAction([request], 'Address deleted!');
   };
 
-  const setShipping = async (
-    addressId: string,
-    isNotified = true,
-  ): Promise<Customer | void> => {
-    return updateAction(
-      [ADDRESS_ACTION.setShipping(addressId)],
-      'successful',
-      isNotified,
-    );
-  };
-  const setBilling = async (
-    addressId: string,
-    isNotified = true,
-  ): Promise<Customer | void> => {
-    return updateAction(
-      [ADDRESS_ACTION.setBilling(addressId)],
-      'successful',
-      isNotified,
-    );
-  };
-
-  const setDefaultBilling = async (
-    addressId: string,
-    isNotified = true,
-  ): Promise<Customer | void> => {
-    return updateAction(
-      [ADDRESS_ACTION.setDefaultBilling(addressId)],
-      'successful',
-      isNotified,
-    );
-  };
-  const setDefaultShipping = async (
-    addressId: string,
-    isNotified = true,
-  ): Promise<Customer | void> => {
-    return updateAction(
-      [ADDRESS_ACTION.setDefaultShipping(addressId)],
-      'successful',
-      isNotified,
-    );
-  };
-
   const setAddressTypes = async (
     addr: ProfileAddressFields,
     addressId: string,
   ): Promise<Customer | void> => {
+    let actions = Array<CustomerUpdateAction>();
     const canNotify = false;
 
-    if (addr.billing === true) {
-      await setBilling(addressId, canNotify);
-      if (addr.defaultBilling === true) {
-        await setDefaultBilling(addressId, canNotify);
+    if (addr.billing) {
+      actions.push(ADDRESS_ACTION.setBilling(addressId));
+      if (addr.defaultBilling) {
+        actions.push(ADDRESS_ACTION.setDefaultBilling(addressId));
       }
     }
-    if (addr.shipping === true) {
-      await setShipping(addressId, canNotify);
-      if (addr.defaultShipping === true) {
-        await setDefaultShipping(addressId, canNotify);
+    if (addr.shipping) {
+      actions.push(ADDRESS_ACTION.setShipping(addressId));
+      if (addr.defaultShipping) {
+        actions.push(ADDRESS_ACTION.setDefaultShipping(addressId));
       }
     }
+    if (actions.length > 0) {
+      return await updateAction(actions, 'Types address changed', canNotify);
+    }
+
+    return;
   };
+
+  const unsetAddressTypes = async (
+    initialValues: ProfileAddressFields,
+    currentValues: ProfileAddressFields,
+    addressId: string,
+  ): Promise<Customer | void> => {
+    let actions = Array<CustomerUpdateAction>();
+    const canNotify = false;
+
+    if (initialValues.defaultBilling && !currentValues.defaultBilling)
+      actions.push(ADDRESS_ACTION.unsetDefaultBilling());
+    if (initialValues.defaultShipping && !currentValues.defaultShipping)
+      actions.push(ADDRESS_ACTION.unsetDefaultShipping());
+    if (initialValues.shipping && !currentValues.shipping)
+      actions.push(ADDRESS_ACTION.unsetShipping(addressId));
+    if (initialValues.billing && !currentValues.billing)
+      actions.push(ADDRESS_ACTION.unsetBilling(addressId));
+    if (actions.length > 0) {
+      return await updateAction(actions, 'Types address changed', canNotify);
+    }
+
+    return;
+  };
+
   const editPersonal = async (
     personal: PersonalFields,
   ): Promise<Customer | void> => {
@@ -311,6 +299,7 @@ export function CustomerSettings() {
     editPersonal,
     createAddress,
     deleteAddress,
+    unsetAddressTypes,
   };
 }
 
