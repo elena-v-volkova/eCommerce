@@ -1,10 +1,15 @@
 import { Checkbox, Input, Select, SelectItem } from '@heroui/react';
-import { UseFormRegister } from 'react-hook-form';
+import { Controller, UseFormRegister } from 'react-hook-form';
+import React from 'react';
 
 import { TRegisterFieldsSchema } from '../lib/utils';
 
 import { COUNTRIES } from '@/shared/store/countries';
 import { AddressFieldsProps } from '@/types';
+
+type TAddressFields = AddressFieldsProps<
+  Pick<TRegisterFieldsSchema, 'address'>
+>;
 
 export const AddressFields = ({
   title,
@@ -13,54 +18,106 @@ export const AddressFields = ({
   errors,
   setValue,
   trigger,
-}: AddressFieldsProps<TRegisterFieldsSchema>) => {
+  disabled = false,
+  newAddress = true,
+  control,
+}: AddressFieldsProps<TAddressFields>) => {
   return (
     <>
       <h4 className="mb-2.5">{title}</h4>
-      <Select
-        aria-label={`${prefix} country`}
-        className="py-0"
-        placeholder="Select Country"
-        {...register(`${prefix}.country`)}
-        errorMessage={errors[prefix]?.country?.message}
-        isInvalid={errors[prefix]?.country?.message ? true : false}
-        onChange={(e) => {
-          const value = e.target.value;
+      <Controller
+        control={control}
+        name={`${prefix}.country`}
+        render={({ field, fieldState }) => {
+          const { ref: registerRef, ...registerProps } = register(
+            `${prefix}.country`,
+          );
+          const selectProps = {
+            ...registerProps,
+            ...field,
+            ref: (e: HTMLSelectElement | null) => {
+              registerRef(e);
+              field.ref(e);
+            },
+          };
 
-          setValue(`${prefix}.country`, value);
-          trigger(`${prefix}.postalCode`);
-          trigger(`${prefix}.country`);
+          return (
+            <Select
+              {...selectProps}
+              aria-label={`${prefix} country`}
+              className="py-0"
+              errorMessage={fieldState.error?.message}
+              isDisabled={disabled}
+              isInvalid={!!fieldState.error}
+              placeholder="Select Country"
+              selectedKeys={field.value ? [field.value] : []}
+              onChange={(e) => {
+                const value = e.target.value;
+
+                setValue(`${prefix}.country`, value);
+                trigger(`${prefix}.postalCode`);
+                trigger(`${prefix}.country`);
+              }}
+              onSelectionChange={(keys) => {
+                const value = Array.from(keys)[0] as string;
+
+                field.onChange(value);
+                trigger(`${prefix}.postalCode`);
+              }}
+            >
+              {COUNTRIES.map((country) => (
+                <SelectItem key={country}>{country}</SelectItem>
+              ))}
+            </Select>
+          );
         }}
-      >
-        {COUNTRIES.map((country) => (
-          <SelectItem key={country}>{country}</SelectItem>
-        ))}
-      </Select>
-
-      <Input
-        label="Enter city"
-        labelPlacement="outside"
-        {...register(`${prefix}.city`)}
-        errorMessage={errors[prefix]?.city?.message}
-        isInvalid={errors[prefix]?.city?.message ? true : false}
       />
-
-      <Input
-        label="Enter street"
-        labelPlacement="outside"
-        type="text"
-        {...register(`${prefix}.streetName`)}
-        errorMessage={errors[prefix]?.streetName?.message}
-        isInvalid={errors[prefix]?.streetName?.message ? true : false}
+      <Controller
+        control={control}
+        name={`${prefix}.city`}
+        render={({ field }) => (
+          <Input
+            label={!newAddress ? 'City' : 'Enter city'}
+            labelPlacement="outside"
+            {...register(`${prefix}.city`)}
+            errorMessage={errors[prefix]?.city?.message}
+            isDisabled={disabled}
+            isInvalid={!!errors[prefix]?.city?.message}
+            {...field}
+          />
+        )}
       />
-
-      <Input
-        label="Postal code"
-        labelPlacement="outside"
-        type="text"
-        {...register(`${prefix}.postalCode`)}
-        errorMessage={errors[prefix]?.postalCode?.message}
-        isInvalid={errors[prefix]?.postalCode?.message ? true : false}
+      <Controller
+        control={control}
+        name={`${prefix}.streetName`}
+        render={({ field }) => (
+          <Input
+            label={!newAddress ? 'Street' : 'Enter street'}
+            labelPlacement="outside"
+            type="text"
+            {...register(`${prefix}.streetName`)}
+            errorMessage={errors[prefix]?.streetName?.message}
+            isDisabled={disabled}
+            isInvalid={!!errors[prefix]?.streetName?.message}
+            {...field}
+          />
+        )}
+      />
+      <Controller
+        control={control}
+        name={`${prefix}.postalCode`}
+        render={({ field }) => (
+          <Input
+            label="Postal code"
+            labelPlacement="outside"
+            type="text"
+            {...register(`${prefix}.postalCode`)}
+            errorMessage={errors[prefix]?.postalCode?.message}
+            isDisabled={disabled}
+            isInvalid={!!errors[prefix]?.postalCode?.message}
+            {...field}
+          />
+        )}
       />
     </>
   );

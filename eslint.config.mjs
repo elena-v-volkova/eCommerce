@@ -22,6 +22,9 @@ export default [
       '*.config.mjs',
       '*.config.ts',
       'commitlint.config.mjs',
+      '**/dist',
+      'esm/*',
+      'public/*',
     ],
     files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {

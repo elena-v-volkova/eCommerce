@@ -44,7 +44,7 @@ export const RegisterForm = ({ step, onDeliveryChange }: RegisterFormProps) => {
   });
   const { createCustomer, isLoading, error } = useRegister();
   const onSubmit = async (data: TRegisterFieldsSchema) => {
-    createCustomer(prepareData(data, sameAsDelivery));
+    await createCustomer(prepareData(data, sameAsDelivery));
   };
   const sameAsDelivery = watch('sameAsDelivery');
 
@@ -73,6 +73,7 @@ export const RegisterForm = ({ step, onDeliveryChange }: RegisterFormProps) => {
         {(step === 'shipping' || !step) && (
           <div className={styles.shipping}>
             <AddressFields
+              control={control}
               errors={errors}
               prefix="address"
               register={register}
@@ -107,6 +108,7 @@ export const RegisterForm = ({ step, onDeliveryChange }: RegisterFormProps) => {
         {(step === 'billing' || !step) && !sameAsDelivery && (
           <div className={styles.show_billing}>
             <AddressFields
+              control={control}
               errors={errors}
               prefix="billingAddress"
               register={register}

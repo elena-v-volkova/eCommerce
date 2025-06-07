@@ -3,50 +3,101 @@ import { today, getLocalTimeZone } from '@internationalized/date';
 import { I18nProvider } from '@react-aria/i18n';
 import { Controller } from 'react-hook-form';
 import { Input } from '@heroui/input';
-
-import { TRegisterFieldsSchema } from '../lib/utils';
+import { Customer } from '@commercetools/platform-sdk';
+import { DateValue } from '@heroui/react';
 
 import { PasswordInput } from '@/components/PasswordInput';
 import { FormFieldsProps } from '@/types';
+
+interface AdditionalProps {
+  personalProps: {
+    user: Customer | null;
+    disabled: boolean;
+    showPassword: boolean;
+  };
+}
+type PersonalFields = {
+  email: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: DateValue;
+  password?: string;
+};
+
+type PersonalInfoProps = Pick<
+  FormFieldsProps<PersonalFields>,
+  'title' | 'register' | 'errors' | 'control'
+> &
+  Partial<AdditionalProps>;
 
 export function PersonalInfo({
   title,
   register,
   errors,
   control,
-}: Pick<
-  FormFieldsProps<TRegisterFieldsSchema>,
-  'title' | 'register' | 'errors' | 'control'
->) {
+  personalProps = {
+    user: null,
+    disabled: false,
+    showPassword: true,
+  },
+}: PersonalInfoProps) {
   return (
     <>
-      <h4 className="mb-2.5">{title}</h4>
-      <Input
-        placeholder="Email"
-        {...register('email')}
-        errorMessage={errors.email?.message}
-        isInvalid={errors.email?.message ? true : false}
+      {title && <h4 className="mb-2.5">{title}</h4>}
+      <Controller
+        control={control}
+        name="email"
+        render={({ field }) => (
+          <Input
+            label={personalProps?.user ? 'Email' : undefined}
+            labelPlacement="outside"
+            placeholder="Email"
+            {...register('email')}
+            errorMessage={errors.email?.message}
+            isDisabled={personalProps?.disabled}
+            isInvalid={!!errors.email?.message}
+            {...field}
+          />
+        )}
       />
-      <PasswordInput
-        errorMessage={errors.password?.message}
-        isInvalid={errors.password?.message ? true : false}
-        register={register('password')}
+      {Boolean(personalProps?.showPassword) && (
+        <PasswordInput
+          errorMessage={errors.password?.message}
+          isInvalid={!!errors.password?.message}
+          register={register('password')}
+        />
+      )}
+      <Controller
+        control={control}
+        name="firstName"
+        render={({ field }) => (
+          <Input
+            label="First name"
+            labelPlacement="outside"
+            type="text"
+            {...register('firstName')}
+            errorMessage={errors.firstName?.message}
+            isDisabled={personalProps?.disabled}
+            isInvalid={!!errors.firstName?.message}
+            {...field}
+          />
+        )}
       />
-      <Input
-        label="First name"
-        labelPlacement="outside"
-        type="text"
-        {...register('firstName')}
-        errorMessage={errors.firstName?.message}
-        isInvalid={errors.firstName?.message ? true : false}
-      />
-      <Input
-        label="Last name"
-        labelPlacement="outside"
-        type="text"
-        {...register('lastName')}
-        errorMessage={errors.lastName?.message}
-        isInvalid={errors.lastName?.message ? true : false}
+      <Controller
+        control={control}
+        name="lastName"
+        render={({ field }) => (
+          <Input
+            label="Last name"
+            labelPlacement="outside"
+            type="text"
+            {...register('lastName')}
+            errorMessage={errors.lastName?.message}
+            isDisabled={personalProps?.disabled}
+            isInvalid={!!errors.lastName?.message}
+            {...field}
+          />
+        )}
       />
 
       <Controller
@@ -57,13 +108,13 @@ export function PersonalInfo({
             <DateInput
               {...register('dateOfBirth')}
               errorMessage={errors.dateOfBirth?.message}
+              isDisabled={personalProps?.disabled}
               isInvalid={!!errors.dateOfBirth}
               label="Date of birth"
               labelPlacement="outside"
               placeholderValue={today(getLocalTimeZone())}
-              onChange={(value) => {
-                field.onChange(value);
-              }}
+              value={field.value ? field.value : undefined}
+              onChange={field.onChange}
             />
           </I18nProvider>
         )}
