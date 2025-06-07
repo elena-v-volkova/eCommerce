@@ -9,7 +9,8 @@ import {
 
 export const anonUserClient = new ClientBuilder()
   .withProjectKey(projectKey)
-  .withClientCredentialsFlow(authMiddlewareOptions)
+  .withAnonymousSessionFlow(authMiddlewareOptions)
+  // .withClientCredentialsFlow(authMiddlewareOptions)
   .withHttpMiddleware(httpMiddlewareOptions)
   // .withLoggerMiddleware()
   .build();

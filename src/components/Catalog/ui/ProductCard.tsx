@@ -3,6 +3,7 @@ import { Star, MapPin, Gauge, Car } from 'lucide-react';
 import { Card, CardBody, Image, Chip } from '@heroui/react';
 
 import { ProductsSimpleNew } from '../module/useProductSearch';
+// import useCart from '@/shared/model/useCart';
 interface IProductCard {
   product: ProductsSimpleNew;
   onClick: (product: ProductsSimpleNew) => void;
@@ -11,6 +12,7 @@ interface IProductCard {
 const ProductCard = ({ product, onClick }: IProductCard) => {
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  // const { cart } = useCart();
 
   const formatPrice = (centAmount: number, currency: string = 'USD') => {
     return (centAmount / 100).toLocaleString('en-US', {
