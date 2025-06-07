@@ -5,6 +5,8 @@ import {
   CustomerUpdateAction,
   InvalidCurrentPasswordError,
   MyCustomerChangePassword,
+  ErrorResponse,
+  ErrorObject,
 } from '@commercetools/platform-sdk';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -16,11 +18,10 @@ import { ADDRESS_ACTION, PERSONAL_DATA_ACTION } from './updateUtils';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
 import { createPasswordFlowClient } from '@/commercetools/login';
-import { ResponseError } from '@/types/commercetools';
 import { PersonalFields } from '@/pages/Profile/PersonalContent';
 import {
   AddressFields,
-  NewAddressFields,
+  ProfileAddressFields,
 } from '@/pages/Profile/AddressContent';
 
 function getVersion(): number {
@@ -88,7 +89,7 @@ export function CustomerSettings() {
 
         return customer;
       })
-      .catch((error) => {
+      .catch((error: ErrorObject) => {
         isInvalidCurrentPasswordError(error)
           ? setError('Invalid Current Password')
           : setError(error.code);
@@ -126,7 +127,7 @@ export function CustomerSettings() {
 
         return customer;
       })
-      .catch((error: ResponseError) => {
+      .catch((error: ErrorResponse) => {
         setError(error.message);
         throw new Error(error.message);
       })
@@ -160,7 +161,7 @@ export function CustomerSettings() {
 
   const editAddress = async (
     addressId: string,
-    editedAddress: NewAddressFields,
+    editedAddress: ProfileAddressFields,
   ): Promise<Customer | void> => {
     if (!addressId || !editedAddress) return;
     const request = ADDRESS_ACTION.change(
@@ -177,13 +178,13 @@ export function CustomerSettings() {
   };
 
   const createAddress = async (
-    newAddress: NewAddressFields,
+    newAddress: ProfileAddressFields,
   ): Promise<Customer | void> => {
     if (!newAddress) return;
     const address = JSON.parse(JSON.stringify(newAddress.address));
 
-    const getIds = (user: Customer): String[] => {
-      return user.addresses.reduce<String[]>((reducer, item: BaseAddress) => {
+    const getIds = (user: Customer): string[] => {
+      return user.addresses.reduce((reducer: string[], item: BaseAddress) => {
         reducer.push(item.id || '');
 
         return reducer;
@@ -225,67 +226,55 @@ export function CustomerSettings() {
     return updateAction([request], 'Address deleted!');
   };
 
-  const setShipping = async (
-    addressId: string,
-    isNotified = true,
-  ): Promise<Customer | void> => {
-    return updateAction(
-      [ADDRESS_ACTION.setShipping(addressId)],
-      'successful',
-      isNotified,
-    );
-  };
-  const setBilling = async (
-    addressId: string,
-    isNotified = true,
-  ): Promise<Customer | void> => {
-    return updateAction(
-      [ADDRESS_ACTION.setBilling(addressId)],
-      'successful',
-      isNotified,
-    );
-  };
-
-  const setDefaultBilling = async (
-    addressId: string,
-    isNotified = true,
-  ): Promise<Customer | void> => {
-    return updateAction(
-      [ADDRESS_ACTION.setDefaultBilling(addressId)],
-      'successful',
-      isNotified,
-    );
-  };
-  const setDefaultShipping = async (
-    addressId: string,
-    isNotified = true,
-  ): Promise<Customer | void> => {
-    return updateAction(
-      [ADDRESS_ACTION.setDefaultShipping(addressId)],
-      'successful',
-      isNotified,
-    );
-  };
-
   const setAddressTypes = async (
-    addr: NewAddressFields,
+    addr: ProfileAddressFields,
     addressId: string,
   ): Promise<Customer | void> => {
+    let actions = Array<CustomerUpdateAction>();
     const canNotify = false;
 
-    if (addr.billing === true) {
-      await setBilling(addressId, canNotify);
-      if (addr.defaultBilling === true) {
-        await setDefaultBilling(addressId, canNotify);
+    if (addr.billing) {
+      actions.push(ADDRESS_ACTION.setBilling(addressId));
+      if (addr.defaultBilling) {
+        actions.push(ADDRESS_ACTION.setDefaultBilling(addressId));
       }
     }
-    if (addr.shipping === true) {
-      await setShipping(addressId, canNotify);
-      if (addr.defaultShipping === true) {
-        await setDefaultShipping(addressId, canNotify);
+    if (addr.shipping) {
+      actions.push(ADDRESS_ACTION.setShipping(addressId));
+      if (addr.defaultShipping) {
+        actions.push(ADDRESS_ACTION.setDefaultShipping(addressId));
       }
     }
+    if (actions.length > 0) {
+      return await updateAction(actions, 'Types address changed', canNotify);
+    }
+
+    return;
   };
+
+  const unsetAddressTypes = async (
+    initialValues: ProfileAddressFields,
+    currentValues: ProfileAddressFields,
+    addressId: string,
+  ): Promise<Customer | void> => {
+    let actions = Array<CustomerUpdateAction>();
+    const canNotify = false;
+
+    if (initialValues.defaultBilling && !currentValues.defaultBilling)
+      actions.push(ADDRESS_ACTION.unsetDefaultBilling());
+    if (initialValues.defaultShipping && !currentValues.defaultShipping)
+      actions.push(ADDRESS_ACTION.unsetDefaultShipping());
+    if (initialValues.shipping && !currentValues.shipping)
+      actions.push(ADDRESS_ACTION.unsetShipping(addressId));
+    if (initialValues.billing && !currentValues.billing)
+      actions.push(ADDRESS_ACTION.unsetBilling(addressId));
+    if (actions.length > 0) {
+      return await updateAction(actions, 'Types address changed', canNotify);
+    }
+
+    return;
+  };
+
   const editPersonal = async (
     personal: PersonalFields,
   ): Promise<Customer | void> => {
@@ -310,6 +299,7 @@ export function CustomerSettings() {
     editPersonal,
     createAddress,
     deleteAddress,
+    unsetAddressTypes,
   };
 }
 

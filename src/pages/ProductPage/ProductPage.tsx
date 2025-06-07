@@ -6,7 +6,7 @@ import { Card, CardBody, CardHeader, Chip, Spinner } from '@heroui/react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 
-import { Price, ProductProjection } from './productPage.types.ts';
+import { Price, ProductProjection } from './productPage.types';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
 

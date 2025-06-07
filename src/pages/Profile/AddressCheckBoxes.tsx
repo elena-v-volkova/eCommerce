@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Checkbox } from '@heroui/react';
 import { UseFormRegister } from 'react-hook-form';
 
-type CheckBoxes = {
+export type AddressCheckBoxes = {
   shipping: boolean;
   billing: boolean;
   defaultShipping: boolean;
@@ -10,7 +10,7 @@ type CheckBoxes = {
 };
 
 interface CheckBoxesProps {
-  register: UseFormRegister<CheckBoxes>;
+  register: UseFormRegister<AddressCheckBoxes>;
 }
 
 export function CheckBoxes({ register }: CheckBoxesProps) {
