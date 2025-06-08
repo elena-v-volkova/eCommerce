@@ -23,6 +23,7 @@ import {
   useDisclosure,
   Divider,
   Pagination,
+  SharedSelection,
 } from '@heroui/react';
 import { useNavigate } from 'react-router';
 
@@ -115,7 +116,7 @@ const Catalog = () => {
     setSearchQuery('');
   }, []);
 
-  const handleSortChange = useCallback((keys: any) => {
+  const handleSortChange = useCallback((keys: SharedSelection) => {
     const selectedKey = Array.from(keys)[0];
 
     if (typeof selectedKey === 'string') {
@@ -127,7 +128,7 @@ const Catalog = () => {
     setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
   }, []);
 
-  const handleConditionChange = useCallback((keys: any) => {
+  const handleConditionChange = useCallback((keys: SharedSelection) => {
     const value = (Array.from(keys)[0] as string) || '';
 
     setFilters((prev) => ({ ...prev, condition: value }));

@@ -1,5 +1,4 @@
 import { Customer } from '@commercetools/platform-sdk';
-import { undefined } from 'zod';
 
 import { AddressType } from '@/types';
 
@@ -10,7 +9,7 @@ export function showAddressType(id: string, customer: Customer): AddressType {
   const isBilling = Boolean(customer.billingAddressIds?.includes(id));
 
   let isDefault: boolean;
-  let type: string;
+  let type: AddressType['type'];
 
   if (isDefaultShipping && isDefaultBilling) {
     isDefault = true;

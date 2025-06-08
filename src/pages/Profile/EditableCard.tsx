@@ -10,10 +10,10 @@ interface EditableCardProps {
   headerChildren?: React.ReactNode | null;
   children: React.ReactNode;
   className?: string;
-  onEdit?: (key: any) => void;
-  onSave: (key: any) => Promise<boolean | undefined>;
-  onDelete?: (key: any) => Promise<boolean | undefined>;
-  onCancel?: (key: any) => void;
+  onEdit?: (key: boolean) => void;
+  onSave: (key: boolean) => Promise<boolean | undefined>;
+  onDelete?: (key: boolean) => Promise<boolean | undefined>;
+  onCancel?: (key: boolean) => void;
   isLoading?: boolean;
   noErrors: boolean;
   addressEdit?: boolean;
@@ -66,7 +66,7 @@ export function EditableCard({
   };
 
   return (
-    <form onReset={onCancel} onSubmit={onSave}>
+    <form>
       <Card className={`${className}`}>
         <CardHeader
           className={

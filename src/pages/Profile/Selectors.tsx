@@ -1,12 +1,11 @@
 import { useNavigate } from 'react-router-dom';
-import { Listbox, ListboxItem } from '@heroui/react';
-import React from 'react';
+import { Listbox, ListboxItem, Selection } from '@heroui/react';
 
 export function Selectors() {
   const navigate = useNavigate();
 
-  const setPath = (key: React.Key) => {
-    const location = key.anchorKey;
+  const setPath = (key: Selection) => {
+    const location = Array.from(key).pop();
     const newPath = `/profile/${location}`;
 
     navigate(newPath);
