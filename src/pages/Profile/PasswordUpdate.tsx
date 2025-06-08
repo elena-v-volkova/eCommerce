@@ -10,7 +10,7 @@ import { EditableCard } from './EditableCard';
 import { REGISTER_SCHEMA } from '@/components/RegisterForm/lib/utils';
 import { PasswordInput } from '@/components/PasswordInput';
 import { CustomerSettings } from '@/shared/store/customerProfile';
-import { useSession } from '@/shared/model/useSession.ts';
+import { useSession } from '@/shared/model/useSession';
 
 const PASSWORD_UPDATE_SCHEMA = z
   .object({
