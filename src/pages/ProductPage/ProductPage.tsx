@@ -6,9 +6,8 @@ import { Card, CardBody, CardHeader, Chip, Spinner } from '@heroui/react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 
-import { Price, ProductProjection } from './productPage.types';
-
 import { apiAnonRoot } from '@/commercetools/anonUser';
+import { Price, ProductProjection } from '@commercetools/platform-sdk';
 
 export default function ProductPage() {
   const { key } = useParams() as { key: string };
@@ -25,7 +24,6 @@ export default function ProductPage() {
     } else {
       document.body.style.overflow = '';
     }
-
     return () => {
       document.body.style.overflow = '';
     };
@@ -33,7 +31,6 @@ export default function ProductPage() {
 
   useEffect(() => {
     let isMounted = true;
-
     setLoading(true);
 
     apiAnonRoot
@@ -73,11 +70,9 @@ export default function ProductPage() {
 
     allPrices.forEach((pr: Price) => {
       const { validFrom, validUntil } = pr;
-
       if (validFrom && validUntil) {
         const from = new Date(validFrom);
         const until = new Date(validUntil);
-
         if (from <= now && now <= until) {
           activeDiscount = pr;
         }
@@ -126,16 +121,16 @@ export default function ProductPage() {
 
       <Card className="overflow-hidden" radius="lg" shadow="lg">
         <div className="grid gap-4 md:grid-cols-2">
-          <div className="order-2 flex justify-center p-4 md:order-1 md:block">
-            <div className="mx-auto h-56 w-[70vw] overflow-hidden sm:h-64 md:mx-0 md:h-80 md:w-full lg:h-96">
+          <div className="order-2 md:order-1 p-4 flex justify-center md:block">
+            <div className="w-[70vw] md:w-full mx-auto md:mx-0 h-56 sm:h-64 md:h-80 lg:h-96 overflow-hidden">
               <Swiper
                 loop
                 navigation
-                className="size-full"
-                modules={[Navigation, Pagination]}
                 pagination={{ clickable: true }}
+                modules={[Navigation, Pagination]}
                 slidesPerView={1}
                 spaceBetween={10}
+                className="h-full w-full"
                 onSwiper={(swiper) => {
                   mainSwiperRef.current = swiper;
                 }}
@@ -162,9 +157,9 @@ export default function ProductPage() {
             </div>
           </div>
 
-          <div className="order-1 space-y-6 p-6 md:order-2">
+          <div className="order-1 md:order-2 space-y-6 p-6">
             <CardHeader className="p-0">
-              <h1 className="whitespace-normal break-words text-3xl font-bold">
+              <h1 className="text-3xl font-bold break-words whitespace-normal">
                 {product.name?.[LOCALE] ?? 'Untitled product'}
               </h1>
             </CardHeader>
@@ -186,7 +181,7 @@ export default function ProductPage() {
 
             {product.description?.[LOCALE] && (
               <CardBody className="p-0">
-                <p className="whitespace-normal break-words text-base leading-relaxed">
+                <p className="text-base leading-relaxed break-words whitespace-normal">
                   {product.description[LOCALE]}
                 </p>
               </CardBody>
@@ -194,7 +189,7 @@ export default function ProductPage() {
 
             {variant.attributes?.length && (
               <div>
-                <h2 className="mb-3 whitespace-normal break-words font-medium">
+                <h2 className="mb-3 font-medium break-words whitespace-normal">
                   Specifications
                 </h2>
                 <div className="flex flex-wrap gap-2">
@@ -203,7 +198,7 @@ export default function ProductPage() {
                       <span className="mr-1 text-xs text-gray-500">
                         {attr.name}:
                       </span>
-                      <span className="whitespace-normal break-words">
+                      <span className="break-words whitespace-normal">
                         {typeof attr.value === 'object'
                           ? (attr.value.label ?? attr.value.key)
                           : attr.value.toString()}
@@ -219,9 +214,9 @@ export default function ProductPage() {
 
       {openIndex !== null && (
         <div
-          className="fixed inset-0 z-50 bg-black/90"
-          role="presentation"
-          type="button"
+          className="fixed inset-0 z-50 bg-black bg-opacity-90"
+          role="button"
+          tabIndex={0}
           onClick={closeFullscreen}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === 'Escape') {
@@ -230,14 +225,15 @@ export default function ProductPage() {
           }}
         >
           <div
-            className="absolute left-1/2 top-[10vh] flex h-[80vh] w-[90vw] -translate-x-1/2 items-center justify-center md:w-[60vw] lg:w-[50vw]"
+            className="absolute left-1/2 top-[10vh] h-[80vh] w-[90vw] md:w-[60vw] lg:w-[50vw] -translate-x-1/2 flex items-center justify-center"
             role="presentation"
+            tabIndex={-1}
             onClick={(e) => e.stopPropagation()}
           >
             <button
-              className="absolute -right-2.5 -top-2.5 z-50 text-3xl text-white"
-              type="button"
+              className="absolute -top-2.5 -right-2.5 z-50 text-3xl text-white"
               onClick={closeFullscreen}
+              type="button"
             >
               &times;
             </button>
@@ -245,12 +241,12 @@ export default function ProductPage() {
             <Swiper
               loop
               navigation
-              className="size-full"
-              initialSlide={openIndex}
-              modules={[Navigation, Pagination]}
               pagination={{ clickable: true }}
+              modules={[Navigation, Pagination]}
               slidesPerView={1}
               spaceBetween={10}
+              initialSlide={openIndex}
+              className="h-full w-full"
             >
               {variant.images?.map((img) => (
                 <SwiperSlide key={img.url}>
