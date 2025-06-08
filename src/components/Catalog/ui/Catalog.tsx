@@ -339,6 +339,19 @@ const Catalog = () => {
         <h3 className="mb-3 font-semibold text-foreground">Condition</h3>
         <Select
           aria-label="Select vehicle condition"
+          endContent={
+            filters.condition && (
+              <button
+                className="text-foreground-400 hover:text-foreground-600"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setFilters((prev) => ({ ...prev, condition: '' }));
+                }}
+              >
+                ✕
+              </button>
+            )
+          }
           label="Vehicle Condition"
           placeholder="All Conditions"
           selectedKeys={filters.condition ? [filters.condition] : []}
@@ -356,6 +369,19 @@ const Catalog = () => {
         <h3 className="mb-3 font-semibold text-foreground">Transmission</h3>
         <Select
           aria-label="Select transmission type"
+          endContent={
+            filters.transmission && (
+              <button
+                className="text-foreground-400 hover:text-foreground-600"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setFilters((prev) => ({ ...prev, transmission: '' }));
+                }}
+              >
+                ✕
+              </button>
+            )
+          }
           label="Transmission Type"
           placeholder="All Transmissions"
           selectedKeys={filters.transmission ? [filters.transmission] : []}
@@ -372,14 +398,27 @@ const Catalog = () => {
         </Select>
       </div>
 
-      <Button
-        className="w-full"
-        color="warning"
-        variant="flat"
-        onPress={clearFilters}
-      >
-        Clear All Filters
-      </Button>
+      <div className="space-y-2">
+        <Button
+          className="w-full"
+          color="warning"
+          variant="flat"
+          onPress={clearFilters}
+        >
+          Clear All Filters
+        </Button>
+
+        {onClose && (
+          <Button
+            className="w-full"
+            color="primary" // Изменить цвет для лучшего выделения
+            variant="solid"
+            onPress={onClose}
+          >
+            Apply Filters
+          </Button>
+        )}
+      </div>
     </div>
   );
 
@@ -559,8 +598,9 @@ const Catalog = () => {
                       ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
                       : 'grid-cols-1'
                   }`}
+                  data-testid="products-list"
                 >
-                  {currentProducts.map((product) => (
+                  {currentProducts?.map((product) => (
                     <ProductCard
                       key={product.id}
                       product={product}
@@ -594,9 +634,9 @@ const Catalog = () => {
       {/* Mobile Filters Modal */}
       <Modal
         classNames={{
-          body: 'py-0',
+          body: 'py-4',
           backdrop: 'bg-background/50 backdrop-opacity-40',
-          base: 'border-none bg-content1 text-foreground',
+          base: 'border-none bg-content1 text-foreground h-[90vh]',
           header: 'border-b-[1px] border-divider',
           footer: 'border-t-[1px] border-divider',
         }}
@@ -611,8 +651,11 @@ const Catalog = () => {
               <ModalHeader className="flex flex-col gap-1">
                 Mobile Filters
               </ModalHeader>
-              <ModalBody>
-                <FiltersContent onClose={onClose} />
+              <ModalBody className="h-[calc(90vh-120px)] overflow-y-auto">
+                <div className="pb-4">
+                  {' '}
+                  <FiltersContent onClose={onClose} />
+                </div>
               </ModalBody>
             </>
           )}
