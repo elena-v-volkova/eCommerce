@@ -13,6 +13,7 @@ import {
   LogoutHandler,
 } from './pages/Profile/ProfilePage';
 import ProductPage from './pages/ProductPage/ProductPage';
+import { CartPage } from './pages/Cart/CartPage';
 
 import { AppRoute } from '@/routes/appRoutes';
 import { PersonalContent } from '@/pages/Profile/PersonalContent';
@@ -62,6 +63,7 @@ function App() {
         <Route element={<NotFound />} path={AppRoute.notFound} />
 
         <Route element={<ProductPage />} path={AppRoute.product} />
+        <Route element={<CartPage />} path={AppRoute.cart} />
       </Route>
     </Routes>
     // </Provider>
