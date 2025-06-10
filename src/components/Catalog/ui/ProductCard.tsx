@@ -1,14 +1,25 @@
 import { useState } from 'react';
-import { Star, MapPin, Gauge, Car } from 'lucide-react';
-import { Card, CardBody, Image, Chip } from '@heroui/react';
+import { MapPin, Gauge, Car, ShoppingCart } from 'lucide-react';
+import { Card, CardBody, Image, Chip, Button } from '@heroui/react';
+import { Cart } from '@commercetools/platform-sdk';
 
 import { ProductsSimpleNew } from '../module/useProductSearch';
+
 interface IProductCard {
   product: ProductsSimpleNew;
   onClick: (product: ProductsSimpleNew) => void;
+  cart: Cart | null;
+  addItem: (productId: string, variantId: number) => Promise<void>;
+  removeItem: (lineItemId: string) => Promise<void>;
 }
 
-const ProductCard = ({ product, onClick }: IProductCard) => {
+const ProductCard = ({
+  product,
+  onClick,
+  cart,
+  addItem,
+  removeItem,
+}: IProductCard) => {
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -21,12 +32,21 @@ const ProductCard = ({ product, onClick }: IProductCard) => {
     });
   };
 
+  const isInCart = cart?.lineItems?.some(
+    (item) => item.productId === product.id,
+  );
+
+  const lineItem = cart?.lineItems?.find(
+    (item) => item.productId === product.id,
+  );
+
   return (
     <Card
-      isPressable
+      as="div"
       className={`cursor-pointer transition-all duration-300 hover:scale-105 ${
         isHovered ? 'ring-2 ring-primary' : ''
       }`}
+      isPressable={true}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onPress={() => onClick(product)}
@@ -121,9 +141,20 @@ const ProductCard = ({ product, onClick }: IProductCard) => {
               </span>
             </div>
 
-            <div className="flex items-center gap-1">
-              <Star className="size-4 text-warning" />
-            </div>
+            <Button
+              className="flex items-center gap-1"
+              color="primary"
+              onPress={() => {
+                if (!isInCart) {
+                  addItem(product.id, product.variantId);
+                } else if (lineItem) {
+                  removeItem(lineItem.id);
+                }
+              }}
+            >
+              <ShoppingCart className="size-6 text-warning" />
+              {!isInCart ? 'Add to cart' : 'Remove from cart'}
+            </Button>
           </div>
         </div>
       </CardBody>

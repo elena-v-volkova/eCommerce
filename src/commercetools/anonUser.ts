@@ -1,17 +1,31 @@
-import { ClientBuilder } from '@commercetools/ts-client';
+import { Client, ClientBuilder } from '@commercetools/ts-client';
 import { createApiBuilderFromCtpClient } from '@commercetools/platform-sdk';
 
 import {
-  authMiddlewareOptions,
   httpMiddlewareOptions,
+  authUrl,
   projectKey,
+  clientId,
+  clientSecret,
+  anonymousTokenCache,
 } from './buildClient';
 
-export const anonUserClient = new ClientBuilder()
+import { getAnonymousId } from '@/shared/utils/anonymousId';
+
+const anonUserClient: Client = new ClientBuilder()
   .withProjectKey(projectKey)
-  .withClientCredentialsFlow(authMiddlewareOptions)
+  .withAnonymousSessionFlow({
+    host: authUrl,
+    projectKey: projectKey,
+    credentials: {
+      clientId: clientId,
+      clientSecret: clientSecret,
+      anonymousId: getAnonymousId(),
+    },
+
+    tokenCache: anonymousTokenCache,
+  })
   .withHttpMiddleware(httpMiddlewareOptions)
-  // .withLoggerMiddleware()
   .build();
 
 export const apiAnonRoot = createApiBuilderFromCtpClient(

@@ -19,7 +19,6 @@ export const useRetroCarCategories = () => {
     const fetchCategories = async () => {
       setIsLoading(true);
       setError(null);
-
       try {
         const response = await apiAnonRoot
           .categories()
