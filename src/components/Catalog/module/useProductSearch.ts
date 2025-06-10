@@ -38,6 +38,7 @@ interface SearchParams {
 
 export interface ProductsSimpleNew {
   id: string;
+  variantId: number;
   name: string;
   slug: string;
   description: string;
@@ -218,6 +219,7 @@ const transformProducts = (
 
     return {
       id: product.id,
+      variantId: product.masterVariant.id,
       name:
         product.name['en-US'] ||
         product.name.en ||

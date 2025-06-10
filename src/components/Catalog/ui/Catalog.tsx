@@ -35,6 +35,8 @@ import {
 import { SkeletonSidebar } from './SkeletonSidebar';
 import ProductCard from './ProductCard';
 
+import { useCart } from '@/shared/context/CartContext';
+
 interface FiltersState {
   priceRange: [number, number];
   brands: string[];
@@ -61,6 +63,7 @@ const Catalog = () => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [filters, setFilters] = useState<FiltersState>(DEFAULT_FILTERS);
   const [viewMode, setViewMode] = useState('grid');
+  const { cart, addItem, removeItem } = useCart();
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { categories, isLoading: isLoadingCategories } =
@@ -116,6 +119,7 @@ const Catalog = () => {
   }, []);
 
   const handleSortChange = useCallback((keys: any) => {
+    console.log(keys);
     const selectedKey = Array.from(keys)[0];
 
     if (typeof selectedKey === 'string') {
@@ -563,7 +567,10 @@ const Catalog = () => {
                   {currentProducts.map((product) => (
                     <ProductCard
                       key={product.id}
+                      addItem={addItem}
+                      cart={cart}
                       product={product}
+                      removeItem={removeItem}
                       onClick={handleProductClick}
                     />
                   ))}

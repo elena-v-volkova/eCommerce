@@ -1,11 +1,28 @@
-import { anonUserClient, apiAnonRoot } from '@/commercetools/anonUser';
-import { CartDraft } from '@commercetools/platform-sdk';
+import {
+  Cart,
+  CartDraft,
+  CartPagedQueryResponse,
+} from '@commercetools/platform-sdk';
 
-async function createAnonymousCart() {
+import { getAnonymousId } from '../utils/anonymousId';
+
+import { apiAnonRoot } from '@/commercetools/anonUser';
+import { createAuthClient } from '@/commercetools/authUser';
+import { tokenCache } from '@/commercetools/buildClient';
+
+interface CartResponse extends CartPagedQueryResponse {
+  count: number;
+  limit: number;
+  offset: number;
+  results: Cart[];
+}
+
+export async function createAnonymousCart(): Promise<Cart> {
   const cartDraft: CartDraft = {
     currency: 'USD',
     country: 'US',
-    inventoryMode: 'None',
+    anonymousId: getAnonymousId(),
+    taxMode: 'Platform',
   };
 
   try {
@@ -13,23 +30,32 @@ async function createAnonymousCart() {
       .carts()
       .post({ body: cartDraft })
       .execute();
-    console.log('Anonymous Cart Created:', response.body);
+
     return response.body;
   } catch (error) {
-    console.error('Error creating anonymous cart:', error);
+    throw error;
   }
 }
 
-async function getAnonymousCart(cartId: string) {
-  try {
-    const response = await apiAnonRoot
-      .carts()
-      .withId({ id: cartId })
-      .get()
-      .execute();
-    console.log('Anonymous Cart:', response.body);
-    return response.body;
-  } catch (error) {
-    console.error('Error fetching anonymous cart:', error);
-  }
+export async function getActiveCustomerCart(
+  customerId: string,
+): Promise<CartResponse> {
+  const apiAuthRoot = createAuthClient(tokenCache.get().token);
+  const res = await apiAuthRoot
+    .carts()
+    .get({
+      queryArgs: {
+        where: `customerId="${customerId}" and cartState="Active"`,
+        limit: 1,
+      },
+    })
+    .execute();
+
+  return res.body;
+}
+
+export async function getCartById(id: string) {
+  const res = await apiAnonRoot.carts().withId({ ID: id }).get().execute();
+
+  return res.body;
 }
