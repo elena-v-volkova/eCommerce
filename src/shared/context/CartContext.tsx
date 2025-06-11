@@ -22,7 +22,7 @@ import { tokenCache } from '@/commercetools/buildClient';
 interface CartContextType {
   cart: Cart | null;
   loading: boolean;
-  addItem: (productId: string, variantId: number) => Promise<void>;
+  addItem: (productId: string, variantId?: number) => Promise<void>;
   removeItem: (lineItemId: string) => Promise<void>;
   updateItemQuantity: (lineItemId: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
@@ -129,7 +129,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
   };
 
-  const addItem = async (productId: string, variantId: number) => {
+  const addItem = async (productId: string, variantId: number = 1) => {
     if (!cart) {
       return;
     }

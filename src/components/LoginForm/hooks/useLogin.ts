@@ -32,7 +32,7 @@ export const useLogin = () => {
           body: {
             email,
             password,
-            anonymousCartId: getCartId(),
+            anonymousCartId: getCartId()!,
             anonymousCartSignInMode: 'MergeWithExistingCustomerCart',
           },
         })
@@ -43,6 +43,23 @@ export const useLogin = () => {
       login(customer.customer);
       navigate(AppRoute.home, { replace: true });
     } catch (err) {
+      const loginClient = createPasswordFlowClient(email, password);
+      const { body: customer } = await loginClient
+        // .get().execute();
+        .login()
+        .post({
+          body: {
+            email,
+            password,
+          },
+        })
+        .execute();
+
+      clearCartId();
+
+      login(customer.customer);
+      navigate(AppRoute.home, { replace: true });
+
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
       setIsLoading(false);

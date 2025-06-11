@@ -9,7 +9,7 @@ interface IProductCard {
   product: ProductsSimpleNew;
   onClick: (product: ProductsSimpleNew) => void;
   cart: Cart | null;
-  addItem: (productId: string) => Promise<void>;
+  addItem: (productId: string, variantId?: number) => Promise<void>;
   removeItem: (lineItemId: string) => Promise<void>;
 }
 
