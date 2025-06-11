@@ -63,7 +63,7 @@ const Catalog = () => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [filters, setFilters] = useState<FiltersState>(DEFAULT_FILTERS);
   const [viewMode, setViewMode] = useState('grid');
-  const { cart, addItem, removeItem } = useCart();
+  const { cart, loading, addItem, removeItem } = useCart();
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { categories, isLoading: isLoadingCategories } =
@@ -572,6 +572,7 @@ const Catalog = () => {
                       product={product}
                       removeItem={removeItem}
                       onClick={handleProductClick}
+                      isLoading={loading}
                     />
                   ))}
                 </div>
