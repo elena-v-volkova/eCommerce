@@ -26,6 +26,7 @@ import { ThemeSwitch } from '@/components/ThemeSwitch';
 import { Logo } from '@/components/Icons';
 import { useAuth } from '@/shared/model/AuthContext';
 import { AppRoute } from '@/routes/appRoutes';
+import { CartItem } from './CartItem';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -109,7 +110,7 @@ export function Header() {
               <Button
                 as={Link}
                 color="primary"
-                href="/login"
+                href={AppRoute.login}
                 size="sm"
                 variant="flat"
               >
@@ -120,7 +121,7 @@ export function Header() {
               <Button
                 as={Link}
                 color="primary"
-                href="/register"
+                href={AppRoute.register}
                 size="sm"
                 variant="flat"
               >
@@ -129,6 +130,9 @@ export function Header() {
             </NavbarItem>
           </>
         )}
+        <NavbarItem>
+          <CartItem />
+        </NavbarItem>
         <NavbarItem>
           <ThemeSwitch />
         </NavbarItem>

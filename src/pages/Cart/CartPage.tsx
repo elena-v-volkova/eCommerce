@@ -9,57 +9,86 @@ import {
   Image,
   Button,
   Chip,
+  Spinner,
 } from '@heroui/react';
-import { Attribute, ProductData } from '@commercetools/platform-sdk';
+import { Attribute, Cart, LineItem } from '@commercetools/platform-sdk';
 
 import styles from './CartPage.module.scss';
 import { AsideCard } from './AsideCard';
-import { mockA, mockB } from './mock';
+import { EmptyCart } from './EmptyCart';
+
+import { useCart } from '@/shared/context/CartContext';
 
 export function CartPage() {
-  return (
-    <div className="flex w-full select-none   items-center justify-center ">
-      <ShopItems />
-    </div>
-  );
-}
-
-function ShopItems() {
-  const [total, setTotal] = useState<Map<string, number>>(new Map());
-  const updateItemCost = (id: string, value: number) => {
-    console.log(total);
-    setTotal((prev) => new Map(prev).set(id, value));
-  };
+  const { cart, loading, clearCart } = useCart();
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    console.log(total);
-  }, [total]);
+    if (!loading && cart) {
+      setIsInitialized(true);
+    }
+  }, [loading, cart]);
+
+  if (loading && !isInitialized) {
+    return (
+      <Spinner
+        className="absolute top-[50dvh] left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+        label="Please wait"
+        size="lg"
+        variant="simple"
+      />
+    );
+  }
 
   return (
-    <div className="flex w-full max-w-[900px] flex-col-reverse items-center gap-4 md:flex-row ">
-      <div className="flex w-full flex-col   ">
-        <CartItem id="123" initCount={1} item={mockB} update={updateItemCost} />
-        <CartItem id="345" initCount={1} item={mockA} update={updateItemCost} />
-      </div>
-      <AsideCard subTotal={total} />
+    <div className="flex w-full select-none   items-center justify-center ">
+      {cart && cart.lineItems.length > 0 ? (
+        <ShopItems cart={cart} clear={clearCart} isLoading={loading} />
+      ) : (
+        <EmptyCart />
+      )}
     </div>
   );
 }
-interface MyProduct extends ProductData {
-  id: string;
+
+function ShopItems({
+  cart,
+  clear,
+  isLoading,
+}: {
+  cart: Cart;
+  clear: () => Promise<void>;
+  isLoading: boolean;
+}) {
+  return (
+    <div className="flex w-full max-w-[900px] flex-col-reverse items-center gap-4 md:flex-row ">
+      <div className="flex w-full max-w-[470px]   flex-col">
+        {cart.lineItems.map((lineItem) => (
+          <CartItem
+            key={lineItem.id}
+            initCount={lineItem.quantity}
+            isLoading={isLoading}
+            item={lineItem}
+          />
+        ))}
+      </div>
+      <AsideCard clearCart={clear} subTotal={cart.totalPrice.centAmount} />
+    </div>
+  );
 }
 
 interface ICartItemProps {
   initCount: number;
-  id: string;
-  item: MyProduct;
-  update: (id: string, value: number) => void;
+  item: LineItem;
+  isLoading: boolean;
 }
 
-function CartItem({ initCount, id, update, item }: ICartItemProps) {
+function CartItem({ initCount, item, isLoading }: ICartItemProps) {
+  const { updateItemQuantity, removeItem, loading } = useCart();
   const [count, setCount] = useState<number>(initCount || 1);
   const MIN = 1;
   const MAX = 1000;
+
   const decrement = () => {
     if (count >= 2) {
       setCount(count - 1);
@@ -71,7 +100,7 @@ function CartItem({ initCount, id, update, item }: ICartItemProps) {
       setCount(input);
     }
   };
-  // const product: MyProduct = JSON.parse(import.meta.env.VITE_MOCK_CAR);
+
   const product = item;
   const formatPrice = (centAmount: number, currency: string = 'USD') => {
     return (centAmount / 100).toLocaleString('en-US', {
@@ -89,30 +118,46 @@ function CartItem({ initCount, id, update, item }: ICartItemProps) {
     return ((current - old) / Math.abs(old)) * 100;
   }
   const locale = 'en-US';
-  const condition = product.masterVariant.attributes
+  const condition = product.variant.attributes
     ?.filter((item: Attribute) => item.name === 'condition')
     .map((item: Attribute) => item.value.label);
-  const price = product.masterVariant.prices?.[0].value.centAmount || 0;
+  const price = product.variant.prices?.[0].value.centAmount || 0;
   const discountedPrice =
-    product.masterVariant.prices?.[0].discounted?.value.centAmount || 0;
+    product.variant.prices?.[0].discounted?.value.centAmount || 0;
   const discount = calculatePercent(price, discountedPrice);
 
-  const itemId = product.id.toString() || '';
+  const itemId = product.id;
 
   useEffect(() => {
-    update(itemId, Math.min(price, discountedPrice) * count);
+    updateItemQuantity(itemId, count);
   }, [count]);
+
+  const deleteHandler = async () => {
+    await removeItem(itemId);
+    setIsOpen(false);
+  };
+
+  const [isOpen, setIsOpen] = useState(false);
 
   const popoverContent = (
     <PopoverContent>
       <div className="px-1 py-2">
-        <div className="  text-small font-bold">
+        <div className="text-small font-bold">
           <p className="my-1">Are you sure?</p>
         </div>
-        <Button isIconOnly className="mx-1 text-small font-bold">
+        <Button
+          isIconOnly
+          className="mx-1 text-small font-bold"
+          isLoading={loading}
+          onClick={() => deleteHandler()}
+        >
           Yes
         </Button>
-        <Button isIconOnly className="mx-1 text-small font-bold">
+        <Button
+          isIconOnly
+          className="mx-1 text-small font-bold"
+          onClick={() => setIsOpen(false)}
+        >
           No
         </Button>
       </div>
@@ -134,7 +179,7 @@ function CartItem({ initCount, id, update, item }: ICartItemProps) {
               height={150}
               shadow="sm"
               src={
-                product.masterVariant.images?.[0]?.url ??
+                product.variant.images?.[0]?.url ??
                 'https://upload.wikimedia.org/wikipedia/ru/thumb/a/ac/No_image_available.svg/250px-No_image_available.svg.png'
               }
               width={150}
@@ -187,6 +232,7 @@ function CartItem({ initCount, id, update, item }: ICartItemProps) {
               <div className="flex w-[130px]">
                 <button
                   className={`rounded-l-lg ${styles.countButton}`}
+                  disabled={Boolean(isLoading)}
                   onClick={() => decrement()}
                 >
                   <Minus color="black" strokeWidth={3} />
@@ -201,11 +247,17 @@ function CartItem({ initCount, id, update, item }: ICartItemProps) {
                 />
                 <button
                   className={`rounded-r-lg ${styles.countButton}`}
+                  disabled={Boolean(isLoading)}
                   onClick={() => increment()}
                 >
                   <Plus color="black" strokeWidth={3} />
                 </button>
-                <Popover color="default" placement="top">
+                <Popover
+                  color="default"
+                  isOpen={isOpen}
+                  placement="top"
+                  onOpenChange={setIsOpen}
+                >
                   <PopoverTrigger>
                     <Button
                       isIconOnly

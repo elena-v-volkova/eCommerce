@@ -32,7 +32,7 @@ export const useLogin = () => {
           body: {
             email,
             password,
-            anonymousCartId: getCartId(),
+            anonymousCartId: getCartId() || '',
             anonymousCartSignInMode: 'MergeWithExistingCustomerCart',
           },
         })

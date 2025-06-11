@@ -9,7 +9,13 @@ import {
 } from '@heroui/react';
 import { useEffect, useState } from 'react';
 
-export function AsideCard({ subTotal }: { subTotal: Map<string, number> }) {
+export function AsideCard({
+  subTotal,
+  clearCart,
+}: {
+  subTotal: number;
+  clearCart: () => Promise<void>;
+}) {
   const formatPrice = (centAmount: number, currency: string = 'USD') => {
     return (centAmount / 100).toLocaleString('en-US', {
       style: 'currency',
@@ -18,20 +24,16 @@ export function AsideCard({ subTotal }: { subTotal: Map<string, number> }) {
       maximumFractionDigits: 0,
     });
   };
-  const [total, setTotal] = useState<string>(
-    formatPrice([...subTotal.values()].reduce((acc, value) => acc + value, 0)),
-  );
+  const [total, setTotal] = useState<string>(formatPrice(subTotal));
 
   useEffect(() => {
-    let amount = formatPrice(
-      [...subTotal.values()].reduce((acc, value) => acc + value, 0),
-    );
+    let amount = formatPrice(subTotal);
 
     setTotal(amount);
   }, [subTotal]);
 
   return (
-    <Card className="min-w-[300px]  max-w-[400px] self-start">
+    <Card className="min-w-[300px]  max-w-[400px] self-center md:self-start">
       <CardHeader className="flex items-stretch gap-3 text-lg font-bold">
         <p className="inline-block text-default-500">Subtotal</p>
         <p className="inline-block  text-black">{total}</p>
@@ -60,6 +62,7 @@ export function AsideCard({ subTotal }: { subTotal: Map<string, number> }) {
           color="warning"
           radius="full"
           variant="light"
+          onClick={clearCart}
         >
           Clear shopping cart
         </Button>

@@ -3,10 +3,9 @@ import { ShoppingBag } from 'lucide-react';
 import { useNavigate } from 'react-router';
 
 import { AppRoute } from '@/routes/appRoutes';
-import { tokenCache } from '@/commercetools/login';
 
 export function EmptyCart() {
-  const hasToken = Object.keys(tokenCache.get()).length > 0;
+  const isUser = localStorage.getItem('userData');
   const navigate = useNavigate();
 
   return (
@@ -15,13 +14,13 @@ export function EmptyCart() {
       <p className="text-large font-semibold leading-9 text-gray-400 lg:text-5xl">
         Don`t have any items in cart.
       </p>
-      {!hasToken && (
+      {!isUser && (
         <p className="font-semibold text-gray-700 lg:text-xl">
           Have an account? Sign in to see your items.
         </p>
       )}
       <div
-        className={`mt-[30px] flex w-full max-w-[400px] ${hasToken ? 'justify-center' : 'justify-between'} gap-4`}
+        className={`mt-[30px] flex w-full max-w-[400px] ${isUser ? 'justify-center' : 'justify-between'} gap-4`}
       >
         <Button
           className="w-[200px] font-bold uppercase"
@@ -32,7 +31,7 @@ export function EmptyCart() {
         >
           catalog page
         </Button>
-        {!hasToken && (
+        {!isUser && (
           <Button
             className="w-[200px] font-bold uppercase"
             color="primary"
