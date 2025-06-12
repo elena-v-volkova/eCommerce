@@ -7,6 +7,7 @@ import {
 } from 'react';
 import {
   Cart,
+  ClientResponse,
   DiscountCodePagedQueryResponse,
 } from '@commercetools/platform-sdk';
 
@@ -32,6 +33,7 @@ interface CartContextType {
   setCart: (cart: Cart | null) => void;
   discounts: DiscountCodePagedQueryResponse | null;
   error: string | null;
+  applyDiscounts: (discountCode: string) => Promise<Cart | void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -310,6 +312,41 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
           setLoading(false);
         });
     };
+
+  const applyDiscounts = async (discountCode: string): Promise<Cart | void> => {
+    const TOKEN: string =
+      tokenCache.get().token || anonymousTokenCache.get().token;
+
+    setLoading(true);
+
+    return await createAuthClient(TOKEN)
+      .carts()
+      .withId({ ID: cart?.id || '' })
+      .post({
+        body: {
+          version: cart?.version || 0,
+          actions: [
+            {
+              action: 'addDiscountCode',
+              code: discountCode,
+            },
+          ],
+        },
+      })
+      .execute()
+      .then((data: ClientResponse<Cart>) => {
+        setCart(data.body);
+
+        return data.body;
+      })
+      .catch((error) => {
+        console.log(error);
+        setError(error.body);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
   const value: CartContextType = {
     cart,
     loading,
@@ -320,6 +357,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     setCart,
     discounts,
     error,
+    applyDiscounts,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

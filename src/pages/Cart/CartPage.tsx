@@ -20,7 +20,7 @@ import { EmptyCart } from './EmptyCart';
 import { useCart } from '@/shared/context/CartContext';
 
 export function CartPage() {
-  const { cart, loading, clearCart } = useCart();
+  const { cart, loading, clearCart, applyDiscounts, error } = useCart();
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
@@ -43,7 +43,13 @@ export function CartPage() {
   return (
     <div className="flex w-full select-none   items-center justify-center ">
       {cart && cart.lineItems.length > 0 ? (
-        <ShopItems cart={cart} clear={clearCart} isLoading={loading} />
+        <ShopItems
+          applyDiscounts={applyDiscounts}
+          cart={cart}
+          clear={clearCart}
+          isLoading={loading}
+          error={error}
+        />
       ) : (
         <EmptyCart />
       )}
@@ -55,10 +61,14 @@ function ShopItems({
   cart,
   clear,
   isLoading,
+  applyDiscounts,
+  error,
 }: {
   cart: Cart;
   clear: () => Promise<void>;
   isLoading: boolean;
+  applyDiscounts: (discountCode: string) => Promise<Cart | void>;
+  error: string | null;
 }) {
   return (
     <div className="flex w-full max-w-[900px] flex-col-reverse items-center gap-4 md:flex-row ">
@@ -72,7 +82,12 @@ function ShopItems({
           />
         ))}
       </div>
-      <AsideCard clearCart={clear} subTotal={cart.totalPrice.centAmount} />
+      <AsideCard
+        applyDiscounts={applyDiscounts}
+        clearCart={clear}
+        subTotal={cart.totalPrice.centAmount}
+        error={error}
+      />
     </div>
   );
 }

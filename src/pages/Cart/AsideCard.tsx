@@ -1,3 +1,4 @@
+import { Cart } from '@commercetools/platform-sdk';
 import {
   Card,
   CardHeader,
@@ -9,13 +10,19 @@ import {
 } from '@heroui/react';
 import { useEffect, useState } from 'react';
 
+type TAsideCard = {
+  subTotal: number;
+  clearCart: () => Promise<void>;
+  applyDiscounts: (discountCode: string) => Promise<Cart | void>;
+  error: string | null;
+};
+
 export function AsideCard({
   subTotal,
   clearCart,
-}: {
-  subTotal: number;
-  clearCart: () => Promise<void>;
-}) {
+  applyDiscounts,
+  error,
+}: TAsideCard) {
   const formatPrice = (centAmount: number, currency: string = 'USD') => {
     return (centAmount / 100).toLocaleString('en-US', {
       style: 'currency',
@@ -25,6 +32,7 @@ export function AsideCard({
     });
   };
   const [total, setTotal] = useState<string>(formatPrice(subTotal));
+  const [code, setCode] = useState<string>('');
 
   useEffect(() => {
     let amount = formatPrice(subTotal);
@@ -40,17 +48,20 @@ export function AsideCard({
       </CardHeader>
       <Divider />
       <CardBody className="gap-2">
+        <p>{error ? error : ''}</p>
         <Input
-          className=" "
+          defaultValue={''}
           label="Promo Code"
           type="text"
           variant="bordered"
+          onValueChange={(value: string) => setCode(value)}
         />
         <Button
-          className="w-[200px]   uppercase"
+          className="w-[50px]   uppercase"
           color="default"
           radius="full"
           variant="flat"
+          onClick={() => applyDiscounts(code)}
         >
           Apply
         </Button>
