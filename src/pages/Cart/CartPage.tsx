@@ -32,7 +32,7 @@ export function CartPage() {
   if (loading && !isInitialized) {
     return (
       <Spinner
-        className="absolute top-[50dvh] left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+        className="absolute left-1/2 top-[50dvh] -translate-x-1/2 -translate-y-1/2"
         label="Please wait"
         size="lg"
         variant="simple"

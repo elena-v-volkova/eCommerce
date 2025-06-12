@@ -5,7 +5,10 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { Cart } from '@commercetools/platform-sdk';
+import {
+  Cart,
+  DiscountCodePagedQueryResponse,
+} from '@commercetools/platform-sdk';
 
 import { clearCartId, getCartId, setCartId } from '../utils/anonymousId';
 import {
@@ -17,7 +20,7 @@ import { useAuth } from '../model/AuthContext';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
 import { createAuthClient } from '@/commercetools/authUser';
-import { tokenCache } from '@/commercetools/buildClient';
+import { anonymousTokenCache, tokenCache } from '@/commercetools/buildClient';
 
 interface CartContextType {
   cart: Cart | null;
@@ -27,6 +30,8 @@ interface CartContextType {
   updateItemQuantity: (lineItemId: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
   setCart: (cart: Cart | null) => void;
+  discounts: DiscountCodePagedQueryResponse | null;
+  error: string | null;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -46,14 +51,20 @@ interface CartProviderProps {
 }
 
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
+  const [error, setError] = useState<string | null>(null);
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
+  const [discounts, setDiscounts] =
+    useState<DiscountCodePagedQueryResponse | null>(null);
 
   // Загрузка корзины при изменении пользователя
   useEffect(() => {
     loadCart();
   }, [user]);
+  useEffect(() => {
+    fetchDiscounts();
+  }, []);
 
   const loadCart = async () => {
     setLoading(true);
@@ -279,6 +290,26 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
   };
 
+  const fetchDiscounts =
+    async (): Promise<DiscountCodePagedQueryResponse | void> => {
+      const TOKEN: string =
+        tokenCache.get().token || anonymousTokenCache.get().token;
+
+      setLoading(true);
+
+      return await createAuthClient(TOKEN)
+        .discountCodes()
+        .get()
+        .execute()
+        .then((data) => setDiscounts(data.body))
+        .catch((error) => {
+          console.log(error);
+          setError(error.body);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    };
   const value: CartContextType = {
     cart,
     loading,
@@ -287,6 +318,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     updateItemQuantity,
     clearCart,
     setCart,
+    discounts,
+    error,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

@@ -1,24 +1,25 @@
-import { AppRoute } from '@/routes/appRoutes';
-import { useCart } from '@/shared/context/CartContext';
 import { Button, Link } from '@heroui/react';
 import { ShoppingCart, BaggageClaim } from 'lucide-react';
+
+import { AppRoute } from '@/routes/appRoutes';
+import { useCart } from '@/shared/context/CartContext';
 
 export function CartItem() {
   const { cart } = useCart();
 
   return (
     <Button
+      isIconOnly
       as={Link}
       href={AppRoute.cart}
-      isIconOnly
-      size="md"
       radius="full"
+      size="md"
       variant="ghost"
     >
       {cart && cart.lineItems.length > 0 ? (
-        <BaggageClaim size={24} strokeWidth={2} color="#006fee" />
+        <BaggageClaim color="#006fee" size={24} strokeWidth={2} />
       ) : (
-        <ShoppingCart size={24} strokeWidth={2} color="#006fee" />
+        <ShoppingCart color="#006fee" size={24} strokeWidth={2} />
       )}
     </Button>
   );

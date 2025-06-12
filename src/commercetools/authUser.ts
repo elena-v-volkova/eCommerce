@@ -10,17 +10,7 @@ const options: ExistingTokenMiddlewareOptions = {
   force: true,
 };
 
-// const authUserClient = new ClientBuilder()
-//   .withProjectKey(projectKey)
-//   .withExistingTokenFlow(`Bearer ${tokenCache.get().token}`, options)
-//   .withHttpMiddleware(httpMiddlewareOptions)
-//   .build();
-
-// export const apiAuthRoot = createApiBuilderFromCtpClient(
-//   authUserClient,
-// ).withProjectKey({ projectKey });
-
-export const createAuthClient = (token) => {
+export const createAuthClient = (token: string) => {
   const authUserClient = new ClientBuilder()
     .withProjectKey(projectKey)
     .withExistingTokenFlow(`Bearer ${token}`, options)

@@ -20,13 +20,13 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 import styles from './Header.module.scss';
+import { CartItem } from './CartItem';
 
 import { SITE_CONFIG } from '@/config/site';
 import { ThemeSwitch } from '@/components/ThemeSwitch';
 import { Logo } from '@/components/Icons';
 import { useAuth } from '@/shared/model/AuthContext';
 import { AppRoute } from '@/routes/appRoutes';
-import { CartItem } from './CartItem';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
