@@ -1,9 +1,6 @@
-import { DateInput } from '@heroui/date-input';
-import { Checkbox, Form, Input } from '@heroui/react';
+import { Checkbox, Form } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { getLocalTimeZone, today } from '@internationalized/date';
-import { Controller, useForm } from 'react-hook-form';
-import { I18nProvider } from '@react-aria/i18n';
+import { useForm } from 'react-hook-form';
 import { useEffect } from 'react';
 import { NavLink } from 'react-router';
 
@@ -17,13 +14,13 @@ import {
 import styles from './Register.module.scss';
 import { AddressFields, DefaultAddress } from './Address';
 import { RegisterButton } from './RegisterButton';
+import { PersonalInfo } from './PersonalInfo';
 
 import useRegister from '@/shared/model/useRegister';
-import { PasswordInput } from '@/components/PasswordInput';
 import { AppRoute } from '@/routes/appRoutes';
 
 type RegisterFormProps = {
-  step?: 'user' | 'shipping' | 'billing' | 'register' | null;
+  step?: 'user' | 'shipping' | 'billing' | null;
   onDeliveryChange: (value: boolean) => void;
 };
 
@@ -47,7 +44,7 @@ export const RegisterForm = ({ step, onDeliveryChange }: RegisterFormProps) => {
   });
   const { createCustomer, isLoading, error } = useRegister();
   const onSubmit = async (data: TRegisterFieldsSchema) => {
-    createCustomer(prepareData(data, sameAsDelivery));
+    await createCustomer(prepareData(data, sameAsDelivery));
   };
   const sameAsDelivery = watch('sameAsDelivery');
 
@@ -65,59 +62,18 @@ export const RegisterForm = ({ step, onDeliveryChange }: RegisterFormProps) => {
       >
         {(step === 'user' || !step) && (
           <div className={styles.customer}>
-            <h4 className="mb-2.5">New user</h4>
-            <Input
-              placeholder="Email"
-              {...register('email')}
-              errorMessage={errors.email?.message}
-              isInvalid={errors.email?.message ? true : false}
-            />
-            <PasswordInput
-              errorMessage={errors.password?.message}
-              isInvalid={errors.password?.message ? true : false}
-              register={register('password')}
-            />
-            <Input
-              label="First name"
-              labelPlacement="outside"
-              type="text"
-              {...register('firstName')}
-              errorMessage={errors.firstName?.message}
-              isInvalid={errors.firstName?.message ? true : false}
-            />
-            <Input
-              label="Last name"
-              labelPlacement="outside"
-              type="text"
-              {...register('lastName')}
-              errorMessage={errors.lastName?.message}
-              isInvalid={errors.lastName?.message ? true : false}
-            />
-
-            <Controller
+            <PersonalInfo
               control={control}
-              name="dateOfBirth"
-              render={({ field }) => (
-                <I18nProvider locale="en-GB">
-                  <DateInput
-                    {...register('dateOfBirth')}
-                    errorMessage={errors.dateOfBirth?.message}
-                    isInvalid={!!errors.dateOfBirth}
-                    label="Date of birth"
-                    labelPlacement="outside"
-                    placeholderValue={today(getLocalTimeZone())}
-                    onChange={(value) => {
-                      field.onChange(value);
-                    }}
-                  />
-                </I18nProvider>
-              )}
+              errors={errors}
+              register={register}
+              title="New user"
             />
           </div>
         )}
         {(step === 'shipping' || !step) && (
           <div className={styles.shipping}>
             <AddressFields
+              control={control}
               errors={errors}
               prefix="address"
               register={register}
@@ -152,6 +108,7 @@ export const RegisterForm = ({ step, onDeliveryChange }: RegisterFormProps) => {
         {(step === 'billing' || !step) && !sameAsDelivery && (
           <div className={styles.show_billing}>
             <AddressFields
+              control={control}
               errors={errors}
               prefix="billingAddress"
               register={register}

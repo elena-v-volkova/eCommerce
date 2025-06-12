@@ -120,7 +120,8 @@ export const REGISTER_SCHEMA = z.object({
     .max(20, { message: 'Password is too long' })
     .regex(/[a-z]/, { message: 'Must contain a lowercase letter' })
     .regex(/[A-Z]/, { message: 'Must at least 1 uppercase letter,' })
-    .regex(/[0-9]/, { message: 'Must contain a number' }),
+    .regex(/[0-9]/, { message: 'Must contain a number' })
+    .optional(),
   address: addressSchema,
   billingAddress: addressSchema,
   sameAsDelivery: z.boolean(),

@@ -10,19 +10,27 @@ import {
   NavbarMenuToggle,
 } from '@heroui/navbar';
 import { useState } from 'react';
+import {
+  Avatar,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+} from '@heroui/react';
+import { useNavigate } from 'react-router-dom';
+
+import styles from './Header.module.scss';
 
 import { SITE_CONFIG } from '@/config/site';
 import { ThemeSwitch } from '@/components/ThemeSwitch';
 import { Logo } from '@/components/Icons';
 import { useAuth } from '@/shared/model/AuthContext';
+import { AppRoute } from '@/routes/appRoutes';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, logout } = useAuth();
-
-  const handleLogout = () => {
-    logout();
-  };
+  const navigate = useNavigate();
 
   return (
     <Navbar isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
@@ -34,7 +42,7 @@ export function Header() {
         <NavbarBrand>
           <Link className="flex items-center gap-2" color="foreground" href="/">
             <Logo />
-            <p className="font-bold text-inherit">ACME</p>
+            <p className="font-bold text-inherit">Car House</p>
           </Link>
         </NavbarBrand>
       </NavbarContent>
@@ -51,16 +59,50 @@ export function Header() {
 
       <NavbarContent justify="end">
         {user ? (
-          <NavbarItem>
-            <Button
-              color="primary"
-              size="sm"
-              variant="flat"
-              onClick={handleLogout}
-            >
-              Logout
-            </Button>
-          </NavbarItem>
+          <Dropdown placement="bottom-end">
+            <DropdownTrigger>
+              <Avatar
+                isBordered
+                showFallback
+                classNames={{
+                  base: 'bg-gradient-to-br from-[#FFB457] to-[#FF905B] ',
+                  name: styles.profile,
+                }}
+                name={[user.firstName?.[0], user.lastName?.[0]].join('')}
+                size="sm"
+                style={{ cursor: 'pointer' }}
+              />
+            </DropdownTrigger>
+            <DropdownMenu aria-label="Profile Actions" variant="flat">
+              <DropdownItem
+                key="profile"
+                className="h-14 gap-2"
+                textValue={`Hello ${user.firstName} ${user.lastName}`} // Add this
+              >
+                <p className="font-semibold">
+                  Hello {user.firstName} {user.lastName}
+                </p>
+              </DropdownItem>
+
+              <DropdownItem
+                key="settings"
+                showDivider
+                textValue="My Profile"
+                onPressUp={() => navigate(AppRoute.profile, { replace: true })}
+              >
+                My Profile
+              </DropdownItem>
+
+              <DropdownItem
+                key="logout"
+                color="danger"
+                textValue="Log Out"
+                onPressUp={logout}
+              >
+                Log Out
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
         ) : (
           <>
             <NavbarItem>

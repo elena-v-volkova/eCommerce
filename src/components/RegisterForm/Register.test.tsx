@@ -1,6 +1,7 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import React from 'react';
 
 import { RouterWrapper } from '../LoginForm/test/test-utils/Wrapper';
 
@@ -175,7 +176,10 @@ describe('RegisterForm', () => {
 
     expect(billingTitle).toBeInTheDocument();
   });
-
+  /*
+    TODO: 
+    - make the test work. understand the context
+  */
   // it('submits correctly when all fields are filled', async () => {
   //   render(<RegisterForm step={null} onDeliveryChange={() => {}} />, {
   //     wrapper: RouterWrapper,
