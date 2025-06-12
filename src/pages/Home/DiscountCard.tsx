@@ -8,7 +8,9 @@ import {
 export function Discounts({ data }: { data: DiscountCodePagedQueryResponse }) {
   return (
     <div className="flex w-full flex-col items-center gap-2">
-      <p className="text-[1.3rem] text-slate-600 capitalize">discount coupons</p>
+      <p className="text-[1.3rem] capitalize text-slate-600">
+        discount coupons
+      </p>
       <div className="flex w-full flex-wrap justify-center gap-2 ">
         {data.results.map((item: DiscountCode) => (
           <DiscountCard key={item.id} {...formatInfo(item)} />
