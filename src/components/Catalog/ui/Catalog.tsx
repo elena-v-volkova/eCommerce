@@ -120,7 +120,6 @@ const Catalog = () => {
   }, []);
 
   const handleSortChange = useCallback((keys: any) => {
-    console.log(keys);
     const selectedKey = Array.from(keys)[0];
 
     if (typeof selectedKey === 'string') {

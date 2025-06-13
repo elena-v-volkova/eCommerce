@@ -10,6 +10,7 @@ import {
   ClientResponse,
   DiscountCode,
   DiscountCodePagedQueryResponse,
+  ErrorResponse,
 } from '@commercetools/platform-sdk';
 
 import { clearCartId, getCartId, setCartId } from '../utils/anonymousId';
@@ -36,6 +37,7 @@ interface CartContextType {
   error: string | null;
   applyDiscounts: (discountCode: string) => Promise<Cart | void>;
   cartDiscountByID: (discountId: string) => Promise<DiscountCode | void>;
+  cancelDiscountById: (discountId: string) => Promise<Cart | void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -305,10 +307,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         .discountCodes()
         .get()
         .execute()
-        .then((data) => setDiscounts(data.body))
-        .catch((error) => {
-          console.log(error);
-          setError(error.body);
+        .then((data) => {
+          setError(null);
+          setDiscounts(data.body);
+        })
+        .catch((error: ErrorResponse) => {
+          setError(error.message);
         })
         .finally(() => {
           setLoading(false);
@@ -338,12 +342,52 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       .execute()
       .then((data: ClientResponse<Cart>) => {
         setCart(data.body);
+        setError(null);
 
         return data.body;
       })
-      .catch((error) => {
-        console.log(error);
-        setError(error.body);
+      .catch((error: ErrorResponse) => {
+        setError(error.message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  const cancelDiscountById = async (
+    discountId: string,
+  ): Promise<Cart | void> => {
+    const TOKEN: string =
+      tokenCache.get().token || anonymousTokenCache.get().token;
+
+    setLoading(true);
+
+    return await createAuthClient(TOKEN)
+      .carts()
+      .withId({ ID: cart?.id || '' })
+      .post({
+        body: {
+          version: cart?.version || 0,
+          actions: [
+            {
+              action: 'removeDiscountCode',
+              discountCode: {
+                typeId: 'discount-code',
+                id: discountId,
+              },
+            },
+          ],
+        },
+      })
+      .execute()
+      .then((data: ClientResponse<Cart>) => {
+        setCart(data.body);
+        setError(null);
+
+        return data.body;
+      })
+      .catch((error: ErrorResponse) => {
+        setError(error.message);
       })
       .finally(() => {
         setLoading(false);
@@ -363,10 +407,13 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       .withId({ ID: discountId })
       .get()
       .execute()
-      .then((data) => data.body)
-      .catch((error) => {
-        console.log(error);
-        setError(error.body);
+      .then((data) => {
+        setError(null);
+
+        return data.body;
+      })
+      .catch((error: ErrorResponse) => {
+        setError(error.message);
       })
       .finally(() => {
         setLoading(false);
@@ -385,6 +432,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     error,
     applyDiscounts,
     cartDiscountByID,
+    cancelDiscountById,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

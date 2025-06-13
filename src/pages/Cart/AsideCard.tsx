@@ -7,7 +7,10 @@ import {
   Button,
   Input,
 } from '@heroui/react';
+import { Check, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
+
+import { formatPrice } from '@/shared/utils/utils';
 
 type TAsideCard = {
   clearCart: () => Promise<void>;
@@ -15,6 +18,12 @@ type TAsideCard = {
   error: string | null;
   cart: Cart;
   cartDiscountByID: (discountId: string) => Promise<DiscountCode | void>;
+  cancelDiscountById: (discountId: string) => Promise<Cart | void>;
+};
+
+type MyDiscount = {
+  amount: string;
+  id: string;
 };
 
 export function AsideCard({
@@ -23,81 +32,119 @@ export function AsideCard({
   error,
   cart,
   cartDiscountByID,
+  cancelDiscountById,
 }: TAsideCard) {
-  const formatPrice = (centAmount: number, currency: string = 'USD') => {
-    return (centAmount / 100).toLocaleString('en-US', {
-      style: 'currency',
-      currency,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    });
-  };
   const [code, setCode] = useState<string>('');
 
-  const [discounts, setDiscounts] = useState<Map<string, string>>(new Map());
+  const [discounts, setDiscounts] = useState<Map<string, MyDiscount>>(
+    new Map(),
+  );
 
   useEffect(() => {
     if (cart.discountOnTotalPrice) {
-      const discounts = cart.discountOnTotalPrice.includedDiscounts;
+      const includedDiscounts = cart.discountOnTotalPrice.includedDiscounts;
 
       cart.discountCodes.forEach((item, index) => {
         cartDiscountByID(item.discountCode.id).then((data) => {
           if (data) {
             const discounted = formatPrice(
-              discounts[index].discountedAmount.centAmount,
+              includedDiscounts[index].discountedAmount.centAmount,
             );
 
             setDiscounts((prev) =>
-              new Map(prev).set(data.code, `-${discounted}`),
+              new Map(prev).set(data.code, {
+                amount: `-${discounted}`,
+                id: cart.discountCodes[index].discountCode.id,
+              }),
             );
           }
         });
       });
+    } else {
+      setDiscounts(new Map());
     }
-  }, [cart.discountOnTotalPrice]);
+  }, [cart.discountOnTotalPrice?.includedDiscounts.length]);
 
   return (
     <Card className="min-w-[300px]  max-w-[400px] self-center md:self-start">
       <div className="flex flex-col content-stretch p-[12px] text-lg font-bold">
-        {discounts.size > 0 && (
+        {cart.discountOnTotalPrice && (
           <>
-            {cart.discountOnTotalPrice && (
-              <div className="flex gap-3  text-default-400">
-                <p>Total</p>
-                <p className=" decoration-3 line-through decoration-red-500 decoration-solid">
-                  {formatPrice(
-                    cart.totalPrice.centAmount +
-                      cart.discountOnTotalPrice.discountedAmount.centAmount,
-                  )}
-                </p>
-              </div>
-            )}
-            {Array.from(discounts.entries()).map(([key, value]) => (
-              <div key={key} className="flex  gap-3 text-sm">
+            <div className="flex items-stretch justify-between text-default-400">
+              <p>Total</p>
+              <p className="decoration-3 line-through decoration-red-500 decoration-solid">
+                {formatPrice(
+                  cart.totalPrice.centAmount +
+                    cart.discountOnTotalPrice.discountedAmount.centAmount,
+                )}
+              </p>
+            </div>
+            {Array.from(discounts.entries()).map(([key, value], index) => (
+              <div
+                key={key}
+                className="flex items-stretch justify-between text-sm"
+              >
                 <p className="text-default-300">{key}</p>
-                <p className="text-default-300">{value}</p>
+                <div className="inline-flex gap-2">
+                  <p className="text-default-300">
+                    {formatPrice(
+                      cart.discountOnTotalPrice?.includedDiscounts[index]
+                        .discountedAmount.centAmount || 0,
+                    )}
+                  </p>
+                  <button
+                    className="flex size-[20px] items-center justify-center rounded-full border-2 hover:border-slate-400"
+                    onClick={() => {
+                      cancelDiscountById(value.id).then((response) => {
+                        if (response) {
+                          setDiscounts(new Map());
+                        }
+                      });
+                    }}
+                  >
+                    <X size={10} strokeWidth={3} />
+                  </button>
+                </div>
               </div>
             ))}
+            <Divider className="my-1" />
           </>
         )}
         <div className="flex content-stretch gap-3">
-          <p className="inline-block text-default-500">Subtotal</p>
-          <p className="inline-block  text-black">
+          <p className="inline-block text-default-500">
+            {cart.discountOnTotalPrice ? 'Subtotal' : 'Total'}
+          </p>
+          <p className="inline-block  text-black dark:text-white">
             {formatPrice(cart.totalPrice.centAmount)}
           </p>
         </div>
       </div>
       <Divider />
       <CardBody className="gap-2">
-        <p>{error ? error : ''}</p>
+        <p className="font-thin text-red-500">{error ? error : ''}</p>
         <Input
           defaultValue={''}
+          endContent={
+            code ? (
+              <Button
+                isIconOnly
+                className="w-[50px]  uppercase"
+                color="success"
+                radius="full"
+                variant="flat"
+                onClick={() => applyDiscounts(code).finally(() => setCode(''))}
+              >
+                <Check strokeWidth={3} />
+              </Button>
+            ) : undefined
+          }
           label="Promo Code"
           type="text"
+          value={code}
           variant="bordered"
           onValueChange={(value: string) => setCode(value)}
         />
-        <Button
+        {/* <Button
           className="w-[50px]   uppercase"
           color="default"
           radius="full"
@@ -105,7 +152,7 @@ export function AsideCard({
           onClick={() => applyDiscounts(code)}
         >
           Apply
-        </Button>
+        </Button> */}
       </CardBody>
       <Divider />
       <CardFooter>

@@ -5,6 +5,8 @@ import { Cart } from '@commercetools/platform-sdk';
 
 import { ProductsSimpleNew } from '../module/useProductSearch';
 
+import { formatPrice } from '@/shared/utils/utils';
+
 interface IProductCard {
   product: ProductsSimpleNew;
   onClick: (product: ProductsSimpleNew) => void;
@@ -22,15 +24,6 @@ const ProductCard = ({
 }: IProductCard) => {
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-
-  const formatPrice = (centAmount: number, currency: string = 'USD') => {
-    return (centAmount / 100).toLocaleString('en-US', {
-      style: 'currency',
-      currency,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    });
-  };
 
   const isInCart = cart?.lineItems?.some(
     (item) => item.productId === product.id,

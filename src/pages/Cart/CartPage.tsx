@@ -23,10 +23,18 @@ import { AsideCard } from './AsideCard';
 import { EmptyCart } from './EmptyCart';
 
 import { useCart } from '@/shared/context/CartContext';
+import { formatPrice } from '@/shared/utils/utils';
 
 export function CartPage() {
-  const { cart, loading, clearCart, applyDiscounts, error, cartDiscountByID } =
-    useCart();
+  const {
+    cart,
+    loading,
+    clearCart,
+    applyDiscounts,
+    cancelDiscountById,
+    error,
+    cartDiscountByID,
+  } = useCart();
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
@@ -51,6 +59,7 @@ export function CartPage() {
       {cart && cart.lineItems.length > 0 ? (
         <ShopItems
           applyDiscounts={applyDiscounts}
+          cancelDiscountById={cancelDiscountById}
           cart={cart}
           cartDiscountByID={cartDiscountByID}
           clear={clearCart}
@@ -71,6 +80,7 @@ function ShopItems({
   applyDiscounts,
   error,
   cartDiscountByID,
+  cancelDiscountById,
 }: {
   cart: Cart;
   clear: () => Promise<void>;
@@ -78,9 +88,10 @@ function ShopItems({
   applyDiscounts: (discountCode: string) => Promise<Cart | void>;
   error: string | null;
   cartDiscountByID: (discountId: string) => Promise<DiscountCode | void>;
+  cancelDiscountById: (discountId: string) => Promise<Cart | void>;
 }) {
   return (
-    <div className="flex w-full max-w-[900px] flex-col-reverse items-center gap-4 md:flex-row">
+    <div className="flex w-full max-w-[900px] flex-col-reverse items-center gap-4 md:flex-row md:items-start">
       <div className="flex w-full max-w-[470px] flex-col">
         {cart.lineItems.map((lineItem) => (
           <CartItem
@@ -93,6 +104,7 @@ function ShopItems({
       </div>
       <AsideCard
         applyDiscounts={applyDiscounts}
+        cancelDiscountById={cancelDiscountById}
         cart={cart}
         cartDiscountByID={cartDiscountByID}
         clearCart={clear}
@@ -127,14 +139,6 @@ function CartItem({ initCount, item, isLoading }: ICartItemProps) {
   };
 
   const product = item;
-  const formatPrice = (centAmount: number, currency: string = 'USD') => {
-    return (centAmount / 100).toLocaleString('en-US', {
-      style: 'currency',
-      currency,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    });
-  };
 
   function calculatePercent(old: number, current: number): number | null {
     if (old === 0) return null;
