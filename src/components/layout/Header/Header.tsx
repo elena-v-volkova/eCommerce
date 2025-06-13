@@ -150,7 +150,7 @@ export function Header() {
       </NavbarContent>
       <NavbarMenu>
         {width <= 470 && (
-          <div className="flex gap-4 items-start">
+          <div className="flex items-start gap-4">
             <NavbarBrand>
               <Logo />
               <p className="font-bold text-inherit">Car House</p>
@@ -171,10 +171,12 @@ export function Header() {
           </NavbarMenuItem>
         ))}
         <Divider />
-        <div className="flex mt-2 gap-3 ">
-          Theme
-          <ThemeSwitch />
-        </div>
+        {width < 470 && (
+          <div className="mt-2 flex gap-3 ">
+            Theme
+            <ThemeSwitch />
+          </div>
+        )}
       </NavbarMenu>
     </Navbar>
   );
