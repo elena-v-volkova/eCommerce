@@ -12,6 +12,7 @@ import {
 import { useState } from 'react';
 import {
   Avatar,
+  Divider,
   Dropdown,
   DropdownItem,
   DropdownMenu,
@@ -27,11 +28,13 @@ import { ThemeSwitch } from '@/components/ThemeSwitch';
 import { Logo } from '@/components/Icons';
 import { useAuth } from '@/shared/model/AuthContext';
 import { AppRoute } from '@/routes/appRoutes';
+import { useWindowWidth } from '@/shared/utils/utils';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const width = useWindowWidth();
 
   return (
     <Navbar isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
@@ -40,12 +43,18 @@ export function Header() {
           aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
           className="sm:hidden"
         />
-        <NavbarBrand>
-          <Link className="flex items-center gap-2" color="foreground" href="/">
-            <Logo />
-            <p className="font-bold text-inherit">Car House</p>
-          </Link>
-        </NavbarBrand>
+        {width > 470 && (
+          <NavbarBrand>
+            <Link
+              className="flex items-center gap-2"
+              color="foreground"
+              href="/"
+            >
+              <Logo />
+              <p className="font-bold text-inherit">Car House</p>
+            </Link>
+          </NavbarBrand>
+        )}
       </NavbarContent>
 
       <NavbarContent className="hidden gap-4 sm:flex" justify="center">
@@ -133,12 +142,21 @@ export function Header() {
         <NavbarItem>
           <CartItem />
         </NavbarItem>
-        <NavbarItem>
-          <ThemeSwitch />
-        </NavbarItem>
+        {width >= 470 && (
+          <NavbarItem>
+            <ThemeSwitch />
+          </NavbarItem>
+        )}
       </NavbarContent>
-
       <NavbarMenu>
+        {width <= 470 && (
+          <div className="flex gap-4 items-start">
+            <NavbarBrand>
+              <Logo />
+              <p className="font-bold text-inherit">Car House</p>
+            </NavbarBrand>
+          </div>
+        )}
         {SITE_CONFIG.navItems.map((item, index) => (
           <NavbarMenuItem key={`${item.label}-${index}`}>
             <Link
@@ -152,6 +170,11 @@ export function Header() {
             </Link>
           </NavbarMenuItem>
         ))}
+        <Divider />
+        <div className="flex mt-2 gap-3 ">
+          Theme
+          <ThemeSwitch />
+        </div>
       </NavbarMenu>
     </Navbar>
   );

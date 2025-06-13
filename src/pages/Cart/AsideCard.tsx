@@ -87,6 +87,7 @@ export function AsideCard({
                 <p className="text-default-300">{key}</p>
                 <div className="inline-flex gap-2">
                   <p className="text-default-300">
+                    -
                     {formatPrice(
                       cart.discountOnTotalPrice?.includedDiscounts[index]
                         .discountedAmount.centAmount || 0,
