@@ -1,7 +1,6 @@
-import { Cart } from '@commercetools/platform-sdk';
+import { Cart, DiscountCode } from '@commercetools/platform-sdk';
 import {
   Card,
-  CardHeader,
   CardBody,
   CardFooter,
   Divider,
@@ -11,17 +10,19 @@ import {
 import { useEffect, useState } from 'react';
 
 type TAsideCard = {
-  subTotal: number;
   clearCart: () => Promise<void>;
   applyDiscounts: (discountCode: string) => Promise<Cart | void>;
   error: string | null;
+  cart: Cart;
+  cartDiscountByID: (discountId: string) => Promise<DiscountCode | void>;
 };
 
 export function AsideCard({
-  subTotal,
   clearCart,
   applyDiscounts,
   error,
+  cart,
+  cartDiscountByID,
 }: TAsideCard) {
   const formatPrice = (centAmount: number, currency: string = 'USD') => {
     return (centAmount / 100).toLocaleString('en-US', {
@@ -31,21 +32,61 @@ export function AsideCard({
       maximumFractionDigits: 0,
     });
   };
-  const [total, setTotal] = useState<string>(formatPrice(subTotal));
   const [code, setCode] = useState<string>('');
 
-  useEffect(() => {
-    let amount = formatPrice(subTotal);
+  const [discounts, setDiscounts] = useState<Map<string, string>>(new Map());
 
-    setTotal(amount);
-  }, [subTotal]);
+  useEffect(() => {
+    if (cart.discountOnTotalPrice) {
+      const discounts = cart.discountOnTotalPrice.includedDiscounts;
+
+      cart.discountCodes.forEach((item, index) => {
+        cartDiscountByID(item.discountCode.id).then((data) => {
+          if (data) {
+            const discounted = formatPrice(
+              discounts[index].discountedAmount.centAmount,
+            );
+
+            setDiscounts((prev) =>
+              new Map(prev).set(data.code, `-${discounted}`),
+            );
+          }
+        });
+      });
+    }
+  }, [cart.discountOnTotalPrice]);
 
   return (
     <Card className="min-w-[300px]  max-w-[400px] self-center md:self-start">
-      <CardHeader className="flex items-stretch gap-3 text-lg font-bold">
-        <p className="inline-block text-default-500">Subtotal</p>
-        <p className="inline-block  text-black">{total}</p>
-      </CardHeader>
+      <div className="flex flex-col content-stretch p-[12px] text-lg font-bold">
+        {discounts.size > 0 && (
+          <>
+            {cart.discountOnTotalPrice && (
+              <div className="flex gap-3  text-default-400">
+                <p>Total</p>
+                <p className=" decoration-3 line-through decoration-red-500 decoration-solid">
+                  {formatPrice(
+                    cart.totalPrice.centAmount +
+                      cart.discountOnTotalPrice.discountedAmount.centAmount,
+                  )}
+                </p>
+              </div>
+            )}
+            {Array.from(discounts.entries()).map(([key, value]) => (
+              <div key={key} className="flex  gap-3 text-sm">
+                <p className="text-default-300">{key}</p>
+                <p className="text-default-300">{value}</p>
+              </div>
+            ))}
+          </>
+        )}
+        <div className="flex content-stretch gap-3">
+          <p className="inline-block text-default-500">Subtotal</p>
+          <p className="inline-block  text-black">
+            {formatPrice(cart.totalPrice.centAmount)}
+          </p>
+        </div>
+      </div>
       <Divider />
       <CardBody className="gap-2">
         <p>{error ? error : ''}</p>

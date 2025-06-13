@@ -8,6 +8,7 @@ import {
 import {
   Cart,
   ClientResponse,
+  DiscountCode,
   DiscountCodePagedQueryResponse,
 } from '@commercetools/platform-sdk';
 
@@ -34,6 +35,7 @@ interface CartContextType {
   discounts: DiscountCodePagedQueryResponse | null;
   error: string | null;
   applyDiscounts: (discountCode: string) => Promise<Cart | void>;
+  cartDiscountByID: (discountId: string) => Promise<DiscountCode | void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -347,6 +349,30 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         setLoading(false);
       });
   };
+
+  const cartDiscountByID = async (
+    discountId: string,
+  ): Promise<DiscountCode | void> => {
+    const TOKEN: string =
+      tokenCache.get().token || anonymousTokenCache.get().token;
+
+    setLoading(true);
+
+    return await createAuthClient(TOKEN)
+      .discountCodes()
+      .withId({ ID: discountId })
+      .get()
+      .execute()
+      .then((data) => data.body)
+      .catch((error) => {
+        console.log(error);
+        setError(error.body);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
   const value: CartContextType = {
     cart,
     loading,
@@ -358,6 +384,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     discounts,
     error,
     applyDiscounts,
+    cartDiscountByID,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

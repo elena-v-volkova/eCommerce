@@ -11,7 +11,12 @@ import {
   Chip,
   Spinner,
 } from '@heroui/react';
-import { Attribute, Cart, LineItem } from '@commercetools/platform-sdk';
+import {
+  Attribute,
+  Cart,
+  DiscountCode,
+  LineItem,
+} from '@commercetools/platform-sdk';
 
 import styles from './CartPage.module.scss';
 import { AsideCard } from './AsideCard';
@@ -20,7 +25,8 @@ import { EmptyCart } from './EmptyCart';
 import { useCart } from '@/shared/context/CartContext';
 
 export function CartPage() {
-  const { cart, loading, clearCart, applyDiscounts, error } = useCart();
+  const { cart, loading, clearCart, applyDiscounts, error, cartDiscountByID } =
+    useCart();
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
@@ -41,14 +47,15 @@ export function CartPage() {
   }
 
   return (
-    <div className="flex w-full select-none   items-center justify-center ">
+    <div className="flex w-full select-none items-center justify-center">
       {cart && cart.lineItems.length > 0 ? (
         <ShopItems
           applyDiscounts={applyDiscounts}
           cart={cart}
+          cartDiscountByID={cartDiscountByID}
           clear={clearCart}
-          isLoading={loading}
           error={error}
+          isLoading={loading}
         />
       ) : (
         <EmptyCart />
@@ -63,16 +70,18 @@ function ShopItems({
   isLoading,
   applyDiscounts,
   error,
+  cartDiscountByID,
 }: {
   cart: Cart;
   clear: () => Promise<void>;
   isLoading: boolean;
   applyDiscounts: (discountCode: string) => Promise<Cart | void>;
   error: string | null;
+  cartDiscountByID: (discountId: string) => Promise<DiscountCode | void>;
 }) {
   return (
-    <div className="flex w-full max-w-[900px] flex-col-reverse items-center gap-4 md:flex-row ">
-      <div className="flex w-full max-w-[470px]   flex-col">
+    <div className="flex w-full max-w-[900px] flex-col-reverse items-center gap-4 md:flex-row">
+      <div className="flex w-full max-w-[470px] flex-col">
         {cart.lineItems.map((lineItem) => (
           <CartItem
             key={lineItem.id}
@@ -84,8 +93,9 @@ function ShopItems({
       </div>
       <AsideCard
         applyDiscounts={applyDiscounts}
+        cart={cart}
+        cartDiscountByID={cartDiscountByID}
         clearCart={clear}
-        subTotal={cart.totalPrice.centAmount}
         error={error}
       />
     </div>
@@ -182,12 +192,12 @@ function CartItem({ initCount, item, isLoading }: ICartItemProps) {
   return (
     <Card
       isBlurred
-      className="start mb-2  w-full max-w-[600px]  bg-background/60 dark:bg-default-100/50  "
+      className="start mb-2 w-full max-w-[600px] bg-background/60 dark:bg-default-100/50"
       shadow="sm"
     >
       <CardBody>
         <div className={styles.cartBody}>
-          <div className="relative size-[200] ">
+          <div className="relative size-[200]">
             <Image
               alt="image"
               className="object-scale-down"
@@ -223,7 +233,7 @@ function CartItem({ initCount, item, isLoading }: ICartItemProps) {
           </div>
 
           <div className="">
-            <div className=" flex flex-col  ">
+            <div className="flex flex-col">
               {/* Title */}
               <h3 className="mb-2 line-clamp-1 text-small font-bold text-foreground">
                 {product.name[`${locale}`]}
@@ -292,9 +302,7 @@ function CartItem({ initCount, item, isLoading }: ICartItemProps) {
               <div className="text-lg font-bold">
                 <p>Total price:</p>
                 <span
-                  className={`text-lg font-bold ${
-                    discountedPrice ? 'text-primary-500' : 'text-foreground'
-                  }`}
+                  className={`text-lg font-bold ${discountedPrice ? 'text-primary-500' : 'text-foreground'}`}
                 >
                   {formatPrice(Math.min(price, discountedPrice) * count)}
                 </span>
