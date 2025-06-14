@@ -19,7 +19,9 @@ export async function createAnonymousCart(): Promise<Cart> {
   const cartDraft: CartDraft = {
     currency: 'USD',
     country: 'US',
+
     // anonymousId: getAnonymousId(),
+
     taxMode: 'Platform',
   };
 
@@ -42,6 +44,7 @@ export async function getActiveCustomerCart(
     tokenCache.get().token,
     tokenCache.get().refreshToken,
   );
+
   const res = await apiAuthRoot
     .carts()
     .get({

@@ -5,8 +5,7 @@ import { useEffect, useState, useMemo, useRef } from 'react';
 import { Card, CardBody, CardHeader, Chip, Spinner } from '@heroui/react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
-
-import { Price, ProductProjection } from './productPage.types.ts';
+import { Price, ProductProjection } from '@commercetools/platform-sdk';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
 
@@ -219,9 +218,9 @@ export default function ProductPage() {
 
       {openIndex !== null && (
         <div
-          className="fixed inset-0 z-50 bg-black/90"
-          role="presentation"
-          type="button"
+          className="fixed inset-0 z-50 bg-black bg-opacity-90"
+          role="button"
+          tabIndex={0}
           onClick={closeFullscreen}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === 'Escape') {
@@ -232,6 +231,7 @@ export default function ProductPage() {
           <div
             className="absolute left-1/2 top-[10vh] flex h-[80vh] w-[90vw] -translate-x-1/2 items-center justify-center md:w-[60vw] lg:w-[50vw]"
             role="presentation"
+            tabIndex={-1}
             onClick={(e) => e.stopPropagation()}
           >
             <button

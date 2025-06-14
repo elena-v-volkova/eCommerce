@@ -10,13 +10,14 @@ interface EditableCardProps {
   headerChildren?: React.ReactNode | null;
   children: React.ReactNode;
   className?: string;
-  onEdit?: (key: any) => void;
-  onSave: (key: any) => Promise<boolean | undefined>;
-  onDelete?: (key: any) => Promise<boolean | undefined>;
-  onCancel?: (key: any) => void;
+  onEdit?: (key: boolean) => void;
+  onSave: (key: boolean) => Promise<boolean | undefined>;
+  onDelete?: (key: boolean) => Promise<boolean | undefined>;
+  onCancel?: (key: boolean) => void;
   isLoading?: boolean;
   noErrors: boolean;
   addressEdit?: boolean;
+  createAddress?: boolean;
 }
 
 export function EditableCard({
@@ -33,6 +34,7 @@ export function EditableCard({
   isLoading = false,
   noErrors = true,
   addressEdit = false,
+  createAddress = false,
   onDelete,
 }: EditableCardProps): JSX.Element {
   const [mode, setMode] = useState(editmode);
@@ -64,7 +66,7 @@ export function EditableCard({
   };
 
   return (
-    <form onReset={onCancel} onSubmit={onSave}>
+    <form>
       <Card className={`${className}`}>
         <CardHeader
           className={
@@ -77,7 +79,9 @@ export function EditableCard({
             dangerouslySetInnerHTML={{ __html: title }}
             className="text-large font-medium text-teal-600"
           />
-          {headerChildren !== null && !editmode && headerChildren}
+          {headerChildren !== null &&
+            (!editmode || createAddress) &&
+            headerChildren}
         </CardHeader>
 
         <CardBody className="overflow-visible p-0">{children}</CardBody>

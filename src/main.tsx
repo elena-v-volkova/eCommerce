@@ -1,8 +1,8 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router';
-import App from './App.tsx';
-import { Provider } from './Provider.tsx';
+import App from './App';
+import { Provider } from './Provider';
 import './index.css';
 import DefaultLayout from './layouts/Default.tsx';
 import { AuthProvider } from './shared/model/AuthContext.tsx';

@@ -55,6 +55,7 @@ export const anonymousTokenCache: TokenCache = {
     } catch (e) {
       console.error('Failed to save anonymous token to localStorage:', e);
     }
+
   },
 };
 

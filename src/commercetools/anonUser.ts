@@ -10,6 +10,8 @@ import {
   anonymousTokenCache,
 } from './buildClient';
 
+
+
 const anonUserClient: Client = new ClientBuilder()
   .withProjectKey(projectKey)
   .withAnonymousSessionFlow({
@@ -19,6 +21,7 @@ const anonUserClient: Client = new ClientBuilder()
       clientId: clientId,
       clientSecret: clientSecret,
       // anonymousId: getAnonymousId(),
+
     },
 
     tokenCache: anonymousTokenCache,

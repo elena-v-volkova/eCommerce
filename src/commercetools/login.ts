@@ -1,5 +1,8 @@
 import { createApiBuilderFromCtpClient } from '@commercetools/platform-sdk'; // Vor ./buildClient
+
 import { Client, ClientBuilder, TokenCache } from '@commercetools/ts-client';
+
+
 
 import {
   authUrl,
@@ -10,6 +13,7 @@ import {
   scopes,
   tokenCache,
 } from './buildClient';
+
 
 type PasswordAuthMiddlewareOptions = {
   host: string;
@@ -27,6 +31,7 @@ type PasswordAuthMiddlewareOptions = {
   oauthUri?: string;
   // fetch?: any;
 };
+
 
 export function createPasswordFlowClient(email: string, password: string) {
   if (!email || !password) {

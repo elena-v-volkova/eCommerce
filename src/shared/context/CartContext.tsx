@@ -5,7 +5,15 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { Cart } from '@commercetools/platform-sdk';
+
+import {
+  Cart,
+  ClientResponse,
+  DiscountCode,
+  DiscountCodePagedQueryResponse,
+  ErrorResponse,
+} from '@commercetools/platform-sdk';
+
 
 import { clearCartId, getCartId, setCartId } from '../utils/anonymousId';
 import {
@@ -17,16 +25,27 @@ import { useAuth } from '../model/AuthContext';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
 import { createAuthClient } from '@/commercetools/authUser';
-import { tokenCache } from '@/commercetools/buildClient';
+
+import { anonymousTokenCache, tokenCache } from '@/commercetools/buildClient';
+
 
 interface CartContextType {
   cart: Cart | null;
   loading: boolean;
+
   addItem: (productId: string, variantId?: number) => Promise<void>;
+
   removeItem: (lineItemId: string) => Promise<void>;
   updateItemQuantity: (lineItemId: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
   setCart: (cart: Cart | null) => void;
+
+  discounts: DiscountCodePagedQueryResponse | null;
+  error: string | null;
+  applyDiscounts: (discountCode: string) => Promise<Cart | void>;
+  cartDiscountByID: (discountId: string) => Promise<DiscountCode | void>;
+  cancelDiscountById: (discountId: string) => Promise<Cart | void>;
+
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -46,14 +65,23 @@ interface CartProviderProps {
 }
 
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
+
+  const [error, setError] = useState<string | null>(null);
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
+  const [discounts, setDiscounts] =
+    useState<DiscountCodePagedQueryResponse | null>(null);
+
 
   // Загрузка корзины при изменении пользователя
   useEffect(() => {
     loadCart();
   }, [user]);
+
+  useEffect(() => {
+    fetchDiscounts();
+  }, []);
 
   const loadCart = async () => {
     setLoading(true);
@@ -85,6 +113,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
           tokenCache.get().token,
           tokenCache.get().refreshToken,
         );
+
         const newCart = await authClient
           .me()
           .carts()
@@ -132,10 +161,13 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
   };
 
+
   const addItem = async (productId: string, variantId: number = 1) => {
+
     if (!cart) {
       return;
     }
+
 
     setLoading(true);
 
@@ -145,10 +177,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
             tokenCache.get().token,
             tokenCache.get().refreshToken,
           )
+
             .me()
             .carts()
             .withId({ ID: cart.id })
         : apiAnonRoot.carts().withId({ ID: cart.id });
+
 
     const tryAddItem = async (version: number): Promise<void> => {
       try {
@@ -186,12 +220,14 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
     try {
       await tryAddItem(cart.version);
+
     } finally {
       setLoading(false);
     }
   };
 
   const removeItem = async (lineItemId: string) => {
+
     if (!cart) return;
 
     setLoading(true);
@@ -202,10 +238,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
             tokenCache.get().token,
             tokenCache.get().refreshToken,
           )
+
             .me()
             .carts()
             .withId({ ID: cart.id })
         : apiAnonRoot.carts().withId({ ID: cart.id });
+
 
     const tryRemoveItem = async (version: number): Promise<void> => {
       try {
@@ -246,10 +284,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
     try {
       await tryRemoveItem(cart.version);
+
     } finally {
       setLoading(false);
     }
   };
+
   const updateItemQuantity = async (lineItemId: string, quantity: number) => {
     if (!cart) {
       return;
@@ -259,10 +299,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       setLoading(true);
 
       const endpoint = user?.id
+
         ? createAuthClient(
             tokenCache.get().token,
             tokenCache.get().refreshToken,
           )
+
             .me()
             .carts()
             .withId({ ID: cart.id })
@@ -309,10 +351,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       }
 
       const endpoint = user?.id
+
         ? createAuthClient(
             tokenCache.get().token,
             tokenCache.get().refreshToken,
           )
+
             .me()
             .carts()
             .withId({ ID: cart.id })
@@ -335,6 +379,132 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
   };
 
+
+  const fetchDiscounts =
+    async (): Promise<DiscountCodePagedQueryResponse | void> => {
+      const TOKEN: string =
+        tokenCache.get().token || anonymousTokenCache.get().token;
+
+      setLoading(true);
+
+      return await createAuthClient(TOKEN)
+        .discountCodes()
+        .get()
+        .execute()
+        .then((data) => {
+          setError(null);
+          setDiscounts(data.body);
+        })
+        .catch((error: ErrorResponse) => {
+          setError(error.message);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    };
+
+  const applyDiscounts = async (discountCode: string): Promise<Cart | void> => {
+    const TOKEN: string =
+      tokenCache.get().token || anonymousTokenCache.get().token;
+
+    setLoading(true);
+
+    return await createAuthClient(TOKEN)
+      .carts()
+      .withId({ ID: cart?.id || '' })
+      .post({
+        body: {
+          version: cart?.version || 0,
+          actions: [
+            {
+              action: 'addDiscountCode',
+              code: discountCode,
+            },
+          ],
+        },
+      })
+      .execute()
+      .then((data: ClientResponse<Cart>) => {
+        setCart(data.body);
+        setError(null);
+
+        return data.body;
+      })
+      .catch((error: ErrorResponse) => {
+        setError(error.message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  const cancelDiscountById = async (
+    discountId: string,
+  ): Promise<Cart | void> => {
+    const TOKEN: string =
+      tokenCache.get().token || anonymousTokenCache.get().token;
+
+    setLoading(true);
+
+    return await createAuthClient(TOKEN)
+      .carts()
+      .withId({ ID: cart?.id || '' })
+      .post({
+        body: {
+          version: cart?.version || 0,
+          actions: [
+            {
+              action: 'removeDiscountCode',
+              discountCode: {
+                typeId: 'discount-code',
+                id: discountId,
+              },
+            },
+          ],
+        },
+      })
+      .execute()
+      .then((data: ClientResponse<Cart>) => {
+        setCart(data.body);
+        setError(null);
+
+        return data.body;
+      })
+      .catch((error: ErrorResponse) => {
+        setError(error.message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  const cartDiscountByID = async (
+    discountId: string,
+  ): Promise<DiscountCode | void> => {
+    const TOKEN: string =
+      tokenCache.get().token || anonymousTokenCache.get().token;
+
+    setLoading(true);
+
+    return await createAuthClient(TOKEN)
+      .discountCodes()
+      .withId({ ID: discountId })
+      .get()
+      .execute()
+      .then((data) => {
+        setError(null);
+
+        return data.body;
+      })
+      .catch((error: ErrorResponse) => {
+        setError(error.message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+
   const value: CartContextType = {
     cart,
     loading,
@@ -343,6 +513,11 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     updateItemQuantity,
     clearCart,
     setCart,
+    discounts,
+    error,
+    applyDiscounts,
+    cartDiscountByID,
+    cancelDiscountById,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

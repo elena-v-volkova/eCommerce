@@ -6,7 +6,7 @@ import { Selectors } from './Selectors';
 import styles from './ProfilePage.module.scss';
 
 import { useAuth } from '@/shared/model/AuthContext';
-import { AppRoute } from '@/routes/appRoutes.ts';
+import { AppRoute } from '@/routes/appRoutes';
 
 export function Profile() {
   return (

@@ -14,10 +14,11 @@ export function useWindowWidth() {
   return width;
 }
 
-export function loadMockUser() {
-  const user = import.meta.env.VITE_MOCK_CUSTOMER;
-  const token = import.meta.env.VITE_MOCK_TOKEN;
-
-  localStorage.setItem('authTokens', token);
-  localStorage.setItem('userData', user);
-}
+export const formatPrice = (centAmount: number, currency: string = 'USD') => {
+  return (centAmount / 100).toLocaleString('en-US', {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+};
