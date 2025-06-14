@@ -37,7 +37,12 @@ export function Header() {
   const width = useWindowWidth();
 
   return (
-    <Navbar isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
+    <Navbar
+      isBlurred={false}
+      isMenuOpen={isMenuOpen}
+      position={'static'}
+      onMenuOpenChange={setIsMenuOpen}
+    >
       <NavbarContent>
         <NavbarMenuToggle
           aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}

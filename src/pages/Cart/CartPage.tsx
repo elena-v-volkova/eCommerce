@@ -200,7 +200,7 @@ function CartItem({ initCount, item, isLoading }: ICartItemProps) {
       shadow="sm"
     >
       <CardBody>
-        <div className={styles.cartBody}>
+        <div className={styles.cart_body}>
           <div className="relative size-[200]">
             <Image
               alt="image"
@@ -260,14 +260,14 @@ function CartItem({ initCount, item, isLoading }: ICartItemProps) {
             <div className="flex flex-col justify-start gap-2">
               <div className="flex w-[130px]">
                 <button
-                  className={`rounded-l-lg ${styles.countButton}`}
+                  className={`rounded-l-lg ${styles.count_button}`}
                   disabled={Boolean(isLoading)}
                   onClick={() => decrement()}
                 >
                   <Minus color="black" strokeWidth={3} />
                 </button>
                 <input
-                  className={styles.noArrows}
+                  className={styles.no_arrows}
                   max={MAX}
                   min={MIN}
                   type="number"
@@ -275,7 +275,7 @@ function CartItem({ initCount, item, isLoading }: ICartItemProps) {
                   onChange={(event) => handler(Number(event.target.value))}
                 />
                 <button
-                  className={`rounded-r-lg ${styles.countButton}`}
+                  className={`rounded-r-lg ${styles.count_button}`}
                   disabled={Boolean(isLoading)}
                   onClick={() => increment()}
                 >
