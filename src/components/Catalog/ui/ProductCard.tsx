@@ -7,7 +7,6 @@ import { Cart } from '@commercetools/platform-sdk';
 
 import { ProductsSimpleNew } from '../module/useProductSearch';
 
-
 import { formatPrice } from '@/shared/utils/utils';
 
 interface IProductCard {
@@ -18,7 +17,6 @@ interface IProductCard {
   addItem: (productId: string, variantId?: number) => Promise<void>;
   removeItem: (lineItemId: string) => Promise<void>;
   isLoading: boolean;
-
 }
 
 const ProductCard = ({
@@ -28,18 +26,9 @@ const ProductCard = ({
   addItem,
   removeItem,
   isLoading,
-
 }: IProductCard) => {
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-
-  const isInCart = cart?.lineItems?.some(
-    (item) => item.productId === product.id,
-  );
-
-  const lineItem = cart?.lineItems?.find(
-    (item) => item.productId === product.id,
-  );
 
   const isInCart = cart?.lineItems?.some(
     (item) => item.productId === product.id,
@@ -152,10 +141,8 @@ const ProductCard = ({
 
             <Button
               className="flex items-center gap-1"
-
               color={!isInCart ? 'primary' : 'danger'}
               isLoading={isLoading}
-              color="primary"
               onPress={() => {
                 if (!isInCart) {
                   addItem(product.id, product.variantId);
@@ -164,13 +151,11 @@ const ProductCard = ({
                 }
               }}
             >
-
               {!isInCart ? (
                 <ShoppingCart className="size-6 text-warning" />
               ) : (
                 <Trash2 className="size-6 text-warning" />
               )}
-
             </Button>
           </div>
         </div>
