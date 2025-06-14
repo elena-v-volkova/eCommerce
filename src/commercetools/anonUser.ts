@@ -10,7 +10,7 @@ import {
   anonymousTokenCache,
 } from './buildClient';
 
-import { getAnonymousId } from '@/shared/utils/anonymousId';
+
 
 const anonUserClient: Client = new ClientBuilder()
   .withProjectKey(projectKey)
@@ -20,7 +20,8 @@ const anonUserClient: Client = new ClientBuilder()
     credentials: {
       clientId: clientId,
       clientSecret: clientSecret,
-      anonymousId: getAnonymousId(),
+      // anonymousId: getAnonymousId(),
+
     },
 
     tokenCache: anonymousTokenCache,

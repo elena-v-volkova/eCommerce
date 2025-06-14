@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { MapPin, Gauge, Car, ShoppingCart } from 'lucide-react';
+
+import { MapPin, Gauge, Car, ShoppingCart, Trash2 } from 'lucide-react';
+
 import { Card, CardBody, Image, Chip, Button } from '@heroui/react';
 import { Cart } from '@commercetools/platform-sdk';
 
@@ -11,8 +13,10 @@ interface IProductCard {
   product: ProductsSimpleNew;
   onClick: (product: ProductsSimpleNew) => void;
   cart: Cart | null;
-  addItem: (productId: string, variantId: number) => Promise<void>;
+
+  addItem: (productId: string, variantId?: number) => Promise<void>;
   removeItem: (lineItemId: string) => Promise<void>;
+  isLoading: boolean;
 }
 
 const ProductCard = ({
@@ -21,6 +25,7 @@ const ProductCard = ({
   cart,
   addItem,
   removeItem,
+  isLoading,
 }: IProductCard) => {
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -136,7 +141,8 @@ const ProductCard = ({
 
             <Button
               className="flex items-center gap-1"
-              color="primary"
+              color={!isInCart ? 'primary' : 'danger'}
+              isLoading={isLoading}
               onPress={() => {
                 if (!isInCart) {
                   addItem(product.id, product.variantId);
@@ -145,8 +151,11 @@ const ProductCard = ({
                 }
               }}
             >
-              <ShoppingCart className="size-6 text-warning" />
-              {!isInCart ? 'Add to cart' : 'Remove from cart'}
+              {!isInCart ? (
+                <ShoppingCart className="size-6 text-warning" />
+              ) : (
+                <Trash2 className="size-6 text-warning" />
+              )}
             </Button>
           </div>
         </div>

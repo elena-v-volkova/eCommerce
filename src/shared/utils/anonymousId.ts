@@ -1,3 +1,7 @@
+
+import { anonymousTokenCache } from '@/commercetools/buildClient';
+
+
 export const getAnonymousId = (): string => {
   const stored = localStorage.getItem('anonymousId');
 
@@ -13,6 +17,23 @@ export const getAnonymousId = (): string => {
 export const clearAnonymousId = (): void => {
   localStorage.removeItem('anonymousId');
 };
+
+
+export const clearAnonymousSession = () => {
+  anonymousTokenCache.set({ token: '', expirationTime: 0, refreshToken: '' });
+  localStorage.removeItem('anonymousId');
+};
+
+export const generateNewAnonymousId = (): string => {
+  const newId = crypto.randomUUID();
+
+  localStorage.setItem('anonymousId', newId);
+  // Также очищаем старый токен кеш
+  localStorage.removeItem('anonTokens');
+
+  return newId;
+};
+
 
 // Получить cartId
 export const getCartId = (): string | null => {
