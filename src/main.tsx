@@ -4,18 +4,21 @@ import { BrowserRouter } from 'react-router';
 import App from './App';
 import { Provider } from './Provider';
 import './index.css';
-import DefaultLayout from './layouts/Default';
-import { AuthProvider } from './shared/model/AuthContext';
+import DefaultLayout from './layouts/Default.tsx';
+import { AuthProvider } from './shared/model/AuthContext.tsx';
+import { CartProvider } from './shared/context/CartContext.tsx';
 
 createRoot(document.body).render(
   <React.StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <Provider>
-          <DefaultLayout>
-            <App />
-          </DefaultLayout>
-        </Provider>
+        <CartProvider>
+          <Provider>
+            <DefaultLayout>
+              <App />
+            </DefaultLayout>
+          </Provider>
+        </CartProvider>
       </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>,
