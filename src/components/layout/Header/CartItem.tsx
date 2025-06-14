@@ -22,11 +22,11 @@ export function CartItem() {
           {' '}
           <ShoppingCart
             className="relative left-1/4 top-3 -translate-x-1/2  -translate-y-1/2 "
-            color="#fff"
+            color="#5794dc66"
             size={24}
             strokeWidth={2}
           />
-          <div className="text-blue absolute left-1/2 top-1/2  -translate-x-1/2 -translate-y-1/2  font-extrabold">
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2  -translate-y-1/2 font-extrabold  text-blue-950 dark:text-blue-50">
             {(cart.totalLineItemQuantity ?? 0) > 1000
               ? '999+'
               : cart.totalLineItemQuantity}

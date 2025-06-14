@@ -1,4 +1,4 @@
-.noArrows {
+.no_arrows {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -18,15 +18,15 @@
   }
 }
 
-.countButton {
+.count_button {
   @apply flex content-center justify-center items-center bg-[#f0f0f0] w-[40px] text-3xl font-bold;
 }
 
-.countButton:hover {
+.count_button:hover {
   background-color: #63acff;
 }
 
-.cartBody {
+.cart_body {
   display: flex;
   gap: 20px;
   width: 100%;
@@ -34,7 +34,7 @@
 }
 
 @media (width <= 550px) {
-  .cartBody {
+  .cart_body {
     flex-direction: column;
     gap: 10px;
     align-items: center;

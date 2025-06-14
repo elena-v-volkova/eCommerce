@@ -20,16 +20,9 @@ In this project, our team of three people including the team leader works togeth
 8. Zod
 9. Swiper js
 10. React toast
-11. Redux toolkit
-12. axios
-13. React Spring
-14. Jira
-15. date-fns
-16. React DayPicker
-17. react-i18next
-18. react-helmet
-19. tailwindcss
-20. HeroUI
+11. Jira
+12. Tailwind CSS
+13. HeroUI
 
 ## Server
 

@@ -21,26 +21,8 @@ function Home() {
         </span>
       </div>
       <Image alt="Main Image" className="dark:invert" src={car} />
-      {/* <div className="flex gap-3">
-        <Link
-          isExternal
-          className={buttonStyles({
-            color: 'primary',
-            radius: 'full',
-            variant: 'shadow',
-          })}
-          href={SITE_CONFIG.links.docs}
-        >
-          Documentation
-        </Link>
-      </div> */}
 
       <div className="mt-2 flex w-full  justify-center ">
-        {/* <Snippet hideCopyButton hideSymbol variant="bordered">
-          <span>
-            Get started by editing <Code color="primary">Home.tsx</Code>
-          </span>
-        </Snippet> */}
         {loading ? (
           <Spinner size="lg" />
         ) : error ? (
