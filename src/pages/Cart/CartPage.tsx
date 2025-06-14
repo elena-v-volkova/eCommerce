@@ -1,5 +1,5 @@
 import { Minus, Plus, Trash2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Card,
   CardBody,
@@ -125,7 +125,7 @@ function CartItem({ initCount, item, isLoading }: ICartItemProps) {
   const [count, setCount] = useState<number>(initCount || 1);
   const MIN = 1;
   const MAX = 1000;
-
+  const isInitial = useRef(true);
   const decrement = () => {
     if (count >= 2) {
       setCount(count - 1);
@@ -158,6 +158,11 @@ function CartItem({ initCount, item, isLoading }: ICartItemProps) {
   const itemId = product.id;
 
   useEffect(() => {
+    if (isInitial.current) {
+      isInitial.current = false;
+
+      return;
+    }
     updateItemQuantity(itemId, count);
   }, [count]);
 
