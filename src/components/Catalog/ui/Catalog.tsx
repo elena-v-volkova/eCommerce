@@ -119,7 +119,6 @@ const Catalog = () => {
   }, []);
 
   const handleSortChange = useCallback((keys: any) => {
-    console.log(keys);
     const selectedKey = Array.from(keys)[0];
 
     if (typeof selectedKey === 'string') {
@@ -569,10 +568,10 @@ const Catalog = () => {
                       key={product.id}
                       addItem={addItem}
                       cart={cart}
+                      isLoading={loading}
                       product={product}
                       removeItem={removeItem}
                       onClick={handleProductClick}
-                      isLoading={loading}
                     />
                   ))}
                 </div>

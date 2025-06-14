@@ -4,8 +4,6 @@ import {
   CartPagedQueryResponse,
 } from '@commercetools/platform-sdk';
 
-import { getAnonymousId } from '../utils/anonymousId';
-
 import { apiAnonRoot } from '@/commercetools/anonUser';
 import { createAuthClient } from '@/commercetools/authUser';
 import { tokenCache } from '@/commercetools/buildClient';
@@ -21,7 +19,7 @@ export async function createAnonymousCart(): Promise<Cart> {
   const cartDraft: CartDraft = {
     currency: 'USD',
     country: 'US',
-    anonymousId: getAnonymousId(),
+    // anonymousId: getAnonymousId(),
     taxMode: 'Platform',
   };
 
@@ -40,7 +38,10 @@ export async function createAnonymousCart(): Promise<Cart> {
 export async function getActiveCustomerCart(
   customerId: string,
 ): Promise<CartResponse> {
-  const apiAuthRoot = createAuthClient(tokenCache.get().token);
+  const apiAuthRoot = createAuthClient(
+    tokenCache.get().token,
+    tokenCache.get().refreshToken,
+  );
   const res = await apiAuthRoot
     .carts()
     .get({

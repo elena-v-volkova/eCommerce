@@ -4,7 +4,14 @@ import {
 } from '@commercetools/ts-client';
 import { createApiBuilderFromCtpClient } from '@commercetools/platform-sdk';
 
-import { httpMiddlewareOptions, projectKey } from './buildClient';
+import {
+  authUrl,
+  clientId,
+  clientSecret,
+  httpMiddlewareOptions,
+  projectKey,
+  tokenCache,
+} from './buildClient';
 
 const options: ExistingTokenMiddlewareOptions = {
   force: true,
@@ -20,10 +27,31 @@ const options: ExistingTokenMiddlewareOptions = {
 //   authUserClient,
 // ).withProjectKey({ projectKey });
 
-export const createAuthClient = (token) => {
+// export const createAuthClient = (token) => {
+//   const authUserClient = new ClientBuilder()
+//     .withProjectKey(projectKey)
+//     .withExistingTokenFlow(`Bearer ${token}`, options)
+//     .withHttpMiddleware(httpMiddlewareOptions)
+//     .build();
+
+//   return createApiBuilderFromCtpClient(authUserClient).withProjectKey({
+//     projectKey,
+//   });
+// };
+
+export const createAuthClient = (accessToken: string, refreshToken: string) => {
   const authUserClient = new ClientBuilder()
     .withProjectKey(projectKey)
-    .withExistingTokenFlow(`Bearer ${token}`, options)
+    .withRefreshTokenFlow({
+      refreshToken,
+      projectKey,
+      credentials: {
+        clientId,
+        clientSecret,
+      },
+      tokenCache,
+      host: authUrl,
+    })
     .withHttpMiddleware(httpMiddlewareOptions)
     .build();
 

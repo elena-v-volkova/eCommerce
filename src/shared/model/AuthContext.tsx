@@ -3,6 +3,7 @@ import { Customer } from '@commercetools/platform-sdk';
 import { useLocation, useNavigate } from 'react-router';
 
 import { AppRoute } from '@/routes/appRoutes';
+import { clearCartId } from '../utils/anonymousId';
 
 interface AuthContextType {
   user: Customer | null;
@@ -29,7 +30,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     localStorage.removeItem('userData');
     localStorage.removeItem('authTokens');
-    // clearCartId();
     setUser(null);
     if (location.pathname === `/${AppRoute.profile}`) {
       navigate(AppRoute.home);
