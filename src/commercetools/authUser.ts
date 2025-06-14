@@ -4,7 +4,6 @@ import {
 } from '@commercetools/ts-client';
 import { createApiBuilderFromCtpClient } from '@commercetools/platform-sdk';
 
-
 import {
   authUrl,
   clientId,
@@ -14,11 +13,9 @@ import {
   tokenCache,
 } from './buildClient';
 
-
 const options: ExistingTokenMiddlewareOptions = {
   force: true,
 };
-
 
 // const authUserClient = new ClientBuilder()
 //   .withProjectKey(projectKey)
@@ -42,7 +39,7 @@ const options: ExistingTokenMiddlewareOptions = {
 //   });
 // };
 
-export const createAuthClient = (accessToken: string, refreshToken: string) => {
+export const createAuthClient = (refreshToken: string) => {
   const authUserClient = new ClientBuilder()
     .withProjectKey(projectKey)
     .withRefreshTokenFlow({

@@ -40,10 +40,7 @@ export async function createAnonymousCart(): Promise<Cart> {
 export async function getActiveCustomerCart(
   customerId: string,
 ): Promise<CartResponse> {
-  const apiAuthRoot = createAuthClient(
-    tokenCache.get().token,
-    tokenCache.get().refreshToken,
-  );
+  const apiAuthRoot = createAuthClient(tokenCache.get().refreshToken);
 
   const res = await apiAuthRoot
     .carts()

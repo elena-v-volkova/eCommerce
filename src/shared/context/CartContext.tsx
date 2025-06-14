@@ -14,7 +14,6 @@ import {
   ErrorResponse,
 } from '@commercetools/platform-sdk';
 
-
 import { clearCartId, getCartId, setCartId } from '../utils/anonymousId';
 import {
   createAnonymousCart,
@@ -27,7 +26,6 @@ import { apiAnonRoot } from '@/commercetools/anonUser';
 import { createAuthClient } from '@/commercetools/authUser';
 
 import { anonymousTokenCache, tokenCache } from '@/commercetools/buildClient';
-
 
 interface CartContextType {
   cart: Cart | null;
@@ -45,7 +43,6 @@ interface CartContextType {
   applyDiscounts: (discountCode: string) => Promise<Cart | void>;
   cartDiscountByID: (discountId: string) => Promise<DiscountCode | void>;
   cancelDiscountById: (discountId: string) => Promise<Cart | void>;
-
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -65,14 +62,12 @@ interface CartProviderProps {
 }
 
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
-
   const [error, setError] = useState<string | null>(null);
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
   const [discounts, setDiscounts] =
     useState<DiscountCodePagedQueryResponse | null>(null);
-
 
   // Загрузка корзины при изменении пользователя
   useEffect(() => {
@@ -109,10 +104,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         setCartId(customerCart.results[0].id);
       } else {
         // Если у пользователя нет корзины, создаем новую
-        const authClient = createAuthClient(
-          tokenCache.get().token,
-          tokenCache.get().refreshToken,
-        );
+        const authClient = createAuthClient(tokenCache.get().refreshToken);
 
         const newCart = await authClient
           .me()
@@ -161,28 +153,20 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
   };
 
-
   const addItem = async (productId: string, variantId: number = 1) => {
-
     if (!cart) {
       return;
     }
-
 
     setLoading(true);
 
     const getEndpoint = () =>
       user?.id
-        ? createAuthClient(
-            tokenCache.get().token,
-            tokenCache.get().refreshToken,
-          )
-
+        ? createAuthClient(tokenCache.get().refreshToken)
             .me()
             .carts()
             .withId({ ID: cart.id })
         : apiAnonRoot.carts().withId({ ID: cart.id });
-
 
     const tryAddItem = async (version: number): Promise<void> => {
       try {
@@ -220,30 +204,23 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
     try {
       await tryAddItem(cart.version);
-
     } finally {
       setLoading(false);
     }
   };
 
   const removeItem = async (lineItemId: string) => {
-
     if (!cart) return;
 
     setLoading(true);
 
     const getEndpoint = () =>
       user?.id
-        ? createAuthClient(
-            tokenCache.get().token,
-            tokenCache.get().refreshToken,
-          )
-
+        ? createAuthClient(tokenCache.get().refreshToken)
             .me()
             .carts()
             .withId({ ID: cart.id })
         : apiAnonRoot.carts().withId({ ID: cart.id });
-
 
     const tryRemoveItem = async (version: number): Promise<void> => {
       try {
@@ -284,7 +261,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
     try {
       await tryRemoveItem(cart.version);
-
     } finally {
       setLoading(false);
     }
@@ -299,12 +275,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       setLoading(true);
 
       const endpoint = user?.id
-
-        ? createAuthClient(
-            tokenCache.get().token,
-            tokenCache.get().refreshToken,
-          )
-
+        ? createAuthClient(tokenCache.get().refreshToken)
             .me()
             .carts()
             .withId({ ID: cart.id })
@@ -351,12 +322,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       }
 
       const endpoint = user?.id
-
-        ? createAuthClient(
-            tokenCache.get().token,
-            tokenCache.get().refreshToken,
-          )
-
+        ? createAuthClient(tokenCache.get().refreshToken)
             .me()
             .carts()
             .withId({ ID: cart.id })
@@ -379,11 +345,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
   };
 
-
   const fetchDiscounts =
     async (): Promise<DiscountCodePagedQueryResponse | void> => {
       const TOKEN: string =
-        tokenCache.get().token || anonymousTokenCache.get().token;
+        tokenCache.get().refreshToken || anonymousTokenCache.get().refreshToken;
 
       setLoading(true);
 
@@ -405,7 +370,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   const applyDiscounts = async (discountCode: string): Promise<Cart | void> => {
     const TOKEN: string =
-      tokenCache.get().token || anonymousTokenCache.get().token;
+      tokenCache.get().refreshToken || anonymousTokenCache.get().refreshToken;
 
     setLoading(true);
 
@@ -442,7 +407,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     discountId: string,
   ): Promise<Cart | void> => {
     const TOKEN: string =
-      tokenCache.get().token || anonymousTokenCache.get().token;
+      tokenCache.get().refreshToken || anonymousTokenCache.get().refreshToken;
 
     setLoading(true);
 
@@ -482,7 +447,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     discountId: string,
   ): Promise<DiscountCode | void> => {
     const TOKEN: string =
-      tokenCache.get().token || anonymousTokenCache.get().token;
+      tokenCache.get().refreshToken || anonymousTokenCache.get().refreshToken;
 
     setLoading(true);
 
@@ -503,7 +468,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         setLoading(false);
       });
   };
-
 
   const value: CartContextType = {
     cart,

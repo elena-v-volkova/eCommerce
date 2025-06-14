@@ -4,7 +4,6 @@ import { useLocation, useNavigate } from 'react-router';
 
 import { clearCartId } from '@/shared/utils/anonymousId';
 import { AppRoute } from '@/routes/appRoutes';
-import { clearCartId } from '../utils/anonymousId';
 
 interface AuthContextType {
   user: Customer | null;
