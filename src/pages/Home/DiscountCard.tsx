@@ -66,7 +66,7 @@ function DiscountCard(prop: DiscountProps) {
           </Snippet>
         </div>
       </div>
-      <p className="  text-md opacity-90">{`${prop.description['en-US']}`}</p>
+      <p className="opacity-90">{`${prop.description['en-US']}`}</p>
     </Card>
   );
 }

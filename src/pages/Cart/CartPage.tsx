@@ -201,7 +201,7 @@ function CartItem({ initCount, item, isLoading }: ICartItemProps) {
   return (
     <Card
       isBlurred
-      className="start mb-2 w-full max-w-[600px] bg-background/60 dark:bg-default-100/50"
+      className="mb-2 w-full max-w-[600px] bg-background/60 dark:bg-default-100/50"
       shadow="sm"
     >
       <CardBody>
