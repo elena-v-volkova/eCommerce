@@ -5,7 +5,6 @@ import Home from './pages/Home/HomePage';
 import Login from './pages/Login/LoginPage';
 import Register from './pages/Register/RegisterPage';
 import { RedirectIfAuthenticated } from './ProtectedRoute';
-import { RoootLayout } from './components/RootLayout/RoootLayout';
 import { CatalogPage } from './pages/Catalog/CatalogPage';
 import {
   DefaultProfileContent,
@@ -24,7 +23,7 @@ function App() {
   return (
     // <Provider store={store}>
     <Routes>
-      <Route element={<RoootLayout />} path="/">
+      <Route path="/">
         <Route element={<Home />} path={AppRoute.home} />
         <Route
           element={

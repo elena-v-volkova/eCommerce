@@ -67,7 +67,6 @@ const Catalog = () => {
 
   const { cart, loading, addItem, removeItem } = useCart();
 
-
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { categories, isLoading: isLoadingCategories } =
     useRetroCarCategories();
@@ -612,7 +611,6 @@ const Catalog = () => {
                       addItem={addItem}
                       cart={cart}
                       isLoading={loading}
-
                       product={product}
                       removeItem={removeItem}
                       onClick={handleProductClick}

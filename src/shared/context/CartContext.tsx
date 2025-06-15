@@ -5,7 +5,6 @@ import {
   useEffect,
   useState,
 } from 'react';
-
 import {
   Cart,
   ClientResponse,
@@ -24,7 +23,6 @@ import { useAuth } from '../model/AuthContext';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
 import { createAuthClient } from '@/commercetools/authUser';
-
 import { anonymousTokenCache, tokenCache } from '@/commercetools/buildClient';
 
 interface CartContextType {

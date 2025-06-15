@@ -37,7 +37,12 @@ export function Header() {
   const width = useWindowWidth();
 
   return (
-    <Navbar isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
+    <Navbar
+      isBlurred={false}
+      isMenuOpen={isMenuOpen}
+      position={'static'}
+      onMenuOpenChange={setIsMenuOpen}
+    >
       <NavbarContent>
         <NavbarMenuToggle
           aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
@@ -48,7 +53,7 @@ export function Header() {
             <Link
               className="flex items-center gap-2"
               color="foreground"
-              href="/"
+              href={AppRoute.home}
             >
               <Logo />
               <p className="font-bold text-inherit">Car House</p>

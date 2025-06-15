@@ -1,7 +1,5 @@
 import { useState } from 'react';
-
 import { MapPin, Gauge, Car, ShoppingCart, Trash2 } from 'lucide-react';
-
 import { Card, CardBody, Image, Chip, Button } from '@heroui/react';
 import { Cart } from '@commercetools/platform-sdk';
 

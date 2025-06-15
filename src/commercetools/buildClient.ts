@@ -1,9 +1,9 @@
 import {
+  TokenCache,
   TokenStore,
   type AuthMiddlewareOptions,
   type HttpMiddlewareOptions,
 } from '@commercetools/ts-client';
-// import { tokenCache } from './login';
 
 export const projectKey = import.meta.env.VITE_CTP_PROJECT_KEY || '';
 export const clientId = import.meta.env.VITE_CTP_CLIENT_ID || '';
@@ -55,7 +55,6 @@ export const anonymousTokenCache: TokenCache = {
     } catch (e) {
       console.error('Failed to save anonymous token to localStorage:', e);
     }
-
   },
 };
 

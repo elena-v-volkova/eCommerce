@@ -1,5 +1,5 @@
 import { Minus, Plus, Trash2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Card,
   CardBody,
@@ -125,7 +125,7 @@ function CartItem({ initCount, item, isLoading }: ICartItemProps) {
   const [count, setCount] = useState<number>(initCount || 1);
   const MIN = 1;
   const MAX = 1000;
-
+  const isInitial = useRef(true);
   const decrement = () => {
     if (count >= 2) {
       setCount(count - 1);
@@ -158,6 +158,11 @@ function CartItem({ initCount, item, isLoading }: ICartItemProps) {
   const itemId = product.id;
 
   useEffect(() => {
+    if (isInitial.current) {
+      isInitial.current = false;
+
+      return;
+    }
     updateItemQuantity(itemId, count);
   }, [count]);
 
@@ -196,11 +201,11 @@ function CartItem({ initCount, item, isLoading }: ICartItemProps) {
   return (
     <Card
       isBlurred
-      className="start mb-2 w-full max-w-[600px] bg-background/60 dark:bg-default-100/50"
+      className="mb-2 w-full max-w-[600px] bg-background/60 dark:bg-default-100/50"
       shadow="sm"
     >
       <CardBody>
-        <div className={styles.cartBody}>
+        <div className={styles.cart_body}>
           <div className="relative size-[200]">
             <Image
               alt="image"
@@ -260,14 +265,14 @@ function CartItem({ initCount, item, isLoading }: ICartItemProps) {
             <div className="flex flex-col justify-start gap-2">
               <div className="flex w-[130px]">
                 <button
-                  className={`rounded-l-lg ${styles.countButton}`}
+                  className={`rounded-l-lg ${styles.count_button}`}
                   disabled={Boolean(isLoading)}
                   onClick={() => decrement()}
                 >
                   <Minus color="black" strokeWidth={3} />
                 </button>
                 <input
-                  className={styles.noArrows}
+                  className={styles.no_arrows}
                   max={MAX}
                   min={MIN}
                   type="number"
@@ -275,7 +280,7 @@ function CartItem({ initCount, item, isLoading }: ICartItemProps) {
                   onChange={(event) => handler(Number(event.target.value))}
                 />
                 <button
-                  className={`rounded-r-lg ${styles.countButton}`}
+                  className={`rounded-r-lg ${styles.count_button}`}
                   disabled={Boolean(isLoading)}
                   onClick={() => increment()}
                 >
