@@ -13,6 +13,7 @@ import tailwindcss from "eslint-plugin-tailwindcss";
 /** @type {import('eslint').Linter.Config[]} */
 export default [
   ...tailwindcss.configs["flat/recommended"],
+
   {
     ignores: [
       '.config/',

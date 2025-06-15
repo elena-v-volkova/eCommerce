@@ -43,16 +43,6 @@ export function CustomerSettings() {
     setUser(value);
   };
 
-  //   const notifyToast = (msg: string) => {
-  //     toast.success(msg, {
-  //       duration: 5000,
-  //       style: {
-  //         fontSize: '1.25rem',
-  //         padding: '16px 24px',
-  //       },
-  //     });
-  // };
-
   const changePassword = async (
     data: MyCustomerChangePassword,
   ): Promise<Customer | void> => {
