@@ -53,7 +53,7 @@ export function Header() {
             <Link
               className="flex items-center gap-2"
               color="foreground"
-              href="/"
+              href={AppRoute.home}
             >
               <Logo />
               <p className="font-bold text-inherit">Car House</p>
