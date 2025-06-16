@@ -27,7 +27,7 @@ export function EmptyCart() {
           color="secondary"
           radius="full"
           variant="ghost"
-          onClick={() => navigate(`/${AppRoute.catalog}`)}
+          onClick={() => navigate(AppRoute.catalog)}
         >
           catalog page
         </Button>
@@ -37,7 +37,7 @@ export function EmptyCart() {
             color="primary"
             radius="full"
             variant="light"
-            onClick={() => navigate(`/${AppRoute.login}`, { replace: false })}
+            onClick={() => navigate(AppRoute.login, { replace: false })}
           >
             Sign in
           </Button>
