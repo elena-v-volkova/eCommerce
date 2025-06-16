@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Avatar, Link } from '@heroui/react';
-import { team } from './teamData';
+import { team } from './teamData.ts';
 
 interface TeamMember {
   name: string;
