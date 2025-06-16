@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card, Avatar, Link } from '@heroui/react';
-
 import { team } from './teamData';
 
 interface TeamMember {
