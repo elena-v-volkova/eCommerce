@@ -13,7 +13,7 @@ import {
 } from './pages/Profile/ProfilePage';
 import ProductPage from './pages/ProductPage/ProductPage';
 import { CartPage } from './pages/Cart/CartPage';
-import AboutPage from './pages/About/aboutPage';
+import AboutPage from './pages/About/AboutPage';
 
 import { AppRoute } from '@/routes/appRoutes';
 import { PersonalContent } from '@/pages/Profile/PersonalContent';
