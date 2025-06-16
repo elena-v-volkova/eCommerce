@@ -1,17 +1,26 @@
 import type { Swiper as SwiperType } from 'swiper';
+import type { ProductProjection, Price } from '@commercetools/platform-sdk';
+
 import { Link as RouterLink, useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useMemo, useRef } from 'react';
-import { Card, CardBody, CardHeader, Chip, Spinner } from '@heroui/react';
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  Chip,
+  Spinner,
+  Button,
+} from '@heroui/react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 
-import type { ProductProjection, Price } from '@commercetools/platform-sdk';
-
 import { apiAnonRoot } from '@/commercetools/anonUser';
-
+import { useCart } from '@/shared/context/CartContext';
 export default function ProductPage() {
   const { key } = useParams() as { key: string };
   const navigate = useNavigate();
+
+  const { cart, addItem, removeItem, loading: cartLoading } = useCart();
 
   const [product, setProduct] = useState<ProductProjection | null>(null);
   const [loading, setLoading] = useState(true);
@@ -54,42 +63,39 @@ export default function ProductPage() {
   const variant = product?.masterVariant;
 
   const { regularPrice, discountedPrice } = useMemo(() => {
-    if (!variant?.prices?.length) {
+    if (!variant?.prices?.length)
       return { regularPrice: null, discountedPrice: null };
-    }
 
     const now = new Date();
     const pricesInCurrency = variant.prices.filter(
       (pr): pr is Price => pr.value.currencyCode === CURRENCY,
     );
-
-    if (pricesInCurrency.length === 0) {
+    if (pricesInCurrency.length === 0)
       return { regularPrice: null, discountedPrice: null };
-    }
 
     const pr = pricesInCurrency[0];
-    const baseAmount = pr.value.centAmount;
-
-    let discountAmount: number | null = null;
+    const base = pr.value.centAmount;
+    let discount: number | null = null;
     if (pr.discounted) {
       const fromOk = pr.validFrom ? new Date(pr.validFrom) <= now : true;
       const untilOk = pr.validUntil ? now <= new Date(pr.validUntil) : true;
-      if (fromOk && untilOk) {
-        discountAmount = pr.discounted.value.centAmount;
-      }
+      if (fromOk && untilOk) discount = pr.discounted.value.centAmount;
     }
 
-    const format = (cents: number) =>
-      (cents / 100).toLocaleString(undefined, {
+    const fmt = (c: number) =>
+      (c / 100).toLocaleString(undefined, {
         style: 'currency',
         currency: CURRENCY,
       });
 
     return {
-      regularPrice: format(baseAmount),
-      discountedPrice: discountAmount !== null ? format(discountAmount) : null,
+      regularPrice: fmt(base),
+      discountedPrice: discount != null ? fmt(discount) : null,
     };
   }, [variant, CURRENCY]);
+
+  const lineItem = cart?.lineItems.find((li) => li.productId === product?.id);
+  const isInCart = Boolean(lineItem);
 
   if (loading) {
     return (
@@ -98,7 +104,6 @@ export default function ProductPage() {
       </div>
     );
   }
-
   if (!product || !variant) return null;
 
   const closeFullscreen = () => setOpenIndex(null);
@@ -106,13 +111,13 @@ export default function ProductPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-6">
       <RouterLink
-        className="text-sm text-gray-500 hover:underline"
         to="/catalog"
+        className="text-sm text-gray-500 hover:underline"
       >
         &larr; Back
       </RouterLink>
 
-      <Card className="overflow-hidden" radius="lg" shadow="lg">
+      <Card radius="lg" shadow="lg">
         <div className="grid gap-4 md:grid-cols-2">
           <div className="order-2 flex justify-center p-4 md:order-1 md:block">
             <div className="mx-auto h-56 w-[70vw] overflow-hidden sm:h-64 md:mx-0 md:h-80 md:w-full lg:h-96">
@@ -123,22 +128,20 @@ export default function ProductPage() {
                 pagination={{ clickable: true }}
                 slidesPerView={1}
                 spaceBetween={10}
-                onSwiper={(swiper) => {
-                  mainSwiperRef.current = swiper;
-                }}
+                onSwiper={(sw) => (mainSwiperRef.current = sw)}
               >
                 {variant.images?.map((img, idx) => (
                   <SwiperSlide key={img.url}>
                     <div className="flex h-full items-center justify-center">
                       <button
-                        className="max-h-full max-w-full cursor-pointer rounded-2xl border-none bg-transparent p-0"
                         type="button"
+                        className="max-h-full max-w-full rounded-2xl bg-transparent p-0"
                         onClick={() => setOpenIndex(idx)}
                       >
                         <img
-                          alt={product.name?.[LOCALE] ?? 'Product image'}
-                          className="rounded-2xl"
                           src={img.url}
+                          alt={product.name?.[LOCALE]}
+                          className="rounded-2xl"
                           style={{ objectFit: 'contain' }}
                         />
                       </button>
@@ -152,22 +155,39 @@ export default function ProductPage() {
           <div className="order-1 space-y-6 p-6 md:order-2">
             <CardHeader className="p-0">
               <h1 className="text-3xl font-bold whitespace-normal break-words">
-                {product.name?.[LOCALE] ?? 'Untitled product'}
+                {product.name?.[LOCALE]}
               </h1>
             </CardHeader>
 
-            {discountedPrice ? (
-              <p className="flex items-baseline gap-4">
-                <span className="text-gray-500 line-through">
-                  {regularPrice}
-                </span>
-                <span className="text-2xl font-semibold">
-                  {discountedPrice}
-                </span>
-              </p>
-            ) : (
-              <p className="text-2xl font-semibold">{regularPrice}</p>
-            )}
+            <div className="flex items-baseline gap-4">
+              {discountedPrice ? (
+                <>
+                  <span className="text-gray-500 line-through">
+                    {regularPrice}
+                  </span>
+                  <span className="text-2xl font-semibold">
+                    {discountedPrice}
+                  </span>
+                </>
+              ) : (
+                <span className="text-2xl font-semibold">{regularPrice}</span>
+              )}
+
+              <Button
+                size="sm"
+                disabled={cartLoading}
+                color={isInCart ? 'danger' : 'primary'}
+                onPress={() => {
+                  if (!isInCart) {
+                    addItem(product.id, variant.id);
+                  } else if (lineItem) {
+                    removeItem(lineItem.id);
+                  }
+                }}
+              >
+                {isInCart ? 'Remove from Cart' : 'Add to Cart'}
+              </Button>
+            </div>
 
             {product.description?.[LOCALE] && (
               <CardBody className="p-0">
@@ -219,13 +239,12 @@ export default function ProductPage() {
             >
               &times;
             </button>
-
             <Swiper
               loop
               navigation
+              initialSlide={openIndex}
               modules={[Navigation, Pagination]}
               pagination={{ clickable: true }}
-              initialSlide={openIndex}
               slidesPerView={1}
               spaceBetween={10}
             >
@@ -233,9 +252,9 @@ export default function ProductPage() {
                 <SwiperSlide key={img.url}>
                   <div className="flex h-full items-center justify-center">
                     <img
-                      alt={product.name?.[LOCALE] ?? 'Product image'}
-                      className="rounded-2xl"
                       src={img.url}
+                      alt={product.name?.[LOCALE]}
+                      className="rounded-2xl"
                       style={{
                         maxWidth: '90%',
                         maxHeight: '90%',
