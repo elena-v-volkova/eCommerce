@@ -176,22 +176,22 @@ export default function ProductPage() {
               ) : (
                 <span className="text-2xl font-semibold">{regularPrice}</span>
               )}
-
-              <Button
-                size="sm"
-                disabled={cartLoading}
-                color={isInCart ? 'danger' : 'primary'}
-                onPress={() => {
-                  if (!isInCart) {
-                    addItem(product.id, variant.id);
-                  } else if (lineItem) {
-                    removeItem(lineItem.id);
-                  }
-                }}
-              >
-                {isInCart ? 'Remove from Cart' : 'Add to Cart'}
-              </Button>
             </div>
+
+            <Button
+              size="sm"
+              disabled={cartLoading}
+              color={isInCart ? 'danger' : 'primary'}
+              onPress={() => {
+                if (!isInCart) {
+                  addItem(product.id, variant.id);
+                } else if (lineItem) {
+                  removeItem(lineItem.id);
+                }
+              }}
+            >
+              {isInCart ? 'Remove from Cart' : 'Add to Cart'}
+            </Button>
 
             {product.description?.[LOCALE] && (
               <CardBody className="p-0">
