@@ -1,11 +1,11 @@
 import type { Swiper as SwiperType } from 'swiper';
-
 import { Link as RouterLink, useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { Card, CardBody, CardHeader, Chip, Spinner } from '@heroui/react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
-import { Price, ProductProjection } from '@commercetools/platform-sdk';
+
+import type { ProductProjection, Price } from '@commercetools/platform-sdk';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
 
@@ -19,12 +19,7 @@ export default function ProductPage() {
   const mainSwiperRef = useRef<SwiperType | null>(null);
 
   useEffect(() => {
-    if (openIndex !== null) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-
+    document.body.style.overflow = openIndex !== null ? 'hidden' : '';
     return () => {
       document.body.style.overflow = '';
     };
@@ -32,7 +27,6 @@ export default function ProductPage() {
 
   useEffect(() => {
     let isMounted = true;
-
     setLoading(true);
 
     apiAnonRoot
@@ -46,7 +40,9 @@ export default function ProductPage() {
         setProduct(res.body);
       })
       .catch(() => navigate('/404'))
-      .finally(() => isMounted && setLoading(false));
+      .finally(() => {
+        if (isMounted) setLoading(false);
+      });
 
     return () => {
       isMounted = false;
@@ -63,42 +59,35 @@ export default function ProductPage() {
     }
 
     const now = new Date();
-    const allPrices = variant.prices.filter(
-      (pr: Price) => pr.value.currencyCode === CURRENCY,
+    const pricesInCurrency = variant.prices.filter(
+      (pr): pr is Price => pr.value.currencyCode === CURRENCY,
     );
 
-    let activeDiscount: Price | null = null;
-    let basePrice: Price | null = null;
-
-    allPrices.forEach((pr: Price) => {
-      const { validFrom, validUntil } = pr;
-
-      if (validFrom && validUntil) {
-        const from = new Date(validFrom);
-        const until = new Date(validUntil);
-
-        if (from <= now && now <= until) {
-          activeDiscount = pr;
-        }
-      }
-    });
-
-    if (activeDiscount) {
-      basePrice =
-        allPrices.find((pr) => pr.id !== activeDiscount!.id) || allPrices[0];
-    } else {
-      basePrice = allPrices[0];
+    if (pricesInCurrency.length === 0) {
+      return { regularPrice: null, discountedPrice: null };
     }
 
-    const format = (pr: Price) =>
-      (pr.value.centAmount / 100).toLocaleString(undefined, {
+    const pr = pricesInCurrency[0];
+    const baseAmount = pr.value.centAmount;
+
+    let discountAmount: number | null = null;
+    if (pr.discounted) {
+      const fromOk = pr.validFrom ? new Date(pr.validFrom) <= now : true;
+      const untilOk = pr.validUntil ? now <= new Date(pr.validUntil) : true;
+      if (fromOk && untilOk) {
+        discountAmount = pr.discounted.value.centAmount;
+      }
+    }
+
+    const format = (cents: number) =>
+      (cents / 100).toLocaleString(undefined, {
         style: 'currency',
         currency: CURRENCY,
       });
 
     return {
-      regularPrice: basePrice ? format(basePrice) : null,
-      discountedPrice: activeDiscount ? format(activeDiscount) : null,
+      regularPrice: format(baseAmount),
+      discountedPrice: discountAmount !== null ? format(discountAmount) : null,
     };
   }, [variant, CURRENCY]);
 
@@ -130,7 +119,6 @@ export default function ProductPage() {
               <Swiper
                 loop
                 navigation
-                className="size-full"
                 modules={[Navigation, Pagination]}
                 pagination={{ clickable: true }}
                 slidesPerView={1}
@@ -143,7 +131,7 @@ export default function ProductPage() {
                   <SwiperSlide key={img.url}>
                     <div className="flex h-full items-center justify-center">
                       <button
-                        className="max-h-full max-w-full cursor-pointer overflow-hidden rounded-2xl border-none bg-transparent p-0"
+                        className="max-h-full max-w-full cursor-pointer rounded-2xl border-none bg-transparent p-0"
                         type="button"
                         onClick={() => setOpenIndex(idx)}
                       >
@@ -163,16 +151,12 @@ export default function ProductPage() {
 
           <div className="order-1 space-y-6 p-6 md:order-2">
             <CardHeader className="p-0">
-              <h1 className="whitespace-normal break-words text-3xl font-bold">
+              <h1 className="text-3xl font-bold whitespace-normal break-words">
                 {product.name?.[LOCALE] ?? 'Untitled product'}
               </h1>
             </CardHeader>
 
-            {regularPrice && !discountedPrice && (
-              <p className="text-2xl font-semibold">{regularPrice}</p>
-            )}
-
-            {regularPrice && discountedPrice && (
+            {discountedPrice ? (
               <p className="flex items-baseline gap-4">
                 <span className="text-gray-500 line-through">
                   {regularPrice}
@@ -181,23 +165,25 @@ export default function ProductPage() {
                   {discountedPrice}
                 </span>
               </p>
+            ) : (
+              <p className="text-2xl font-semibold">{regularPrice}</p>
             )}
 
             {product.description?.[LOCALE] && (
               <CardBody className="p-0">
-                <p className="whitespace-normal break-words text-base leading-relaxed">
+                <p className="text-base leading-relaxed whitespace-normal break-words">
                   {product.description[LOCALE]}
                 </p>
               </CardBody>
             )}
 
-            {variant.attributes?.length && (
+            {(variant.attributes?.length ?? 0) > 0 && (
               <div>
-                <h2 className="mb-3 whitespace-normal break-words font-medium">
+                <h2 className="mb-3 font-medium whitespace-normal break-words">
                   Specifications
                 </h2>
                 <div className="flex flex-wrap gap-2">
-                  {variant.attributes.map((attr) => (
+                  {variant.attributes!.map((attr) => (
                     <Chip key={attr.name} color="primary" variant="bordered">
                       <span className="mr-1 text-xs text-gray-500">
                         {attr.name}:
@@ -217,23 +203,15 @@ export default function ProductPage() {
       </Card>
 
       {openIndex !== null && (
-        <div
-          className="fixed inset-0 z-50 bg-black bg-opacity-90"
-          role="button"
-          tabIndex={0}
+        <button
+          className="fixed inset-0 z-50 bg-black/90"
+          type="button"
           onClick={closeFullscreen}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === 'Escape') {
-              closeFullscreen();
-            }
-          }}
+          onKeyDown={(e) =>
+            (e.key === 'Enter' || e.key === 'Escape') && closeFullscreen()
+          }
         >
-          <div
-            className="absolute left-1/2 top-[10vh] flex h-[80vh] w-[90vw] -translate-x-1/2 items-center justify-center md:w-[60vw] lg:w-[50vw]"
-            role="presentation"
-            tabIndex={-1}
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="absolute left-1/2 top-[10vh] flex h-[80vh] w-[90vw] -translate-x-1/2 items-center justify-center md:w-[60vw] lg:w-[50vw]">
             <button
               className="absolute -right-2.5 -top-2.5 z-50 text-3xl text-white"
               type="button"
@@ -245,10 +223,9 @@ export default function ProductPage() {
             <Swiper
               loop
               navigation
-              className="size-full"
-              initialSlide={openIndex}
               modules={[Navigation, Pagination]}
               pagination={{ clickable: true }}
+              initialSlide={openIndex}
               slidesPerView={1}
               spaceBetween={10}
             >
@@ -270,7 +247,7 @@ export default function ProductPage() {
               ))}
             </Swiper>
           </div>
-        </div>
+        </button>
       )}
     </div>
   );
