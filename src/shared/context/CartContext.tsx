@@ -345,12 +345,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   const fetchDiscounts =
     async (): Promise<DiscountCodePagedQueryResponse | void> => {
-      const TOKEN: string =
-        tokenCache.get().refreshToken || anonymousTokenCache.get().refreshToken;
-
-      setLoading(true);
-
-      return await createAuthClient(TOKEN)
+      apiAnonRoot
         .discountCodes()
         .get()
         .execute()
