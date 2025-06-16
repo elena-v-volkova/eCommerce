@@ -89,6 +89,7 @@ export default function ProductPage() {
 
     const fmt = (c: number) => {
       const value = c / 100;
+
       return value.toLocaleString(undefined, {
         style: 'currency',
         currency: CURRENCY,
@@ -184,9 +185,9 @@ export default function ProductPage() {
             </div>
 
             <Button
-              size="sm"
-              disabled={cartLoading}
               color={isInCart ? 'danger' : 'primary'}
+              disabled={cartLoading}
+              size="sm"
               onPress={() => {
                 if (!isInCart) {
                   addItem(product.id, variant.id);
