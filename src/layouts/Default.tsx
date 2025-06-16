@@ -3,6 +3,7 @@ import { ArrowUp } from 'lucide-react';
 import { Button } from '@heroui/react';
 
 import { Header } from '@/components/layout/Header/Header';
+import Footer from '@/components/layout/Footer/Footer';
 
 export default function DefaultLayout({
   children,
@@ -57,6 +58,7 @@ export default function DefaultLayout({
       >
         <ArrowUp color="#aaa" strokeWidth={3} />
       </Button>
+      <Footer />
     </div>
   );
 }
