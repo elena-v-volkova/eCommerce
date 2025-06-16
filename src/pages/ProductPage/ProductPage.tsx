@@ -82,11 +82,15 @@ export default function ProductPage() {
       if (fromOk && untilOk) discount = pr.discounted.value.centAmount;
     }
 
-    const fmt = (c: number) =>
-      (c / 100).toLocaleString(undefined, {
+    const fmt = (c: number) => {
+      const value = c / 100;
+      return value.toLocaleString(undefined, {
         style: 'currency',
         currency: CURRENCY,
+        minimumFractionDigits: value % 1 === 0 ? 0 : 2,
+        maximumFractionDigits: 2,
       });
+    };
 
     return {
       regularPrice: fmt(base),
