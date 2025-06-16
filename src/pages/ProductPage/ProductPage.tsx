@@ -29,6 +29,7 @@ export default function ProductPage() {
 
   useEffect(() => {
     document.body.style.overflow = openIndex !== null ? 'hidden' : '';
+
     return () => {
       document.body.style.overflow = '';
     };
@@ -36,6 +37,7 @@ export default function ProductPage() {
 
   useEffect(() => {
     let isMounted = true;
+
     setLoading(true);
 
     apiAnonRoot
@@ -70,15 +72,18 @@ export default function ProductPage() {
     const pricesInCurrency = variant.prices.filter(
       (pr): pr is Price => pr.value.currencyCode === CURRENCY,
     );
+
     if (pricesInCurrency.length === 0)
       return { regularPrice: null, discountedPrice: null };
 
     const pr = pricesInCurrency[0];
     const base = pr.value.centAmount;
     let discount: number | null = null;
+
     if (pr.discounted) {
       const fromOk = pr.validFrom ? new Date(pr.validFrom) <= now : true;
       const untilOk = pr.validUntil ? now <= new Date(pr.validUntil) : true;
+
       if (fromOk && untilOk) discount = pr.discounted.value.centAmount;
     }
 
@@ -115,8 +120,8 @@ export default function ProductPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-6">
       <RouterLink
-        to="/catalog"
         className="text-sm text-gray-500 hover:underline"
+        to="/catalog"
       >
         &larr; Back
       </RouterLink>
@@ -138,14 +143,14 @@ export default function ProductPage() {
                   <SwiperSlide key={img.url}>
                     <div className="flex h-full items-center justify-center">
                       <button
-                        type="button"
                         className="max-h-full max-w-full rounded-2xl bg-transparent p-0"
+                        type="button"
                         onClick={() => setOpenIndex(idx)}
                       >
                         <img
-                          src={img.url}
                           alt={product.name?.[LOCALE]}
                           className="rounded-2xl"
+                          src={img.url}
                           style={{ objectFit: 'contain' }}
                         />
                       </button>
@@ -158,7 +163,7 @@ export default function ProductPage() {
 
           <div className="order-1 space-y-6 p-6 md:order-2">
             <CardHeader className="p-0">
-              <h1 className="text-3xl font-bold whitespace-normal break-words">
+              <h1 className="whitespace-normal break-words text-3xl font-bold">
                 {product.name?.[LOCALE]}
               </h1>
             </CardHeader>
@@ -195,7 +200,7 @@ export default function ProductPage() {
 
             {product.description?.[LOCALE] && (
               <CardBody className="p-0">
-                <p className="text-base leading-relaxed whitespace-normal break-words">
+                <p className="whitespace-normal break-words text-base leading-relaxed">
                   {product.description[LOCALE]}
                 </p>
               </CardBody>
@@ -203,7 +208,7 @@ export default function ProductPage() {
 
             {(variant.attributes?.length ?? 0) > 0 && (
               <div>
-                <h2 className="mb-3 font-medium whitespace-normal break-words">
+                <h2 className="mb-3 whitespace-normal break-words font-medium">
                   Specifications
                 </h2>
                 <div className="flex flex-wrap gap-2">
@@ -256,9 +261,9 @@ export default function ProductPage() {
                 <SwiperSlide key={img.url}>
                   <div className="flex h-full items-center justify-center">
                     <img
-                      src={img.url}
                       alt={product.name?.[LOCALE]}
                       className="rounded-2xl"
+                      src={img.url}
                       style={{
                         maxWidth: '90%',
                         maxHeight: '90%',

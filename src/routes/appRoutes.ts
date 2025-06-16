@@ -4,6 +4,7 @@ export enum AppRoute {
   register = '/register',
   catalog = '/catalog',
   home = '/',
+  about = 'about',
   product = 'products/:key',
   cart = '/cart',
   notFound = '*',

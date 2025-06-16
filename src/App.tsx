@@ -13,6 +13,7 @@ import {
 } from './pages/Profile/ProfilePage';
 import ProductPage from './pages/ProductPage/ProductPage';
 import { CartPage } from './pages/Cart/CartPage';
+import AboutPage from './pages/About/AboutPage';
 
 import { AppRoute } from '@/routes/appRoutes';
 import { PersonalContent } from '@/pages/Profile/PersonalContent';
@@ -63,6 +64,7 @@ function App() {
 
         <Route element={<ProductPage />} path={AppRoute.product} />
         <Route element={<CartPage />} path={AppRoute.cart} />
+        <Route element={<AboutPage />} path={AppRoute.about} />
       </Route>
     </Routes>
     // </Provider>
