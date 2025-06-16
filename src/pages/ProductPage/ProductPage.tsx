@@ -87,11 +87,15 @@ export default function ProductPage() {
       if (fromOk && untilOk) discount = pr.discounted.value.centAmount;
     }
 
-    const fmt = (c: number) =>
-      (c / 100).toLocaleString(undefined, {
+    const fmt = (c: number) => {
+      const value = c / 100;
+      return value.toLocaleString(undefined, {
         style: 'currency',
         currency: CURRENCY,
+        minimumFractionDigits: value % 1 === 0 ? 0 : 2,
+        maximumFractionDigits: 2,
       });
+    };
 
     return {
       regularPrice: fmt(base),
@@ -177,22 +181,22 @@ export default function ProductPage() {
               ) : (
                 <span className="text-2xl font-semibold">{regularPrice}</span>
               )}
-
-              <Button
-                color={isInCart ? 'danger' : 'primary'}
-                disabled={cartLoading}
-                size="sm"
-                onPress={() => {
-                  if (!isInCart) {
-                    addItem(product.id, variant.id);
-                  } else if (lineItem) {
-                    removeItem(lineItem.id);
-                  }
-                }}
-              >
-                {isInCart ? 'Remove from Cart' : 'Add to Cart'}
-              </Button>
             </div>
+
+            <Button
+              size="sm"
+              disabled={cartLoading}
+              color={isInCart ? 'danger' : 'primary'}
+              onPress={() => {
+                if (!isInCart) {
+                  addItem(product.id, variant.id);
+                } else if (lineItem) {
+                  removeItem(lineItem.id);
+                }
+              }}
+            >
+              {isInCart ? 'Remove from Cart' : 'Add to Cart'}
+            </Button>
 
             {product.description?.[LOCALE] && (
               <CardBody className="p-0">
