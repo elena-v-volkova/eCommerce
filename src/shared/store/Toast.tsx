@@ -1,11 +1,11 @@
 import { addToast, cn } from '@heroui/react';
 import { X } from 'lucide-react';
 
-export function notifyToast(msg: string) {
+export function notifyToast(msg: string, timeout = 5000) {
   addToast({
     title: msg,
     // description: msg,
-    timeout: 5000,
+    timeout: timeout,
     classNames: {
       base: cn([
         'bg-default-50 dark:bg-background shadow-sm',

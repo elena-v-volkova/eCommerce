@@ -16,6 +16,7 @@ import { Navigation, Pagination } from 'swiper/modules';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
 import { useCart } from '@/shared/context/CartContext';
+import { notifyToast } from '@/shared/store/Toast';
 export default function ProductPage() {
   const { key } = useParams() as { key: string };
   const navigate = useNavigate();
@@ -192,7 +193,9 @@ export default function ProductPage() {
                 if (!isInCart) {
                   addItem(product.id, variant.id);
                 } else if (lineItem) {
-                  removeItem(lineItem.id);
+                  removeItem(lineItem.id).then(() =>
+                    notifyToast('Item removed from cart', 2000),
+                  );
                 }
               }}
             >

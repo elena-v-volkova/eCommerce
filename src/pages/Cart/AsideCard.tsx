@@ -10,6 +10,8 @@ import {
 import { Check, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
+import { PopoverCart } from './PopoverContent';
+
 import { formatPrice } from '@/shared/utils/utils';
 
 type TAsideCard = {
@@ -19,6 +21,7 @@ type TAsideCard = {
   cart: Cart;
   cartDiscountByID: (discountId: string) => Promise<DiscountCode | void>;
   cancelDiscountById: (discountId: string) => Promise<Cart | void>;
+  isLoading: boolean;
 };
 
 type MyDiscount = {
@@ -33,6 +36,7 @@ export function AsideCard({
   cart,
   cartDiscountByID,
   cancelDiscountById,
+  isLoading,
 }: TAsideCard) {
   const [code, setCode] = useState<string>('');
 
@@ -145,27 +149,23 @@ export function AsideCard({
           variant="bordered"
           onValueChange={(value: string) => setCode(value)}
         />
-        {/* <Button
-          className="w-[50px]   uppercase"
-          color="default"
-          radius="full"
-          variant="flat"
-          onClick={() => applyDiscounts(code)}
-        >
-          Apply
-        </Button> */}
       </CardBody>
       <Divider />
       <CardFooter>
-        <Button
-          className="w-[200px] font-bold uppercase"
-          color="warning"
-          radius="full"
-          variant="light"
-          onClick={clearCart}
-        >
-          Clear shopping cart
-        </Button>
+        <PopoverCart
+          action={() => clearCart()}
+          isLoading={isLoading}
+          triggerButton={
+            <Button
+              className="w-[200px] font-bold uppercase"
+              color="warning"
+              radius="full"
+              variant="light"
+            >
+              Clear shopping cart
+            </Button>
+          }
+        />
       </CardFooter>
     </Card>
   );

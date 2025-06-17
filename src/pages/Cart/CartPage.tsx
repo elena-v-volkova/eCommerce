@@ -1,16 +1,6 @@
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import {
-  Card,
-  CardBody,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  Image,
-  Button,
-  Chip,
-  Spinner,
-} from '@heroui/react';
+import { Card, CardBody, Image, Button, Chip, Spinner } from '@heroui/react';
 import {
   Attribute,
   Cart,
@@ -21,6 +11,7 @@ import {
 import styles from './CartPage.module.scss';
 import { AsideCard } from './AsideCard';
 import { EmptyCart } from './EmptyCart';
+import { PopoverCart } from './PopoverContent';
 
 import { useCart } from '@/shared/context/CartContext';
 import { formatPrice } from '@/shared/utils/utils';
@@ -109,6 +100,7 @@ function ShopItems({
         cartDiscountByID={cartDiscountByID}
         clearCart={clear}
         error={error}
+        isLoading={isLoading}
       />
     </div>
   );
@@ -168,35 +160,7 @@ function CartItem({ initCount, item, isLoading }: ICartItemProps) {
 
   const deleteHandler = async () => {
     await removeItem(itemId);
-    setIsOpen(false);
   };
-
-  const [isOpen, setIsOpen] = useState(false);
-
-  const popoverContent = (
-    <PopoverContent>
-      <div className="px-1 py-2">
-        <div className="text-small font-bold">
-          <p className="my-1">Are you sure?</p>
-        </div>
-        <Button
-          isIconOnly
-          className="mx-1 text-small font-bold"
-          isLoading={loading}
-          onClick={() => deleteHandler()}
-        >
-          Yes
-        </Button>
-        <Button
-          isIconOnly
-          className="mx-1 text-small font-bold"
-          onClick={() => setIsOpen(false)}
-        >
-          No
-        </Button>
-      </div>
-    </PopoverContent>
-  );
 
   return (
     <Card
@@ -286,13 +250,10 @@ function CartItem({ initCount, item, isLoading }: ICartItemProps) {
                 >
                   <Plus color="black" strokeWidth={3} />
                 </button>
-                <Popover
-                  color="default"
-                  isOpen={isOpen}
-                  placement="top"
-                  onOpenChange={setIsOpen}
-                >
-                  <PopoverTrigger>
+                <PopoverCart
+                  action={() => deleteHandler()}
+                  isLoading={loading}
+                  triggerButton={
                     <Button
                       isIconOnly
                       className="ml-4 sm:ml-8"
@@ -301,12 +262,10 @@ function CartItem({ initCount, item, isLoading }: ICartItemProps) {
                       }
                       radius="sm"
                       size="sm"
-                      type="button"
                       variant="light"
                     />
-                  </PopoverTrigger>
-                  {popoverContent}
-                </Popover>
+                  }
+                />
               </div>
               <div className="text-lg font-bold">
                 <p>Total price:</p>
