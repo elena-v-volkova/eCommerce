@@ -1,8 +1,11 @@
 import React from 'react';
-import { Card, Avatar, Link } from '@heroui/react';
+import { Card, Avatar, Link, Divider } from '@heroui/react';
+
 import lena from '../../assets/lena.jpg';
 import artsem from '../../assets/artsem.jpeg';
 import andrej from '../../assets/andrej.jpg';
+
+import { Stack } from './Stack';
 
 interface TeamMember {
   name: string;
@@ -10,6 +13,7 @@ interface TeamMember {
   bio: string;
   photoSrc: string;
   githubUrl: string;
+  contribution: string[];
 }
 
 const team: TeamMember[] = [
@@ -19,6 +23,12 @@ const team: TeamMember[] = [
     bio: 'Always ready to lend a hand and explain complex concepts. An excellent team lead and technical specialist.',
     photoSrc: andrej,
     githubUrl: 'https://github.com/FranticMario',
+    contribution: [
+      'commerce tools api',
+      'catalog page',
+      'login page',
+      'selection of tools',
+    ],
   },
   {
     name: 'Elena Volkova',
@@ -26,6 +36,12 @@ const team: TeamMember[] = [
     bio: 'Great technical specialist delivering fast, high-quality, and cost-effective solutions.',
     photoSrc: lena,
     githubUrl: 'https://github.com/elena-v-volkova',
+    contribution: [
+      'product page',
+      'about page',
+      'structure project',
+      'selection of tools',
+    ],
   },
   {
     name: 'Artsem Rogovenko',
@@ -33,6 +49,12 @@ const team: TeamMember[] = [
     bio: 'Highly responsible and deeply invested in the project’s success, with strong problem-solving and communication skills.',
     photoSrc: artsem,
     githubUrl: 'https://github.com/artsemrogovenko',
+    contribution: [
+      'main page',
+      'register page',
+      'cart page',
+      'linter settings',
+    ],
   },
 ];
 
@@ -42,6 +64,7 @@ const TeamMemberCard: React.FC<TeamMember> = ({
   bio,
   photoSrc,
   githubUrl,
+  contribution,
 }) => (
   <Card className="flex flex-col items-center p-6">
     <Avatar alt={name} className="mb-4 size-24" src={photoSrc} />
@@ -49,7 +72,15 @@ const TeamMemberCard: React.FC<TeamMember> = ({
     <p className="mb-2 text-center text-sm font-medium text-indigo-600">
       {role}
     </p>
-    <p className="mb-3 text-center text-gray-700">{bio}</p>
+    <p className="mb-3 text-center text-gray-700 dark:text-gray-300">{bio}</p>
+    <h3 className="font-medium capitalize text-yellow-500">
+      contribution to development
+    </h3>
+    <div className="p-2 text-center font-semibold capitalize">
+      {contribution.map((value) => (
+        <p key={value}>{value}</p>
+      ))}
+    </div>
     <Link
       className="mt-auto font-semibold hover:underline"
       href={githubUrl}
@@ -72,15 +103,22 @@ const AboutPage: React.FC = () => {
       </section>
 
       <section className="container mx-auto px-4 py-8">
-        <div className="mb-8 rounded-lg bg-gray-200 p-6 shadow-lg">
-          <h2 className="mb-4 text-2xl font-semibold text-indigo-700">
+        <div className="mb-8 flex flex-col rounded-lg bg-gray-200 p-6 shadow-lg dark:bg-slate-800">
+          <h2 className="mb-4 text-2xl font-semibold text-indigo-700 dark:text-slate-100">
             Our Collaboration
           </h2>
-          <p className="mx-auto max-w-3xl text-center text-indigo-800">
+          <p className="mx-auto max-w-3xl text-center text-indigo-800 dark:text-slate-300">
             Fueled by agile sprints, rigorous peer reviews, and daily stand-ups,
             our team harnessed collective creativity and technical precision to
             craft a resilient, high-impact solution.
           </p>
+          <Divider className="my-4" />
+          <div className="flex flex-col ">
+            <h3 className="text-center font-semibold uppercase">
+              Development tools
+            </h3>
+            <Stack />
+          </div>
         </div>
       </section>
 
