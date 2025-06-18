@@ -9,3 +9,11 @@
   color: aliceblue;
   text-transform: uppercase;
 }
+
+.shopping {
+  color: #fff;
+}
+
+html.dark .shopping {
+  color: #555;
+}

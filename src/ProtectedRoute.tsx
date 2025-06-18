@@ -1,23 +1,24 @@
 import { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router';
 
-import { useSession } from './shared/model/useSession';
+import { useAuth } from './shared/model/AuthContext';
 
 export const RedirectIfAuthenticated = ({
   children,
 }: {
   children: ReactNode;
 }) => {
-  const { token } = useSession();
+  // const { token } = useSession();
+  const { user } = useAuth();
   const location = useLocation();
 
-  if (token && location.pathname === '/login') {
+  if (user && location.pathname === '/login') {
     return <Navigate replace to="/" />;
   }
-  if (token && location.pathname === '/register') {
+  if (user && location.pathname === '/register') {
     return <Navigate replace to="/" />;
   }
-  if (!token && location.pathname.match('/profile')) {
+  if (!user && location.pathname.match('/profile')) {
     return <Navigate replace to="/login" />;
   }
 

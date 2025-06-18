@@ -9,12 +9,12 @@ import {
   ErrorObject,
 } from '@commercetools/platform-sdk';
 import { useState } from 'react';
-import toast from 'react-hot-toast';
 
 import { useSession } from '../model/useSession';
 
 import { getCountryInfo } from './countries';
 import { ADDRESS_ACTION, PERSONAL_DATA_ACTION } from './updateUtils';
+import { notifyToast } from './Toast';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
 import { createPasswordFlowClient } from '@/commercetools/login';
@@ -41,16 +41,6 @@ export function CustomerSettings() {
   const updateLocalClient = (value: Customer) => {
     updateUser(value);
     setUser(value);
-  };
-
-  const notifyToast = (msg: string) => {
-    toast.success(msg, {
-      duration: 5000,
-      style: {
-        fontSize: '1.25rem',
-        padding: '16px 24px',
-      },
-    });
   };
 
   const changePassword = async (

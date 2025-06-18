@@ -21,6 +21,7 @@ export interface Price {
   };
   validFrom?: string;
   validUntil?: string;
+  discounted?: number;
 }
 
 export interface Variant {
