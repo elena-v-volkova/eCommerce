@@ -25,7 +25,6 @@ export const generateNewAnonymousId = (): string => {
   const newId = crypto.randomUUID();
 
   localStorage.setItem('anonymousId', newId);
-  // Также очищаем старый токен кеш
   localStorage.removeItem('anonTokens');
 
   return newId;

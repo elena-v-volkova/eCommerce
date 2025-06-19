@@ -58,7 +58,6 @@ export function PasswordUpdate() {
     if (Object.keys(errors).length === 0) {
       const data = getValues();
       const request = {
-        // id: user?.id || '',
         version: user?.version || 1,
         currentPassword: data?.current || '',
         newPassword: data.password || '',

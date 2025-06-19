@@ -92,7 +92,7 @@ export function Header() {
               <DropdownItem
                 key="profile"
                 className="h-14 gap-2"
-                textValue={`Hello ${user.firstName} ${user.lastName}`} // Add this
+                textValue={`Hello ${user.firstName} ${user.lastName}`}
               >
                 <p className="font-semibold">
                   Hello {user.firstName} {user.lastName}

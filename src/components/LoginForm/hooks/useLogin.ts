@@ -11,7 +11,6 @@ export const useLogin = () => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { login } = useAuth();
-  // const { setCart } = useCart();
   const fetchUser = async ({
     email,
     password,
@@ -26,7 +25,6 @@ export const useLogin = () => {
     try {
       const loginClient = createPasswordFlowClient(email, password);
       const { body: customer } = await loginClient
-        // .get().execute();
         .login()
         .post({
           body: {
@@ -45,7 +43,6 @@ export const useLogin = () => {
     } catch (err) {
       const loginClient = createPasswordFlowClient(email, password);
       const { body: customer } = await loginClient
-        // .get().execute();
         .login()
         .post({
           body: {

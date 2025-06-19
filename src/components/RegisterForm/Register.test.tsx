@@ -152,7 +152,6 @@ describe('RegisterForm', () => {
       expect(onDeliveryChange).toHaveBeenCalledWith(false);
     });
 
-    // Second toggle (back to true)
     await user.click(sameAsDeliveryCheckbox);
     await waitFor(() => {
       expect(onDeliveryChange).toHaveBeenCalledWith(true);

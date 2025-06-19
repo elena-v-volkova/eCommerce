@@ -303,14 +303,3 @@ function isInvalidCurrentPasswordError(
     error.code === 'InvalidCurrentPassword'
   );
 }
-
-// function isCustomer(obj: any): obj is Customer {
-//   return (
-//     obj !== null &&
-//     typeof obj === 'object' &&
-//     typeof obj.id === 'string' &&
-//     typeof obj.version === 'number' &&
-//     typeof obj.email === 'string' &&
-//     Array.isArray(obj.addresses)
-//   );
-// }

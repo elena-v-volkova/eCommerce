@@ -4,7 +4,6 @@ import { X } from 'lucide-react';
 export function notifyToast(msg: string, timeout = 5000) {
   addToast({
     title: msg,
-    // description: msg,
     timeout: timeout,
     classNames: {
       base: cn([

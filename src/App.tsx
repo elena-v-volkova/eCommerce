@@ -22,7 +22,6 @@ import { PasswordUpdate } from '@/pages/Profile/PasswordUpdate';
 
 function App() {
   return (
-    // <Provider store={store}>
     <Routes>
       <Route path="/">
         <Route element={<Home />} path={AppRoute.home} />
@@ -67,7 +66,6 @@ function App() {
         <Route element={<AboutPage />} path={AppRoute.about} />
       </Route>
     </Routes>
-    // </Provider>
   );
 }
 export default App;
