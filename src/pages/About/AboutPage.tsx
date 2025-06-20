@@ -1,95 +1,9 @@
 import React from 'react';
-import { Card, Avatar, Link, Divider } from '@heroui/react';
-
-import lena from '../../assets/lena.jpg';
-import artsem from '../../assets/artsem.jpeg';
-import andrej from '../../assets/andrej.jpg';
+import { Link, Divider } from '@heroui/react';
 
 import { Stack } from './Stack';
-
-interface TeamMember {
-  name: string;
-  role: string;
-  bio: string;
-  photoSrc: string;
-  githubUrl: string;
-  contribution: string[];
-}
-
-const team: TeamMember[] = [
-  {
-    name: 'Andrej Dortmann',
-    role: 'Frontend Engineer & team lead',
-    bio: 'Always ready to lend a hand and explain complex concepts. An excellent team lead and technical specialist.',
-    photoSrc: andrej,
-    githubUrl: 'https://github.com/FranticMario',
-    contribution: [
-      'commerce tools api',
-      'catalog page',
-      'login page',
-      'selection of tools',
-    ],
-  },
-  {
-    name: 'Elena Volkova',
-    role: 'Frontend Engineer',
-    bio: 'Great technical specialist delivering fast, high-quality, and cost-effective solutions.',
-    photoSrc: lena,
-    githubUrl: 'https://github.com/elena-v-volkova',
-    contribution: [
-      'product page',
-      'about page',
-      'structure project',
-      'selection of tools',
-    ],
-  },
-  {
-    name: 'Artsem Rogovenko',
-    role: 'Frontend Engineer',
-    bio: 'Highly responsible and deeply invested in the project’s success, with strong problem-solving and communication skills.',
-    photoSrc: artsem,
-    githubUrl: 'https://github.com/artsemrogovenko',
-    contribution: [
-      'main page',
-      'register page',
-      'cart page',
-      'linter settings',
-    ],
-  },
-];
-
-const TeamMemberCard: React.FC<TeamMember> = ({
-  name,
-  role,
-  bio,
-  photoSrc,
-  githubUrl,
-  contribution,
-}) => (
-  <Card className="flex flex-col items-center p-6">
-    <Avatar alt={name} className="mb-4 size-24" src={photoSrc} />
-    <h3 className="mb-1 text-center text-xl font-semibold">{name}</h3>
-    <p className="mb-2 text-center text-sm font-medium text-indigo-600">
-      {role}
-    </p>
-    <p className="mb-3 text-center text-gray-700 dark:text-gray-300">{bio}</p>
-    <h3 className="font-medium capitalize text-yellow-500">
-      contribution to development
-    </h3>
-    <div className="p-2 text-center font-semibold capitalize">
-      {contribution.map((value) => (
-        <p key={value}>{value}</p>
-      ))}
-    </div>
-    <Link
-      className="mt-auto font-semibold hover:underline"
-      href={githubUrl}
-      target="_blank"
-    >
-      View GitHub Profile
-    </Link>
-  </Card>
-);
+import { TeamMemberCard } from './TeamMemberCard';
+import { team } from './team';
 
 const AboutPage: React.FC = () => {
   return (
@@ -113,7 +27,7 @@ const AboutPage: React.FC = () => {
             craft a resilient, high-impact solution.
           </p>
           <Divider className="my-4" />
-          <div className="flex flex-col ">
+          <div className="flex flex-col">
             <h3 className="text-center font-semibold uppercase">
               Development tools
             </h3>
