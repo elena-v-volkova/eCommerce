@@ -185,18 +185,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
           .execute();
 
         setCart(updatedCart.body);
-      } catch (error: any) {
-        if (
-          error.code === 'ConcurrentModification' ||
-          error?.body?.errors?.[0]?.code === 'ConcurrentModification'
-        ) {
-          // Получаем актуальную версию корзины и пробуем снова
-          const latestCart = await getEndpoint().get().execute();
-
-          await tryAddItem(latestCart.body.version);
-        } else {
-          throw error;
-        }
+      } catch (error) {
+        throw error;
       }
     };
 
@@ -232,28 +222,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
           .execute();
 
         setCart(res.body);
-      } catch (error: any) {
-        const message =
-          error?.body?.errors?.[0]?.message?.toLowerCase?.() ?? '';
-
-        const isConcurrentModification =
-          error?.body?.errors?.[0]?.code === 'ConcurrentModification';
-
-        const isLineItemMissing =
-          message.includes('does not contain a line item with the id') ||
-          message.includes('no line item with id');
-
-        if (isConcurrentModification) {
-          const latestCart = await getEndpoint().get().execute();
-
-          await tryRemoveItem(latestCart.body.version);
-        } else if (isLineItemMissing) {
-          const latestCart = await getEndpoint().get().execute();
-
-          setCart(latestCart.body);
-        } else {
-          throw error;
-        }
+      } catch (error) {
+        throw error;
       }
     };
 
