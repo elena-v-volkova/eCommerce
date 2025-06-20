@@ -35,6 +35,7 @@ export function Header() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const width = useWindowWidth();
+  const RebuildingBoundary = 470;
 
   return (
     <Navbar
@@ -48,7 +49,7 @@ export function Header() {
           aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
           className="sm:hidden"
         />
-        {width > 470 && (
+        {width > RebuildingBoundary && (
           <NavbarBrand>
             <Link
               className="flex items-center gap-2"
@@ -147,14 +148,14 @@ export function Header() {
         <NavbarItem>
           <CartItem />
         </NavbarItem>
-        {width >= 470 && (
+        {width >= RebuildingBoundary && (
           <NavbarItem>
             <ThemeSwitch />
           </NavbarItem>
         )}
       </NavbarContent>
       <NavbarMenu>
-        {width <= 470 && (
+        {width <= RebuildingBoundary && (
           <div className="flex items-start gap-4">
             <NavbarBrand>
               <Logo />
@@ -176,7 +177,7 @@ export function Header() {
           </NavbarMenuItem>
         ))}
         <Divider />
-        {width < 470 && (
+        {width < RebuildingBoundary && (
           <div className="mt-2 flex gap-3 ">
             Theme
             <ThemeSwitch />
