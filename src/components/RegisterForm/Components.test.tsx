@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useForm } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import { describe, expect, it, vi } from 'vitest';
 
 import { PasswordInput } from '../PasswordInput';
@@ -75,22 +75,20 @@ describe('PasswordInput', () => {
 });
 
 function TestAddressFields() {
-  const {
-    register,
-    formState: { errors },
-    setValue,
-    trigger,
-  } = useForm<TRegisterFieldsSchema>();
+  const props = useForm<TRegisterFieldsSchema>();
 
   return (
-    <AddressFields
-      errors={errors}
-      prefix="address"
-      register={register}
-      setValue={setValue}
-      title="Shipping address"
-      trigger={trigger}
-    />
+    <FormProvider {...props}>
+      <AddressFields
+        control={props.control}
+        errors={props.formState.errors}
+        prefix="address"
+        register={props.register}
+        setValue={props.setValue}
+        title="Shipping address"
+        trigger={props.trigger}
+      />
+    </FormProvider>
   );
 }
 

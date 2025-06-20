@@ -19,7 +19,6 @@ In this project, our team of three people including the team leader works togeth
 7. React hook form
 8. Zod
 9. Swiper js
-10. React toast
 11. Jira
 12. Tailwind CSS
 13. HeroUI
