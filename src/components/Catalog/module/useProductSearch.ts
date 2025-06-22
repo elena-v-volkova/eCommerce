@@ -8,8 +8,6 @@ import {
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
 
-// Interfaces
-
 interface QueryArgs {
   limit: number;
   offset: number;
@@ -38,6 +36,7 @@ interface SearchParams {
 
 export interface ProductsSimpleNew {
   id: string;
+  variantId: number;
   name: string;
   slug: string;
   description: string;
@@ -218,6 +217,7 @@ const transformProducts = (
 
     return {
       id: product.id,
+      variantId: product.masterVariant.id,
       name:
         product.name['en-US'] ||
         product.name.en ||
@@ -290,7 +290,6 @@ const extractFilterOptions = (products: ProductProjection[]): FilterOptions => {
   };
 };
 
-// Custom Hook
 export const useProductSearch = () => {
   const [searchResult, setSearchResult] = useState<SearchResult>({
     products: [],

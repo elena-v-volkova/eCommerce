@@ -5,7 +5,6 @@ import Home from './pages/Home/HomePage';
 import Login from './pages/Login/LoginPage';
 import Register from './pages/Register/RegisterPage';
 import { RedirectIfAuthenticated } from './ProtectedRoute';
-import { RoootLayout } from './components/RootLayout/RoootLayout';
 import { CatalogPage } from './pages/Catalog/CatalogPage';
 import {
   DefaultProfileContent,
@@ -13,6 +12,8 @@ import {
   LogoutHandler,
 } from './pages/Profile/ProfilePage';
 import ProductPage from './pages/ProductPage/ProductPage';
+import { CartPage } from './pages/Cart/CartPage';
+import AboutPage from './pages/About/AboutPage';
 
 import { AppRoute } from '@/routes/appRoutes';
 import { PersonalContent } from '@/pages/Profile/PersonalContent';
@@ -21,9 +22,8 @@ import { PasswordUpdate } from '@/pages/Profile/PasswordUpdate';
 
 function App() {
   return (
-    // <Provider store={store}>
     <Routes>
-      <Route element={<RoootLayout />} path="/">
+      <Route path="/">
         <Route element={<Home />} path={AppRoute.home} />
         <Route
           element={
@@ -62,9 +62,10 @@ function App() {
         <Route element={<NotFound />} path={AppRoute.notFound} />
 
         <Route element={<ProductPage />} path={AppRoute.product} />
+        <Route element={<CartPage />} path={AppRoute.cart} />
+        <Route element={<AboutPage />} path={AppRoute.about} />
       </Route>
     </Routes>
-    // </Provider>
   );
 }
 export default App;

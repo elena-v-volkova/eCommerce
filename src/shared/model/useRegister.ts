@@ -1,5 +1,6 @@
-import toast from 'react-hot-toast';
 import { useState } from 'react';
+
+import { notifyToast } from '../store/Toast';
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
 import { MyCustomerDraft, ResponseError } from '@/types/commercetools';
@@ -26,13 +27,7 @@ function useRegister() {
           password: customerDraft.password,
         });
 
-        toast.success('Registration was successful!', {
-          duration: 5000,
-          style: {
-            fontSize: '1.25rem',
-            padding: '16px 24px',
-          },
-        });
+        notifyToast('Registration was successful!');
       })
       .catch((err) => {
         const loginError = err as ResponseError;

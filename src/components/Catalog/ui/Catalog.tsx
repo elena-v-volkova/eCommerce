@@ -36,6 +36,8 @@ import {
 import { SkeletonSidebar } from './SkeletonSidebar';
 import ProductCard from './ProductCard';
 
+import { useCart } from '@/shared/context/CartContext';
+
 interface FiltersState {
   priceRange: [number, number];
   brands: string[];
@@ -62,6 +64,8 @@ const Catalog = () => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [filters, setFilters] = useState<FiltersState>(DEFAULT_FILTERS);
   const [viewMode, setViewMode] = useState('grid');
+
+  const { cart, loading, addItem, removeItem } = useCart();
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { categories, isLoading: isLoadingCategories } =
@@ -116,7 +120,7 @@ const Catalog = () => {
     setSearchQuery('');
   }, []);
 
-  const handleSortChange = useCallback((keys: SharedSelection) => {
+  const handleSortChange = useCallback((keys: any) => {
     const selectedKey = Array.from(keys)[0];
 
     if (typeof selectedKey === 'string') {
@@ -142,7 +146,6 @@ const Catalog = () => {
     setFilters((prev) => ({ ...prev, priceRange }));
   }, []);
 
-  // Effects
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, selectedCategory, filters, sortBy, sortOrder]);
@@ -412,7 +415,7 @@ const Catalog = () => {
         {onClose && (
           <Button
             className="w-full"
-            color="primary" // Изменить цвет для лучшего выделения
+            color="primary"
             variant="solid"
             onPress={onClose}
           >
@@ -604,7 +607,11 @@ const Catalog = () => {
                   {currentProducts?.map((product) => (
                     <ProductCard
                       key={product.id}
+                      addItem={addItem}
+                      cart={cart}
+                      isLoading={loading}
                       product={product}
+                      removeItem={removeItem}
                       onClick={handleProductClick}
                     />
                   ))}
