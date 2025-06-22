@@ -40,6 +40,7 @@ export const team: TeamMember[] = [
     contribution: [
       'main page',
       'register page',
+      'profile page',
       'cart page',
       'linter settings',
     ],
