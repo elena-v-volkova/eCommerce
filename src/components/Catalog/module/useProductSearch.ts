@@ -8,8 +8,6 @@ import {
 
 import { apiAnonRoot } from '@/commercetools/anonUser';
 
-// Interfaces
-
 interface QueryArgs {
   limit: number;
   offset: number;
@@ -292,7 +290,6 @@ const extractFilterOptions = (products: ProductProjection[]): FilterOptions => {
   };
 };
 
-// Custom Hook
 export const useProductSearch = () => {
   const [searchResult, setSearchResult] = useState<SearchResult>({
     products: [],

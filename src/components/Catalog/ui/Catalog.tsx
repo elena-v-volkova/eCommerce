@@ -146,7 +146,6 @@ const Catalog = () => {
     setFilters((prev) => ({ ...prev, priceRange }));
   }, []);
 
-  // Effects
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, selectedCategory, filters, sortBy, sortOrder]);
@@ -416,7 +415,7 @@ const Catalog = () => {
         {onClose && (
           <Button
             className="w-full"
-            color="primary" // Изменить цвет для лучшего выделения
+            color="primary"
             variant="solid"
             onPress={onClose}
           >

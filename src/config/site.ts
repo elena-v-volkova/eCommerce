@@ -22,8 +22,4 @@ export const SITE_CONFIG = {
     { label: 'Login', href: '/login' },
     { label: 'Sign Up', href: '/register' },
   ],
-
-  links: {
-    docs: 'https://heroui.com',
-  },
 };

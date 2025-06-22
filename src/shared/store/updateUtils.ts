@@ -33,17 +33,10 @@ export const PERSONAL_DATA_ACTION = {
   }),
   setDateOfBirth: (dateOfBirth: DateValue): MyCustomerSetDateOfBirthAction => ({
     action: 'setDateOfBirth',
-    dateOfBirth: dateOfBirth.toString(), //formatDateForAPI(dateOfBirth),
+    dateOfBirth: dateOfBirth.toString(),
   }),
 };
 
-// function formatDateForAPI(date: DateValue): string {
-//   const year = date.year;
-//   const month = String(date.month + 1).padStart(2, '0');
-//   const day = String(date.day).padStart(2, '0');
-
-//   return `${year}-${month}-${day}`;
-// }
 //#endregion personal
 
 //#region address

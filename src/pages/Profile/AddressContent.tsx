@@ -154,7 +154,6 @@ function CardAddress({
           await unsetAddressTypes(initialValues, getValues(), addressId);
           customer = await editAddress(addressId, getValues());
         }
-        // reset( );
         resetError();
         if (isNewAddress) reset();
         setCreateMode(!value);
